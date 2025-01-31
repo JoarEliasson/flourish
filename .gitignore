@@ -143,3 +143,6 @@ replay_pid*
 
 # environment specific files #
 .env
+
+# documents folder
+documents/
