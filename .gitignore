@@ -1,5 +1,7 @@
 ### Intellij ###
 # Default ignored files
+.idea/
+.vscode/
 /shelf/
 /.idea/workspace.xml
 
