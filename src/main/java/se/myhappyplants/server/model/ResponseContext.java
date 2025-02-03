@@ -1,9 +1,9 @@
 package se.myhappyplants.server.model;
 
 import se.myhappyplants.server.model.ResponseHandlers.*;
-import se.myhappyplants.server.services.PlantRepository;
-import se.myhappyplants.server.services.UserPlantRepository;
-import se.myhappyplants.server.services.UserRepository;
+import se.myhappyplants.server.db.PlantRepository;
+import se.myhappyplants.server.db.UserPlantRepository;
+import se.myhappyplants.server.db.UserRepository;
 import se.myhappyplants.shared.MessageType;
 
 import java.util.HashMap;

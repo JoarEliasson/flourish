@@ -18,4 +18,7 @@ module se.myhappyplants {
     exports se.myhappyplants.server.services;
 
     opens se.myhappyplants.client.controller to javafx.fxml;
+  exports se.myhappyplants.server.config;
+    exports se.myhappyplants.server.db;
+  exports se.myhappyplants.server.db.refactored;
 }
