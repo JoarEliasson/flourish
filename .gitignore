@@ -4,6 +4,7 @@
 .vscode/
 /shelf/
 /.idea/workspace.xml
+/target/
 
 # Editor-based HTTP Client requests
 /httpRequests/
