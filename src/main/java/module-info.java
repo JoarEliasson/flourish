@@ -6,7 +6,6 @@ module se.myhappyplants {
     requires javafx.swing;
     requires javafx.web;
     requires com.google.gson;
-    requires com.microsoft.sqlserver.jdbc;
     requires java.sql;
     requires jbcrypt;
 
@@ -16,9 +15,8 @@ module se.myhappyplants {
     exports se.myhappyplants.server;
     exports se.myhappyplants.server.controller;
     exports se.myhappyplants.server.services;
+    exports se.myhappyplants.server.config;
+    exports se.myhappyplants.server.db;
 
     opens se.myhappyplants.client.controller to javafx.fxml;
-  exports se.myhappyplants.server.config;
-    exports se.myhappyplants.server.db;
-  exports se.myhappyplants.server.db.refactored;
 }

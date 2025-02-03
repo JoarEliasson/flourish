@@ -1,7 +1,7 @@
 package se.myhappyplants.server.model.ResponseHandlers;
 
-import se.myhappyplants.server.model.IResponseHandler;
 import se.myhappyplants.server.db.PlantRepository;
+import se.myhappyplants.server.model.IResponseHandler;
 import se.myhappyplants.shared.Message;
 import se.myhappyplants.shared.Plant;
 
@@ -22,7 +22,7 @@ public class Search implements IResponseHandler {
         Message response;
         String searchText = request.getMessageText();
         try {
-            ArrayList<Plant> plantList = plantRepository.getResult(searchText);
+            ArrayList<Plant> plantList = plantRepository.searchPlants(searchText);
             response = new Message(plantList, true);
         } catch (Exception e) {
             response = new Message(false);

@@ -1,12 +1,12 @@
 package se.myhappyplants.server.db;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import se.myhappyplants.shared.Plant;
 import se.myhappyplants.shared.PlantDetails;
 import se.myhappyplants.shared.WaterCalculator;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Repository class responsible for plant-related database operations.
@@ -15,8 +15,8 @@ import se.myhappyplants.shared.WaterCalculator;
  * and calculating watering frequency.
  * </p>
  *
- * @author  Joar Eliasson
- * @since   2025-02-03
+ * @author Joar Eliasson
+ * @since 2025-02-03
  */
 public class PlantRepository {
 
@@ -37,15 +37,14 @@ public class PlantRepository {
      * @param plantSearch the search string to match against plant names.
      * @return a list of matching Plant objects; an empty list if no matches are found.
      */
-    public List<Plant> searchPlants(String plantSearch) {
-        List<Plant> plantList = new ArrayList<>();
+    public ArrayList<Plant> searchPlants(String plantSearch) {
+        ArrayList<Plant> plantList = new ArrayList<>();
         String escapedSearch = escapeString(plantSearch);
         String query = "SELECT id, common_name, scientific_name, family, image_url FROM Species " +
-            "WHERE scientific_name LIKE '%" + escapedSearch + "%' " +
-            "OR common_name LIKE '%" + escapedSearch + "%';";
+                "WHERE scientific_name LIKE '%" + escapedSearch + "%' " +
+                "OR common_name LIKE '%" + escapedSearch + "%';";
         try (ResultSet resultSet = queryExecutor.executeQuery(query)) {
             while (resultSet.next()) {
-                // The species id is an integer; convert to String if needed.
                 String plantId = Integer.toString(resultSet.getInt("id"));
                 String commonName = resultSet.getString("common_name");
                 String scientificName = resultSet.getString("scientific_name");
@@ -55,7 +54,6 @@ public class PlantRepository {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // In production, consider throwing a custom exception.
         }
         return plantList;
     }
@@ -69,7 +67,7 @@ public class PlantRepository {
     public PlantDetails getPlantDetails(Plant plant) {
         PlantDetails plantDetails = null;
         String query = "SELECT genus, scientific_name, light, water_frequency, family FROM Species " +
-            "WHERE id = " + plant.getPlantId() + ";";
+                "WHERE id = " + plant.getPlantId() + ";";
         try (ResultSet resultSet = queryExecutor.executeQuery(query)) {
             if (resultSet.next()) {
                 String genus = resultSet.getString("genus");

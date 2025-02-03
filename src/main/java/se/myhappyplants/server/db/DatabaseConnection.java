@@ -6,8 +6,8 @@ import java.sql.SQLException;
 /**
  * Defines the contract for a database connection.
  *
- * @author  Joar Eliasson
- * @since   2025-02-03
+ * @author Joar Eliasson
+ * @since 2025-02-03
  */
 public interface DatabaseConnection {
     /**

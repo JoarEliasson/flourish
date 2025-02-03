@@ -1,10 +1,11 @@
 package se.myhappyplants.server.db;
 
+import org.mindrot.jbcrypt.BCrypt;
+import se.myhappyplants.shared.User;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.mindrot.jbcrypt.BCrypt;
-import se.myhappyplants.shared.User;
 
 /**
  * Repository class responsible for user-related database operations.
@@ -38,7 +39,7 @@ public class UserRepository {
         String email = escapeString(user.getEmail());
         // Insert into "Users" (note: auto-generated id and timestamp fields are handled by the DB)
         String query = "INSERT INTO Users (username, email, password, notification_activated, fun_facts_activated) " +
-            "VALUES ('" + username + "', '" + email + "', '" + hashedPassword + "', 1, 1);";
+                "VALUES ('" + username + "', '" + email + "', '" + hashedPassword + "', 1, 1);";
         try {
             queryExecutor.executeUpdate(query);
             return true;
@@ -78,7 +79,7 @@ public class UserRepository {
     public User getUserDetails(String email) {
         String safeEmail = escapeString(email);
         String query = "SELECT id, username, notification_activated, fun_facts_activated FROM Users " +
-            "WHERE email = '" + safeEmail + "';";
+                "WHERE email = '" + safeEmail + "';";
         try (ResultSet resultSet = queryExecutor.executeQuery(query)) {
             if (resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -115,11 +116,9 @@ public class UserRepository {
             }
             int userId = resultSet.getInt("id");
 
-            // First, delete all plants belonging to the user.
             String deletePlantsQuery = "DELETE FROM Plants WHERE user_id = " + userId + ";";
             transactionStmt.executeUpdate(deletePlantsQuery);
 
-            // Then, delete the user record.
             String deleteUserQuery = "DELETE FROM Users WHERE id = " + userId + ";";
             transactionStmt.executeUpdate(deleteUserQuery);
 
@@ -147,7 +146,7 @@ public class UserRepository {
         String safeEmail = escapeString(user.getEmail());
         int notificationsValue = notifications ? 1 : 0;
         String query = "UPDATE Users SET notification_activated = " + notificationsValue +
-            " WHERE email = '" + safeEmail + "';";
+                " WHERE email = '" + safeEmail + "';";
         try {
             queryExecutor.executeUpdate(query);
             return true;
@@ -168,7 +167,7 @@ public class UserRepository {
         String safeEmail = escapeString(user.getEmail());
         int funFactsValue = funFactsEnabled ? 1 : 0;
         String query = "UPDATE Users SET fun_facts_activated = " + funFactsValue +
-            " WHERE email = '" + safeEmail + "';";
+                " WHERE email = '" + safeEmail + "';";
         try {
             queryExecutor.executeUpdate(query);
             return true;

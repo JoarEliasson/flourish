@@ -1,12 +1,13 @@
 package se.myhappyplants.server.db;
 
+import se.myhappyplants.shared.Plant;
+import se.myhappyplants.shared.User;
+
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
-import se.myhappyplants.shared.Plant;
-import se.myhappyplants.shared.User;
 
 /**
  * Repository class responsible for handling user plant library operations.
@@ -14,8 +15,8 @@ import se.myhappyplants.shared.User;
  * Provides methods to save, retrieve, update, and delete plants from a user's library.
  * </p>
  *
- * @author  Joar Eliasson
- * @since   2025-02-03
+ * @author Joar Eliasson
+ * @since 2025-02-03
  */
 public class UserPlantRepository {
 
@@ -42,10 +43,9 @@ public class UserPlantRepository {
      */
     public boolean savePlant(User user, Plant plant) {
         String safeNickname = escapeString(plant.getNickname());
-        // Note: The column "plant_id" has been renamed to "species_id" in our new design.
         String query = "INSERT INTO Plants (user_id, nickname, species_id, last_watered, image_url) " +
-            "VALUES (" + user.getUniqueId() + ", '" + safeNickname + "', " + plant.getPlantId() +
-            ", '" + plant.getLastWatered() + "', '" + plant.getImageURL() + "');";
+                "VALUES (" + user.getUniqueId() + ", '" + safeNickname + "', " + plant.getPlantId() +
+                ", '" + plant.getLastWatered() + "', '" + plant.getImageURL() + "');";
         try {
             queryExecutor.executeUpdate(query);
             return true;
@@ -61,10 +61,10 @@ public class UserPlantRepository {
      * @param user the user whose plant library is to be retrieved.
      * @return a list of Plant objects representing the user's library.
      */
-    public List<Plant> getUserLibrary(User user) {
-        List<Plant> plantList = new ArrayList<>();
+    public ArrayList<Plant> getUserLibrary(User user) {
+        ArrayList<Plant> plantList = new ArrayList<>();
         String query = "SELECT nickname, species_id, last_watered, image_url FROM Plants " +
-            "WHERE user_id = " + user.getUniqueId() + ";";
+                "WHERE user_id = " + user.getUniqueId() + ";";
         try (ResultSet resultSet = queryExecutor.executeQuery(query)) {
             while (resultSet.next()) {
                 String nickname = resultSet.getString("nickname");
@@ -72,7 +72,7 @@ public class UserPlantRepository {
                 LocalDate lastWatered = resultSet.getDate("last_watered").toLocalDate();
                 String imageURL = resultSet.getString("image_url");
                 long waterFrequency = plantRepository.getWaterFrequency(plantId);
-                Plant plant = new Plant(nickname, plantId, lastWatered, waterFrequency, imageURL);
+                Plant plant = new Plant(nickname, plantId, Date.valueOf(lastWatered), waterFrequency, imageURL);
                 plantList.add(plant);
             }
         } catch (SQLException e) {
@@ -91,14 +91,14 @@ public class UserPlantRepository {
     public Plant getPlant(User user, String nickname) {
         String safeNickname = escapeString(nickname);
         String query = "SELECT nickname, species_id, last_watered, image_url FROM Plants " +
-            "WHERE user_id = " + user.getUniqueId() + " AND nickname = '" + safeNickname + "';";
+                "WHERE user_id = " + user.getUniqueId() + " AND nickname = '" + safeNickname + "';";
         try (ResultSet resultSet = queryExecutor.executeQuery(query)) {
             if (resultSet.next()) {
                 String plantId = Integer.toString(resultSet.getInt("species_id"));
                 LocalDate lastWatered = resultSet.getDate("last_watered").toLocalDate();
                 String imageURL = resultSet.getString("image_url");
                 long waterFrequency = plantRepository.getWaterFrequency(plantId);
-                return new Plant(safeNickname, plantId, lastWatered, waterFrequency, imageURL);
+                return new Plant(safeNickname, plantId, Date.valueOf(lastWatered), waterFrequency, imageURL);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -116,7 +116,7 @@ public class UserPlantRepository {
     public boolean deletePlant(User user, String nickname) {
         String safeNickname = escapeString(nickname);
         String query = "DELETE FROM Plants WHERE user_id = " + user.getUniqueId() +
-            " AND nickname = '" + safeNickname + "';";
+                " AND nickname = '" + safeNickname + "';";
         try {
             queryExecutor.executeUpdate(query);
             return true;
@@ -137,7 +137,7 @@ public class UserPlantRepository {
     public boolean changeLastWatered(User user, String nickname, LocalDate date) {
         String safeNickname = escapeString(nickname);
         String query = "UPDATE Plants SET last_watered = '" + date.toString() + "' " +
-            "WHERE user_id = " + user.getUniqueId() + " AND nickname = '" + safeNickname + "';";
+                "WHERE user_id = " + user.getUniqueId() + " AND nickname = '" + safeNickname + "';";
         try {
             queryExecutor.executeUpdate(query);
             return true;
@@ -159,7 +159,7 @@ public class UserPlantRepository {
         String safeNickname = escapeString(nickname);
         String safeNewNickname = escapeString(newNickname);
         String query = "UPDATE Plants SET nickname = '" + safeNewNickname + "' " +
-            "WHERE user_id = " + user.getUniqueId() + " AND nickname = '" + safeNickname + "';";
+                "WHERE user_id = " + user.getUniqueId() + " AND nickname = '" + safeNickname + "';";
         try {
             queryExecutor.executeUpdate(query);
             return true;
@@ -178,7 +178,7 @@ public class UserPlantRepository {
     public boolean changeAllToWatered(User user) {
         LocalDate today = LocalDate.now();
         String query = "UPDATE Plants SET last_watered = '" + today.toString() + "' " +
-            "WHERE user_id = " + user.getUniqueId() + ";";
+                "WHERE user_id = " + user.getUniqueId() + ";";
         try {
             queryExecutor.executeUpdate(query);
             return true;
@@ -198,7 +198,7 @@ public class UserPlantRepository {
     public boolean changePlantPicture(User user, Plant plant) {
         String safeNickname = escapeString(plant.getNickname());
         String query = "UPDATE Plants SET image_url = '" + plant.getImageURL() + "' " +
-            "WHERE user_id = " + user.getUniqueId() + " AND nickname = '" + safeNickname + "';";
+                "WHERE user_id = " + user.getUniqueId() + " AND nickname = '" + safeNickname + "';";
         try {
             queryExecutor.executeUpdate(query);
             return true;

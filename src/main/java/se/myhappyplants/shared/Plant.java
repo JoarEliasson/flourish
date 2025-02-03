@@ -10,7 +10,7 @@ import java.time.LocalDate;
  * Class defining a plant
  * Created by: Frida Jacobsson
  * Updated by: Linn Borgström, Eric Simonson, Susanne Vikström
- *
+ * <p>
  * Refactored by: Joar Eliasson
  * Date: 2025-02-03
  * Added constructor for plant object from MyHappyPlants database
