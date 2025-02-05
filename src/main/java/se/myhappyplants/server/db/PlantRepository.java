@@ -1,10 +1,12 @@
 package se.myhappyplants.server.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import se.myhappyplants.api.TrefleApiClient;
 import se.myhappyplants.shared.Plant;
 import se.myhappyplants.shared.PlantDetails;
 import se.myhappyplants.shared.WaterCalculator;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,14 +26,17 @@ public class PlantRepository {
 
     private final QueryExecutor queryExecutor;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final TrefleApiClient apiClient;
 
     /**
      * Constructs a PlantRepository with the specified QueryExecutor.
      *
      * @param queryExecutor the QueryExecutor to use for database operations.
+     * @param apiClient the TrefleApiClient to use for API operations.
      */
-    public PlantRepository(QueryExecutor queryExecutor) {
+    public PlantRepository(QueryExecutor queryExecutor, TrefleApiClient apiClient) {
         this.queryExecutor = queryExecutor;
+        this.apiClient = apiClient;
     }
 
     /**
@@ -67,7 +72,8 @@ public class PlantRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        plantList.removeIf(plant -> plant.getCommonName() == null);
+        plantList.removeIf(plant -> plant.getCommonName() == null || plant.getCommonName().isEmpty() ||
+                plant.getCommonName().equals("null"));
         return plantList;
     }
 
@@ -77,9 +83,8 @@ public class PlantRepository {
      * @param plant the Plant object for which to retrieve details.
      * @return a PlantDetails object containing detailed information, or null if not found.
      */
-    //TODO: Refactor to retrieve from API
     public PlantDetails getPlantDetails(Plant plant) {
-        PlantDetails plantDetails = null;
+        PlantDetails plantDetails = getPlantDetailsFromApi(plant.getSpeciesId());
         String query = "SELECT genus, scientific_name, light, water_frequency, family " +
                 "FROM Species WHERE id = " + plant.getSpeciesId() + ";";
         try (ResultSet resultSet = queryExecutor.executeQuery(query)) {
@@ -99,6 +104,21 @@ public class PlantRepository {
             e.printStackTrace();
         }
         return plantDetails;
+    }
+
+    /**
+     * Retrieves detailed plant information for the species with the given id by calling the Trefle API.
+     *
+     * @param speciesId the species id.
+     * @return a PlantDetails object with detailed information, or null if an error occurs.
+     */
+    public PlantDetails getPlantDetailsFromApi(int speciesId) {
+        try {
+            return apiClient.fetchPlantDetails(speciesId);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**

@@ -1,5 +1,7 @@
 package se.myhappyplants.server;
 
+import se.myhappyplants.api.ApiConfig;
+import se.myhappyplants.api.TrefleApiClient;
 import se.myhappyplants.server.controller.ResponseController;
 import se.myhappyplants.server.db.*;
 import se.myhappyplants.server.services.Server;
@@ -27,7 +29,7 @@ public class ServerApplication {
             QueryExecutor queryExecutor = new DefaultQueryExecutor(connection);
 
             UserRepository userRepository = new UserRepository(queryExecutor);
-            PlantRepository plantRepository = new PlantRepository(queryExecutor);
+            PlantRepository plantRepository = new PlantRepository(queryExecutor, new TrefleApiClient(ApiConfig.TREFLE_API_TOKEN));
             UserPlantRepository userPlantRepository = new UserPlantRepository(queryExecutor, plantRepository);
 
             ResponseController responseController = new ResponseController(userRepository, userPlantRepository, plantRepository);

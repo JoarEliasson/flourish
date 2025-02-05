@@ -4,8 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
+/**
+ * PlantObj represents a plant species object from the Trefle API.
+ * <p>
+ * The object contains fields for the plant's ID, common name, scientific name, genus, family,
+ * image URL, and synonyms.
+ * <p>
+ * @author  Joar Eliasson
+ * @since   2025-02-04
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PlantObj {
+public class PlantDto {
     private int id;
 
     @JsonProperty("common_name")
@@ -22,7 +31,6 @@ public class PlantObj {
 
     private List<String> synonyms;
 
-    // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

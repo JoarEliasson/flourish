@@ -14,12 +14,14 @@ import java.util.List;
  * TreflePlantSyncRunner is responsible for synchronizing plant species data
  * from the Trefle API into the local database. It fetches data one page at a time,
  * tracks progress, and uses additional delays so that API rate limits are not exceeded.
+ * <p>
+ * @author  Joar Eliasson
+ * @since   2025-02-04
  */
 public class TreflePlantSyncRunner {
     private final TrefleApiClient apiClient;
     private final PlantRepository plantRepository;
 
-    // Progress tracking variables.
     private int totalPlantsFetched = 0;
     private int totalPlantsInserted = 0;
 
@@ -34,12 +36,11 @@ public class TreflePlantSyncRunner {
      */
     public void runSync() {
         try {
-            List<PlantObj> allPlantObjs = apiClient.fetchAllPlants();
-            totalPlantsFetched = allPlantObjs.size();
+            List<PlantDto> allPlantDtos = apiClient.fetchAllPlants();
+            totalPlantsFetched = allPlantDtos.size();
 
-            for (PlantObj pObj : allPlantObjs) {
+            for (PlantDto pObj : allPlantDtos) {
                 if (!plantRepository.speciesExists(pObj.getId())) {
-                    // Convert API response to the domain model.
                     Plant plant = new Plant(
                             pObj.getId(),
                             pObj.getCommonName(),
@@ -47,7 +48,7 @@ public class TreflePlantSyncRunner {
                             pObj.getGenus(),
                             pObj.getFamily(),
                             pObj.getImageUrl(),
-                            pObj.getSynonyms() // List<String> synonyms
+                            pObj.getSynonyms()
                     );
                     plantRepository.insertSpecies(plant);
                     totalPlantsInserted++;
@@ -70,14 +71,11 @@ public class TreflePlantSyncRunner {
      */
     public static void main(String[] args) {
         try {
-            // Create the API client using the token from configuration.
             TrefleApiClient apiClient = new TrefleApiClient(ApiConfig.TREFLE_API_TOKEN);
-            // Initialize database connection and repository.
             MySQLDatabaseConnection connection = MySQLDatabaseConnection.getInstance();
             QueryExecutor queryExecutor = new DefaultQueryExecutor(connection);
-            PlantRepository plantRepository = new PlantRepository(queryExecutor);
+            PlantRepository plantRepository = new PlantRepository(queryExecutor, apiClient);
 
-            // Create and run the sync runner.
             TreflePlantSyncRunner syncRunner = new TreflePlantSyncRunner(apiClient, plantRepository);
             syncRunner.runSync();
         } catch (SQLException e) {

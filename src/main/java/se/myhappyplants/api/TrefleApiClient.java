@@ -6,6 +6,7 @@ import se.myhappyplants.server.db.MySQLDatabaseConnection;
 import se.myhappyplants.server.db.PlantRepository;
 import se.myhappyplants.server.db.QueryExecutor;
 import se.myhappyplants.shared.Plant;
+import se.myhappyplants.shared.PlantDetails;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,8 +15,17 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * TrefleApiClient is a client for the Trefle API, which provides plant species data.
+ * <p>
+ * The client can fetch one page of plant data, fetch all plant data, and fetch a page of data
+ * from a specified URL. It also provides a main method for testing the integration of API retrieval
+ * and database insertion.
+ * <p>
+ * @author  Joar Eliasson
+ * @since   2025-02-04
+ */
 public class TrefleApiClient {
 
     public static final String BASE_URL = "https://trefle.io";
@@ -34,6 +44,35 @@ public class TrefleApiClient {
         this.objectMapper = new ObjectMapper();
     }
 
+
+    /**
+     * Retrieves detailed data for a plant species from Trefle.
+     *
+     * @param speciesId the unique species identifier.
+     * @return a PlantDetails object containing detailed information.
+     * @throws IOException if an I/O error occurs.
+     * @throws InterruptedException if the request is interrupted.
+     */
+    public PlantDetails fetchPlantDetails(int speciesId) throws IOException, InterruptedException {
+        String url = String.format("%s/api/v1/plants/%d?token=%s", BASE_URL, speciesId, apiToken);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) {
+            throw new IOException("Failed to fetch plant details, status code: " + response.statusCode());
+        }
+        PlantDetailsResponse detailsResponse = objectMapper.readValue(response.body(), PlantDetailsResponse.class);
+        PlantDetailsDto dto = detailsResponse.getData();
+
+        String genusName = (dto.getGenus() != null) ? dto.getGenus().getName() : null;
+        String familyName = (dto.getFamily() != null) ? dto.getFamily().getName() : null;
+
+        return new PlantDetails(genusName, dto.getScientificName(), dto.getLight(), dto.getWaterFrequency(), familyName);
+    }
+
     /**
      * Fetches one page of plant data from the Trefle API.
      *
@@ -41,7 +80,7 @@ public class TrefleApiClient {
      * @throws IOException if an I/O error occurs.
      * @throws InterruptedException if the request is interrupted.
      */
-    public List<PlantObj> fetchOnePage() throws IOException, InterruptedException {
+    public List<PlantDto> fetchOnePage() throws IOException, InterruptedException {
         String url = String.format("%s/api/v1/plants?token=%s", BASE_URL, apiToken);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -51,7 +90,7 @@ public class TrefleApiClient {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            TrefleApiResponse apiResponse = objectMapper.readValue(response.body(), TrefleApiResponse.class);
+            PlantDataResponse apiResponse = objectMapper.readValue(response.body(), PlantDataResponse.class);
             return apiResponse.getData();
         } else {
             throw new IOException("Failed to fetch page, status code: " + response.statusCode());
@@ -66,16 +105,15 @@ public class TrefleApiClient {
      * @throws IOException if an I/O error occurs.
      * @throws InterruptedException if the request is interrupted.
      */
-    public List<PlantObj> fetchAllPlants() throws IOException, InterruptedException {
+    public List<PlantDto> fetchAllPlants() throws IOException, InterruptedException {
         String currentUrl = String.format("%s/api/v1/plants?token=%s", BASE_URL, apiToken);
-        List<PlantObj> allPlants = new ArrayList<>();
+        List<PlantDto> allPlants = new ArrayList<>();
         int requestCount = 0;
         long periodStartTime = System.currentTimeMillis();
         final int REQUEST_THRESHOLD = 100;
         final long ONE_MINUTE_MS = 60000;
 
         while (currentUrl != null) {
-            // Enforce rate limiting
             if (requestCount >= REQUEST_THRESHOLD) {
                 long elapsed = System.currentTimeMillis() - periodStartTime;
                 if (elapsed < ONE_MINUTE_MS) {
@@ -105,13 +143,12 @@ public class TrefleApiClient {
                 break;
             }
 
-            TrefleApiResponse apiResponse = objectMapper.readValue(response.body(), TrefleApiResponse.class);
+            PlantDataResponse apiResponse = objectMapper.readValue(response.body(), PlantDataResponse.class);
             if (apiResponse.getData() != null) {
                 allPlants.addAll(apiResponse.getData());
             }
             System.out.println("Progress: " + allPlants.size() + " plants retrieved so far...");
 
-            // Determine the next URL:
             if (apiResponse.getLinks() != null && apiResponse.getLinks().containsKey("next")) {
                 String nextUrl = apiResponse.getLinks().get("next");
                 if (nextUrl != null && !nextUrl.isEmpty()) {
@@ -128,13 +165,11 @@ public class TrefleApiClient {
             } else {
                 currentUrl = null;
             }
-            // Gentle delay between pages.
             Thread.sleep(1000);
         }
         System.out.println("Total plants retrieved: " + allPlants.size());
         return allPlants;
     }
-
 
     /**
      * Fetches a page of data from the specified URL and returns the parsed API response.
@@ -144,7 +179,7 @@ public class TrefleApiClient {
      * @throws IOException if an I/O error occurs.
      * @throws InterruptedException if the request is interrupted.
      */
-    public TrefleApiResponse fetchPageResponse(String url) throws IOException, InterruptedException {
+    public PlantDataResponse fetchPageResponse(String url) throws IOException, InterruptedException {
         java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                 .uri(java.net.URI.create(url))
                 .GET()
@@ -152,7 +187,7 @@ public class TrefleApiClient {
 
         java.net.http.HttpResponse<String> response = httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() == 200) {
-            return objectMapper.readValue(response.body(), TrefleApiResponse.class);
+            return objectMapper.readValue(response.body(), PlantDataResponse.class);
         } else if (response.statusCode() == 429) {
             System.out.println("API rate limit reached. Waiting 10 seconds before retrying...");
             Thread.sleep(10000);
@@ -161,7 +196,6 @@ public class TrefleApiClient {
             throw new IOException("Failed to fetch page, status code: " + response.statusCode());
         }
     }
-
 
     /**
      * Returns the Trefle API token.
@@ -179,22 +213,17 @@ public class TrefleApiClient {
      */
     public static void main(String[] args) {
         try {
-            // Instantiate the API client using the token from configuration.
             TrefleApiClient apiClient = new TrefleApiClient(ApiConfig.TREFLE_API_TOKEN);
 
-            // Fetch one page of plant species data from the Trefle API.
-            List<PlantObj> plantObjs = apiClient.fetchOnePage();
-            System.out.println("Retrieved " + plantObjs.size() + " plant species from the API (one page).");
+            List<PlantDto> plantDtos = apiClient.fetchOnePage();
+            System.out.println("Retrieved " + plantDtos.size() + " plant species from the API (one page).");
 
-            // Set up the database connection and repository.
             MySQLDatabaseConnection connection = MySQLDatabaseConnection.getInstance();
             QueryExecutor queryExecutor = new DefaultQueryExecutor(connection);
-            PlantRepository plantRepository = new PlantRepository(queryExecutor);
+            PlantRepository plantRepository = new PlantRepository(queryExecutor, apiClient);
 
-            // Process each plant species from the API response.
-            for (PlantObj pObj : plantObjs) {
+            for (PlantDto pObj : plantDtos) {
                 if (!plantRepository.speciesExists(pObj.getId())) {
-                    // Convert API response to domain model.
                     Plant plant = new Plant(
                             pObj.getId(),
                             pObj.getCommonName(),
@@ -204,7 +233,6 @@ public class TrefleApiClient {
                             pObj.getImageUrl(),
                             pObj.getSynonyms()
                     );
-                    // Insert the new species into the database.
                     plantRepository.insertSpecies(plant);
                     System.out.println("Inserted new species: " + plant);
                 } else {

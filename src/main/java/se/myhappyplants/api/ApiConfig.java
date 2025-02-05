@@ -6,6 +6,9 @@ import java.util.Properties;
 
 /**
  * Loads API configuration values from the .env file in the project root.
+ *
+ * @author  Joar Eliasson
+ * @since   2025-02-04
  */
 public final class ApiConfig {
 

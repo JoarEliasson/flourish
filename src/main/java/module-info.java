@@ -20,6 +20,7 @@ module se.myhappyplants {
     exports se.myhappyplants.server.config;
     exports se.myhappyplants.server.db;
     exports se.myhappyplants.api;
+    exports se.myhappyplants.shared;
 
     opens se.myhappyplants.client.controller to javafx.fxml;
     opens se.myhappyplants.api to com.fasterxml.jackson.databind;
