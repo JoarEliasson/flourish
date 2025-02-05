@@ -32,24 +32,24 @@
                 <ImageView fitHeight="300.0" fitWidth="105.0" layoutX="632.0" layoutY="121.0" pickOnBounds="true"
                            preserveRatio="true">
                     <image>
-                        <Image url="@../../../../Blommor/blomma15.1.png"/>
+                        <Image url="@../../../../images/flowers/blomma15.1.png"/>
                     </image>
                 </ImageView>
                 <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="229.0" layoutY="94.0" pickOnBounds="true"
                            preserveRatio="true">
                     <image>
-                        <Image url="@../../../../Blommor/blomma13.1.png"/>
+                        <Image url="@../../../../images/flowers/blomma13.1.png"/>
                     </image>
                 </ImageView>
                 <ImageView fitHeight="130.0" fitWidth="116.0" layoutX="430.0" layoutY="168.0" pickOnBounds="true"
                            preserveRatio="true">
                     <image>
-                        <Image url="@../../../../Blommor/login.png"/>
+                        <Image url="@../../../../images/flowers/login.png"/>
                     </image>
                 </ImageView>
                 <ImageView fitHeight="170.0" fitWidth="250.0" layoutX="334.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../Blommor/Logotyp.png"/>
+                        <Image url="@../../../../images/flowers/Logotyp.png"/>
                     </image>
                 </ImageView>
             </children>

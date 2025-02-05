@@ -12,9 +12,7 @@ CREATE TABLE `Species` (
                            `family` VARCHAR(255) NOT NULL,
                            `common_name` VARCHAR(255) DEFAULT NULL,
                            `image_url` VARCHAR(500) DEFAULT NULL,
-                           `light` VARCHAR(255) DEFAULT NULL,
-                           `url_wikipedia_en` VARCHAR(500) DEFAULT NULL,
-                           `water_frequency` INT DEFAULT NULL,
+                           `synonyms` JSON DEFAULT NULL,
                            PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

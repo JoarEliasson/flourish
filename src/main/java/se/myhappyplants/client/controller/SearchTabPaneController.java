@@ -118,7 +118,7 @@ public class SearchTabPaneController {
     private void showResultsOnPane() {
         ObservableList<SearchPlantPane> searchPlantPanes = FXCollections.observableArrayList();
         for (Plant plant : searchResults) {
-            searchPlantPanes.add(new SearchPlantPane(this, ImageLibrary.getLoadingImageFile().toURI().toString(), plant));
+            searchPlantPanes.add(new SearchPlantPane(this, ImageLibrary.getPlusSign(), plant));
         }
         listViewResult.getItems().clear();
         listViewResult.setItems(searchPlantPanes);
@@ -131,12 +131,12 @@ public class SearchTabPaneController {
                         for (SearchPlantPane spp : searchPlantPanes) {
                             Plant Plant = spp.getPlant();
                             if (Plant.getImageURL().equals("")) {
-                                spp.setDefaultImage(ImageLibrary.getDefaultPlantImage().toURI().toString());
+                                spp.setDefaultImage(ImageLibrary.getDefaultPlantImage());
                             } else {
                                 try {
                                     spp.updateImage();
                                 } catch (IllegalArgumentException e) {
-                                    spp.setDefaultImage(ImageLibrary.getDefaultPlantImage().toURI().toString());
+                                    spp.setDefaultImage(ImageLibrary.getDefaultPlantImage());
                                 }
                             }
                             updateProgress(i++, searchPlantPanes.size());
@@ -178,7 +178,7 @@ public class SearchTabPaneController {
                         Platform.runLater(() -> listViewResult.getItems().clear());
                         return;
                     }
-                    Platform.runLater(() -> showResultsOnPane());
+                    Platform.runLater(this::showResultsOnPane);
                 }
             } else {
                 Platform.runLater(() -> MessageBox.display(BoxTitle.Error, "The connection to the server has failed. Check your connection and try again."));

@@ -6,8 +6,10 @@ module se.myhappyplants {
     requires javafx.swing;
     requires javafx.web;
     requires com.google.gson;
-    requires java.sql;
     requires jbcrypt;
+    requires com.fasterxml.jackson.databind;
+    requires java.net.http;
+    requires java.sql;
 
     exports se.myhappyplants.client.controller;
     exports se.myhappyplants.client.model;
@@ -17,6 +19,8 @@ module se.myhappyplants {
     exports se.myhappyplants.server.services;
     exports se.myhappyplants.server.config;
     exports se.myhappyplants.server.db;
+    exports se.myhappyplants.api;
 
     opens se.myhappyplants.client.controller to javafx.fxml;
+    opens se.myhappyplants.api to com.fasterxml.jackson.databind;
 }

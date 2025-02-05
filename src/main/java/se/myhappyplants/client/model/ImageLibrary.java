@@ -1,42 +1,57 @@
 package se.myhappyplants.client.model;
 
 import javafx.scene.image.Image;
-
-import java.io.File;
+import java.net.URL;
 
 /**
- * Container class for the images
+ * Container class for the images.
+ * <p>
+ * This version loads images from the classpath using getResource().
+ * If a resource is not found, it falls back to an online placeholder image.
+ * </p>
  */
 public class ImageLibrary {
 
-    private static final Image plusSign = new Image("Blommor/plusSign.png");
-    private static final File loadingImageFile = new File("resources/images/img.png");
-    private static final File defaultPlantImageFile = new File("resources/images/Grn_vxt.png");
+    private static final Image plusSign;
+    private static final Image loadingImage;
+    private static final Image defaultPlantImage;
+
+    static {
+        plusSign = loadImage("/images/plusSign.png");       // file name exactly as in resources
+        loadingImage = loadImage("/images/img.png");
+        defaultPlantImage = loadImage("/images/Grn_vxt.png");
+    }
 
     /**
-     * Getter method to the plus sign image
+     * Loads an image from the classpath using the given resource path.
      *
-     * @return Image
+     * @param resourcePath the resource path (e.g. "/images/plusSign.png")
+     * @return a JavaFX Image
      */
+    private static Image loadImage(String resourcePath) {
+        URL resourceUrl = ImageLibrary.class.getResource(resourcePath);
+        if (resourceUrl == null) {
+            System.err.println("Resource not found: " + resourcePath);
+            // Fallback to an online placeholder image
+            return new Image("https://via.placeholder.com/150");
+        }
+        try {
+            return new Image(resourceUrl.toExternalForm());
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error loading image from: " + resourcePath + ". " + e.getMessage());
+            return new Image("https://via.placeholder.com/150");
+        }
+    }
+
     public static Image getPlusSign() {
         return plusSign;
     }
 
-    /**
-     * Getter method to the loading image
-     *
-     * @return Image
-     */
-    public static File getLoadingImageFile() {
-        return loadingImageFile;
+    public static Image getLoadingImage() {
+        return loadingImage;
     }
 
-    /**
-     * Getter method to the default plant image
-     *
-     * @return File
-     */
-    public static File getDefaultPlantImage() {
-        return defaultPlantImageFile;
+    public static Image getDefaultPlantImage() {
+        return defaultPlantImage;
     }
 }

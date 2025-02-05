@@ -37,7 +37,6 @@ public class UserRepository {
         String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
         String username = escapeString(user.getUsername());
         String email = escapeString(user.getEmail());
-        // Insert into "Users" (note: auto-generated id and timestamp fields are handled by the DB)
         String query = "INSERT INTO Users (username, email, password, notification_activated, fun_facts_activated) " +
                 "VALUES ('" + username + "', '" + email + "', '" + hashedPassword + "', 1, 1);";
         try {

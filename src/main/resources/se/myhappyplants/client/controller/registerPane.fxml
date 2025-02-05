@@ -31,23 +31,23 @@
                         onAction="#registerButtonPressed" styleClass="defaultButton" text="Sign up"/>
                 <ImageView fitHeight="113.0" fitWidth="97.0" layoutX="587.0" layoutY="57.0" pickOnBounds="true"
                            preserveRatio="true">
-                    <Image url="@../../../../Blommor/blomma11.1.png"/>
+                    <Image url="@../../../../images/flowers/blomma11.1.png"/>
                 </ImageView>
                 <ImageView fitHeight="209.0" fitWidth="150.0" layoutX="153.0" layoutY="307.0" pickOnBounds="true"
                            preserveRatio="true">
-                    <Image url="@../../../../Blommor/blomma8.1.png"/>
+                    <Image url="@../../../../images/flowers/blomma8.1.png"/>
                 </ImageView>
                 <ImageView fitHeight="104.0" fitWidth="108.0" layoutX="111.0" layoutY="230.0" pickOnBounds="true"
                            preserveRatio="true">
-                    <Image url="@../../../../Blommor/vattenkanna1.png"/>
+                    <Image url="@../../../../images/flowers/vattenkanna1.png"/>
                 </ImageView>
                 <ImageView fitHeight="42.0" fitWidth="38.0" layoutX="196.0" layoutY="306.0" pickOnBounds="true"
                            preserveRatio="true" rotate="-20.6">
-                    <Image url="@../../../../Blommor/vattenproppe2.png"/>
+                    <Image url="@../../../../images/flowers/vattenproppe2.png"/>
                 </ImageView>
                 <ImageView fitHeight="35.0" fitWidth="29.0" layoutX="198.0" layoutY="291.0" pickOnBounds="true"
                            preserveRatio="true" rotate="-26.6">
-                    <Image url="@../../../../Blommor/vattenproppe2.png"/>
+                    <Image url="@../../../../images/flowers/vattenproppe2.png"/>
                     <rotationAxis>
                         <Point3D x="1.0" y="1.0" z="1.0"/>
                     </rotationAxis>
@@ -59,12 +59,12 @@
                 <ImageView fitHeight="135.0" fitWidth="130.0" layoutX="428.0" layoutY="129.0" pickOnBounds="true"
                            preserveRatio="true">
                     <image>
-                        <Image url="@../../../../Blommor/register.png"/>
+                        <Image url="@../../../../images/flowers/register.png"/>
                     </image>
                 </ImageView>
                 <ImageView fitHeight="139.0" fitWidth="228.0" layoutX="351.0" layoutY="7.0">
                     <image>
-                        <Image url="@../../../../Blommor/Logotyp.png"/>
+                        <Image url="@../../../../images/flowers/Logotyp.png"/>
                     </image>
                 </ImageView>
             </children>

@@ -44,7 +44,7 @@ public class UserPlantRepository {
     public boolean savePlant(User user, Plant plant) {
         String safeNickname = escapeString(plant.getNickname());
         String query = "INSERT INTO Plants (user_id, nickname, species_id, last_watered, image_url) " +
-                "VALUES (" + user.getUniqueId() + ", '" + safeNickname + "', " + plant.getPlantId() +
+                "VALUES (" + user.getUniqueId() + ", '" + safeNickname + "', " + plant.getSpeciesId() +
                 ", '" + plant.getLastWatered() + "', '" + plant.getImageURL() + "');";
         try {
             queryExecutor.executeUpdate(query);
@@ -72,8 +72,13 @@ public class UserPlantRepository {
                 LocalDate lastWatered = resultSet.getDate("last_watered").toLocalDate();
                 String imageURL = resultSet.getString("image_url");
                 long waterFrequency = plantRepository.getWaterFrequency(plantId);
-                Plant plant = new Plant(nickname, plantId, Date.valueOf(lastWatered), waterFrequency, imageURL);
-                plantList.add(plant);
+                int waterFrequencyInt = (int) waterFrequency;
+                try {
+                    int speciesId = Integer.parseInt(plantId);
+                    plantList.add(new Plant(speciesId, nickname, lastWatered, waterFrequencyInt, imageURL));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -98,7 +103,9 @@ public class UserPlantRepository {
                 LocalDate lastWatered = resultSet.getDate("last_watered").toLocalDate();
                 String imageURL = resultSet.getString("image_url");
                 long waterFrequency = plantRepository.getWaterFrequency(plantId);
-                return new Plant(safeNickname, plantId, Date.valueOf(lastWatered), waterFrequency, imageURL);
+                int waterFrequencyInt = (int) waterFrequency;
+                int speciesId = Integer.parseInt(plantId);
+                return new Plant(speciesId, safeNickname, lastWatered, waterFrequencyInt, imageURL);
             }
         } catch (SQLException e) {
             e.printStackTrace();

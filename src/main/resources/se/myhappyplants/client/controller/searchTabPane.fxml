@@ -19,7 +19,7 @@
                 <ImageView fitHeight="79.0" fitWidth="125.0" layoutX="770.0" layoutY="-1.0" pickOnBounds="true"
                            preserveRatio="true">
                     <image>
-                        <Image url="@../../../../Blommor/Logotyp.png"/>
+                        <Image url="@../../../../images/flowers/Logotyp.png"/>
                     </image>
                 </ImageView>
             </children>
@@ -49,13 +49,13 @@
                 <ImageView fitHeight="96.0" fitWidth="114.0" layoutX="14.0" layoutY="32.0" pickOnBounds="true"
                            preserveRatio="true">
                     <image>
-                        <Image url="@../../../../Blommor/results.png"/>
+                        <Image url="@../../../../images/flowers/results.png"/>
                     </image>
                 </ImageView>
                 <ImageView fx:id="imgFunFactTitle" fitHeight="108.0" fitWidth="134.0" layoutX="786.0" layoutY="26.0"
                            pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../Blommor/funfacts.png"/>
+                        <Image url="@../../../../images/flowers/funfacts.png"/>
                     </image>
                 </ImageView>
                 <TextField fx:id="txtNbrOfResults" editable="false" style="-fx-background-color: transparent"
