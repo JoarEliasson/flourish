@@ -8,6 +8,8 @@ module se.myhappyplants {
     requires com.google.gson;
     requires java.sql;
     requires jbcrypt;
+    requires mysql.connector.j;
+    requires java.mail;
 
     exports se.myhappyplants.client.controller;
     exports se.myhappyplants.client.model;
