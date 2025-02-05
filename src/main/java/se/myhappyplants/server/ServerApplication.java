@@ -29,8 +29,9 @@ public class ServerApplication {
             UserRepository userRepository = new UserRepository(queryExecutor);
             PlantRepository plantRepository = new PlantRepository(queryExecutor);
             UserPlantRepository userPlantRepository = new UserPlantRepository(queryExecutor, plantRepository);
+            PasswordResetTokenRepository tokenRepository = new PasswordResetTokenRepository(queryExecutor);
 
-            ResponseController responseController = new ResponseController(userRepository, userPlantRepository, plantRepository);
+            ResponseController responseController = new ResponseController(userRepository, userPlantRepository, plantRepository, tokenRepository);
 
             Server server = new Server(2555, responseController);
             server.run();

@@ -77,7 +77,7 @@ public class SettingsTabPaneController {
     @FXML
     public void changeNotificationsSetting() {
         Thread changeNotificationsThread = new Thread(() -> {
-            Message notificationRequest = new Message(MessageType.changeNotifications, tglBtnChangeNotification.isSelected(), LoggedInUser.getInstance().getUser());
+            Message notificationRequest = new Message(MessageType.CHANGE_NOTIFICATIONS, tglBtnChangeNotification.isSelected(), LoggedInUser.getInstance().getUser());
             ServerConnection connection = ServerConnection.getClientConnection();
             Message notificationResponse = connection.makeRequest(notificationRequest);
             if (notificationResponse != null) {
@@ -104,7 +104,7 @@ public class SettingsTabPaneController {
     @FXML
     public void changeFunFactsSetting() {
         Thread changeFunFactsThread = new Thread(() -> {
-            Message changeFunFactsRequest = new Message(MessageType.changeFunFacts, tglBtnChangeFunFacts.isSelected(), LoggedInUser.getInstance().getUser());
+            Message changeFunFactsRequest = new Message(MessageType.CHANGE_FUN_FACTS, tglBtnChangeFunFacts.isSelected(), LoggedInUser.getInstance().getUser());
             ServerConnection connection = ServerConnection.getClientConnection();
             Message funFactsResponse = connection.makeRequest(changeFunFactsRequest);
             if (funFactsResponse != null) {
@@ -134,7 +134,7 @@ public class SettingsTabPaneController {
         int answer = MessageBox.askYesNo(BoxTitle.Delete, "Are you sure you want to delete your account?");
         if (answer == 1) {
             Thread deleteAccountThread = new Thread(() -> {
-                Message deleteMessage = new Message(MessageType.deleteAccount, new User(LoggedInUser.getInstance().getUser().getEmail(), passFldDeleteAccount.getText()));
+                Message deleteMessage = new Message(MessageType.DELETE_ACCOUNT, new User(LoggedInUser.getInstance().getUser().getEmail(), passFldDeleteAccount.getText()));
                 ServerConnection connection = ServerConnection.getClientConnection();
                 Message deleteResponse = connection.makeRequest(deleteMessage);
                 if (deleteResponse != null) {

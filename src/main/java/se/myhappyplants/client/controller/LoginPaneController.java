@@ -1,7 +1,6 @@
 package se.myhappyplants.client.controller;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -73,7 +72,7 @@ public class LoginPaneController {
     @FXML
     private void loginButtonPressed() {
         Thread loginThread = new Thread(() -> {
-            Message loginMessage = new Message(MessageType.login, new User(txtFldEmail.getText(), passFldPassword.getText()));
+            Message loginMessage = new Message(MessageType.LOGIN, new User(txtFldEmail.getText(), passFldPassword.getText()));
             ServerConnection connection = ServerConnection.getClientConnection();
             Message loginResponse = connection.makeRequest(loginMessage);
 

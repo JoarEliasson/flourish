@@ -7,8 +7,11 @@ import java.util.ArrayList;
 /**
  * Class that can be used for communication between Client/Server
  * Client/Server via TCP
- * Created by: Christopher O'Driscoll
- * Updated by: Linn Borgström 2021-05-13
+ * <p>
+ * Updated with new constructors and methods
+ * @author Joar Eliasson
+ * @since 2025-02-05
+ * </p>
  */
 public class Message implements Serializable {
 
@@ -22,7 +25,8 @@ public class Message implements Serializable {
     private Plant plant;
     private String newNickname;
     private PlantDetails plantDetails;
-
+    private String token;
+    private String newPassword;
 
     /**
      * create a message that can be used to send a boolean value
@@ -160,6 +164,18 @@ public class Message implements Serializable {
         this.success = success;
     }
 
+    /**
+     * Creates a message that can be used to send
+     * a boolean value and a text
+     *
+     * @param mailSent
+     * @param messageText
+     */
+    public Message(boolean mailSent, String messageText) {
+        this.success = mailSent;
+        this.messageText = messageText;
+    }
+
     public String getNewNickname() {
         return newNickname;
     }
@@ -199,4 +215,13 @@ public class Message implements Serializable {
     public PlantDetails getPlantDetails() {
         return plantDetails;
     }
+
+    public String getToken() {
+        return token;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
 }

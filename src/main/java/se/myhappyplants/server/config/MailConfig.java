@@ -30,6 +30,7 @@ public class MailConfig {
     public static final String MAIL_PASSWORD = properties.getProperty("MAIL_PASSWORD");
     public static final String MAIL_SMTP_AUTH = properties.getProperty("MAIL_AUTH");
     public static final String MAIL_SMTP_SSL_ENABLE = properties.getProperty("MAIL_SMTP_SSL_ENABLE");
+    public static final String MAIL_AUTH_PASSWORD = properties.getProperty("MAIL_AUTH_PASSWORD");
 
     private MailConfig() {
     }

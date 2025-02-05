@@ -3,6 +3,7 @@ USE db_mysql_g1_da489a;
 DROP TABLE IF EXISTS `Plants`;
 DROP TABLE IF EXISTS `Users`;
 DROP TABLE IF EXISTS `Species`;
+DROP TABLE IF EXISTS `PasswordReset`;
 
 -- Species table
 CREATE TABLE `Species` (
@@ -49,4 +50,16 @@ CREATE TABLE `Plants` (
                           KEY `IX_Plants_species_id` (`species_id`),
                           CONSTRAINT `FK_Plants_Users` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`),
                           CONSTRAINT `FK_Plants_Species` FOREIGN KEY (`species_id`) REFERENCES `Species` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- PasswordReset table
+CREATE TABLE `PasswordReset` (
+                                `id` INT NOT NULL AUTO_INCREMENT,
+                                `user_id` INT NOT NULL,
+                                `token` VARCHAR(255) NOT NULL,
+                                `expires_at` DATETIME NOT NULL,
+                                `used` BOOLEAN NOT NULL DEFAULT 0,
+                                `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                PRIMARY KEY (`id`),
+                                CONSTRAINT `FK_PasswordReset_Users` FOREIGN KEY (`user_id`) REFERENCES `Users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

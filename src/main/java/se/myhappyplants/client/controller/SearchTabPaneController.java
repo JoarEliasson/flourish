@@ -163,7 +163,7 @@ public class SearchTabPaneController {
         txtFldSearchText.addToHistory();
         PopupBox.display(MessageText.holdOnGettingInfo.toString());
         Thread searchThread = new Thread(() -> {
-            Message apiRequest = new Message(MessageType.search, txtFldSearchText.getText());
+            Message apiRequest = new Message(MessageType.SEARCH, txtFldSearchText.getText());
             ServerConnection connection = ServerConnection.getClientConnection();
             Message apiResponse = connection.makeRequest(apiRequest);
 
@@ -201,7 +201,7 @@ public class SearchTabPaneController {
     public PlantDetails getPlantDetails(Plant plant) {
         PopupBox.display(MessageText.holdOnGettingInfo.toString());
         PlantDetails plantDetails = null;
-        Message getInfoSearchedPlant = new Message(MessageType.getMorePlantInfo, plant);
+        Message getInfoSearchedPlant = new Message(MessageType.GET_MORE_PLANT_INFO, plant);
         ServerConnection connection = ServerConnection.getClientConnection();
         Message response = connection.makeRequest(getInfoSearchedPlant);
         if (response != null) {
