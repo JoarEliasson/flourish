@@ -41,12 +41,13 @@ public class ForgotPasswordPaneController {
 
     @FXML
     private void switchToMainPane() throws IOException {
-        StartClient.setRoot(String.valueOf(RootName.mainPane));
+        ClientApplication.setRoot(String.valueOf(RootName.mainPane));
+
     }
 
     public void swapToLogin(MouseEvent mouseEvent) {
         try {
-            StartClient.setRoot(RootName.loginPane.toString());
+            ClientApplication.setRoot(RootName.loginPane.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }

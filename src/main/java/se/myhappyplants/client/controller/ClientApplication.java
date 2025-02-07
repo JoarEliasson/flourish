@@ -13,14 +13,12 @@ import se.myhappyplants.client.view.JResourceManager;
 import java.io.IOException;
 
 /**
- * JavaFX Application Main class
- * If javaFX not installed, execute maven goals:
- * 1.  mvn javafx:compile
- * 2.  mvn javafx:run
- * Created by: Christopher O'Driscoll, Eric Simonsson
- * Updated by: Linn Borgström, 2021-05-13
+ * Class that starts the client application.
+ * <p>
+ * @author  Joar Eliasson
+ * @since   2025-02-07
  */
-public class StartClient extends Application {
+public class ClientApplication extends Application {
 
     private static Scene scene;
     private static Stage window;
@@ -47,7 +45,7 @@ public class StartClient extends Application {
      * @throws IOException
      */
     private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(StartClient.class.getResource(fxml + ".fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource(fxml + ".fxml"));
         return fxmlLoader.load();
     }
 

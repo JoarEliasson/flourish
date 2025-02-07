@@ -44,7 +44,7 @@ public class UserPlantRepository {
     public boolean savePlant(User user, Plant plant) {
         String safeNickname = escapeString(plant.getNickname());
         String query = "INSERT INTO Plants (user_id, nickname, species_id, last_watered, image_url) " +
-                "VALUES (" + user.getUniqueId() + ", '" + safeNickname + "', " + plant.getPlantId() +
+                "VALUES (" + user.getUniqueId() + ", '" + safeNickname + "', " + plant.getSpeciesId() +
                 ", '" + plant.getLastWatered() + "', '" + plant.getImageURL() + "');";
         try {
             queryExecutor.executeUpdate(query);
@@ -71,9 +71,22 @@ public class UserPlantRepository {
                 String plantId = Integer.toString(resultSet.getInt("species_id"));
                 LocalDate lastWatered = resultSet.getDate("last_watered").toLocalDate();
                 String imageURL = resultSet.getString("image_url");
+                /*
+
+                Currently no data exists for water frequency
+                A default value of 7 is used for now
+
                 long waterFrequency = plantRepository.getWaterFrequency(plantId);
-                Plant plant = new Plant(nickname, plantId, Date.valueOf(lastWatered), waterFrequency, imageURL);
-                plantList.add(plant);
+                int waterFrequencyInt = (int) waterFrequency;
+
+                 */
+                try {
+                    int waterFrequencyInt = 7;
+                    int speciesId = Integer.parseInt(plantId);
+                    plantList.add(new Plant(speciesId, nickname, lastWatered, waterFrequencyInt, imageURL));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -97,8 +110,11 @@ public class UserPlantRepository {
                 String plantId = Integer.toString(resultSet.getInt("species_id"));
                 LocalDate lastWatered = resultSet.getDate("last_watered").toLocalDate();
                 String imageURL = resultSet.getString("image_url");
-                long waterFrequency = plantRepository.getWaterFrequency(plantId);
-                return new Plant(safeNickname, plantId, Date.valueOf(lastWatered), waterFrequency, imageURL);
+                // see comment in getUserLibrary method above
+                // long waterFrequency = plantRepository.getWaterFrequency(plantId);
+                int waterFrequencyInt = 7;
+                int speciesId = Integer.parseInt(plantId);
+                return new Plant(speciesId, safeNickname, lastWatered, waterFrequencyInt, imageURL);
             }
         } catch (SQLException e) {
             e.printStackTrace();

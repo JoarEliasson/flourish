@@ -103,7 +103,7 @@ public class LoginPaneController {
      */
     @FXML
     private void switchToMainPane() throws IOException {
-        StartClient.setRoot(String.valueOf(RootName.mainPane));
+        ClientApplication.setRoot(String.valueOf(RootName.mainPane));
     }
 
     /**
@@ -111,7 +111,7 @@ public class LoginPaneController {
      */
     public void swapToRegister() {
         try {
-            StartClient.setRoot(RootName.registerPane.toString());
+            ClientApplication.setRoot(RootName.registerPane.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -120,7 +120,8 @@ public class LoginPaneController {
 
     public void swapToForgotPassword() {
         try {
-            StartClient.setRoot(RootName.forgotPasswordPane.toString());
+            ClientApplication.setRoot(RootName.forgotPasswordPane.toString());
+
         } catch (IOException e) {
             e.printStackTrace();
         }

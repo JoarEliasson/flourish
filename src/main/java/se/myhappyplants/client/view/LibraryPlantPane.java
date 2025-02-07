@@ -168,7 +168,7 @@ public class LibraryPlantPane extends Pane implements PlantPane {
         this.lastWateredLabel = new Label();
         lastWateredLabel.setLayoutY(226);
         lastWateredLabel.setLayoutX(10);
-        Date lastWateredDate = plant.getLastWatered();
+        LocalDate lastWateredDate = plant.getLastWatered();
         lastWateredLabel.setText("Last watered: " + lastWateredDate.toString());
     }
 

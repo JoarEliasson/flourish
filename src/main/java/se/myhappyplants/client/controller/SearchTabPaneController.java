@@ -118,37 +118,37 @@ public class SearchTabPaneController {
     private void showResultsOnPane() {
         ObservableList<SearchPlantPane> searchPlantPanes = FXCollections.observableArrayList();
         for (Plant plant : searchResults) {
-            searchPlantPanes.add(new SearchPlantPane(this, ImageLibrary.getLoadingImageFile().toURI().toString(), plant));
+            searchPlantPanes.add(new SearchPlantPane(this, ImageLibrary.getPlusSign(), plant));
         }
         listViewResult.getItems().clear();
         listViewResult.setItems(searchPlantPanes);
 
         Task getImagesTask =
-                new Task() {
-                    @Override
-                    protected Object call() {
-                        long i = 1;
-                        for (SearchPlantPane spp : searchPlantPanes) {
-                            Plant Plant = spp.getPlant();
-                            if (Plant.getImageURL().equals("")) {
-                                spp.setDefaultImage(ImageLibrary.getDefaultPlantImage().toURI().toString());
-                            } else {
-                                try {
-                                    spp.updateImage();
-                                } catch (IllegalArgumentException e) {
-                                    spp.setDefaultImage(ImageLibrary.getDefaultPlantImage().toURI().toString());
-                                }
+            new Task() {
+                @Override
+                protected Object call() {
+                    long i = 1;
+                    for (SearchPlantPane spp : searchPlantPanes) {
+                        Plant Plant = spp.getPlant();
+                        if (Plant.getImageURL().equals("")) {
+                            spp.setDefaultImage(ImageLibrary.getDefaultPlantImage());
+                        } else {
+                            try {
+                                spp.updateImage();
+                            } catch (IllegalArgumentException e) {
+                                spp.setDefaultImage(ImageLibrary.getDefaultPlantImage());
                             }
-                            updateProgress(i++, searchPlantPanes.size());
                         }
-                        Text text = (Text) progressIndicator.lookup(".percentage");
-                        if (text.getText().equals("90%") || text.getText().equals("Done")) {
-                            text.setText("Done");
-                            progressIndicator.setPrefWidth(text.getLayoutBounds().getWidth());
-                        }
-                        return true;
+                        updateProgress(i++, searchPlantPanes.size());
                     }
-                };
+                    Text text = (Text) progressIndicator.lookup(".percentage");
+                    if (text.getText().equals("90%") || text.getText().equals("Done")) {
+                        text.setText("Done");
+                        progressIndicator.setPrefWidth(text.getLayoutBounds().getWidth());
+                    }
+                    return true;
+                }
+            };
         Thread imageThread = new Thread(getImagesTask);
         progressIndicator.progressProperty().bind(getImagesTask.progressProperty());
         imageThread.start();
@@ -178,7 +178,7 @@ public class SearchTabPaneController {
                         Platform.runLater(() -> listViewResult.getItems().clear());
                         return;
                     }
-                    Platform.runLater(() -> showResultsOnPane());
+                    Platform.runLater(this::showResultsOnPane);
                 }
             } else {
                 Platform.runLater(() -> MessageBox.display(BoxTitle.Error, "The connection to the server has failed. Check your connection and try again."));

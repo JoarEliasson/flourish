@@ -208,7 +208,8 @@ public class MyPlantsTabPaneController {
         long currentDateMilli = System.currentTimeMillis();
         Date date = new Date(currentDateMilli);
         String imageURL = PictureRandomizer.getRandomPictureURL();
-        Plant plantToAdd = new Plant(uniqueNickName, selectedPlant.getPlantId(), date, imageURL);
+        //int strng localdate String
+        Plant plantToAdd = new Plant(selectedPlant.getSpeciesId(), uniqueNickName, selectedPlant.getLastWatered(), selectedPlant.getWaterFrequencyDays(), imageURL);
         PopupBox.display(MessageText.sucessfullyAddPlant.toString());
         addPlantToDB(plantToAdd);
     }
@@ -396,7 +397,7 @@ public class MyPlantsTabPaneController {
                     Files.delete(newPictureFile.toPath());
                     Files.copy(selectedImage.toPath(), newPictureFile.toPath());
                 }
-                lpp.getPlant().setImageURL(newPictureFile.toURI().toURL().toString());
+                lpp.getPlant().setCustomImageURL(newPictureFile.toURI().toString());
                 lpp.updateImage();
                 Thread changePlantPictureThread = new Thread(() -> {
                     Message changePlantPicture = new Message(MessageType.CHANGE_PLANT_PICTURE, LoggedInUser.getInstance().getUser(), lpp.getPlant());

@@ -71,7 +71,7 @@ public class MainPaneController {
             e.printStackTrace();
         }
         LoggedInUser.getInstance().setUser(null);
-        StartClient.setRoot(String.valueOf(RootName.loginPane));
+        ClientApplication.setRoot(String.valueOf(RootName.loginPane));
     }
 
     /**
