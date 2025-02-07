@@ -42,6 +42,7 @@ public class ForgotPasswordPaneController {
     @FXML
     private void switchToMainPane() throws IOException {
         ClientApplication.setRoot(String.valueOf(RootName.mainPane));
+
     }
 
     public void swapToLogin(MouseEvent mouseEvent) {

@@ -121,6 +121,7 @@ public class LoginPaneController {
     public void swapToForgotPassword() {
         try {
             ClientApplication.setRoot(RootName.forgotPasswordPane.toString());
+
         } catch (IOException e) {
             e.printStackTrace();
         }
