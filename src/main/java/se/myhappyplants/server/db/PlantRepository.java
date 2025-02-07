@@ -49,9 +49,9 @@ public class PlantRepository {
         ArrayList<Plant> plantList = new ArrayList<>();
         String escapedSearch = escapeString(plantSearch);
         String query = "SELECT id, common_name, scientific_name, genus, family, image_url, synonyms " +
-                "FROM Species " +
-                "WHERE scientific_name LIKE '%" + escapedSearch + "%' " +
-                "OR common_name LIKE '%" + escapedSearch + "%';";
+            "FROM Species " +
+            "WHERE scientific_name LIKE '%" + escapedSearch + "%' " +
+            "OR common_name LIKE '%" + escapedSearch + "%';";
         try (ResultSet resultSet = queryExecutor.executeQuery(query)) {
             while (resultSet.next()) {
                 int speciesId = resultSet.getInt("id");
@@ -64,7 +64,7 @@ public class PlantRepository {
                 List<String> synonyms = null;
                 if (synonymsJson != null) {
                     synonyms = objectMapper.readValue(synonymsJson,
-                            objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
+                        objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
                 }
                 Plant plant = new Plant(speciesId, commonName, scientificName, genus, family, imageUrl, synonyms);
                 plantList.add(plant);
@@ -73,7 +73,7 @@ public class PlantRepository {
             e.printStackTrace();
         }
         plantList.removeIf(plant -> plant.getCommonName() == null || plant.getCommonName().isEmpty() ||
-                plant.getCommonName().equals("null"));
+            plant.getCommonName().equals("null"));
         return plantList;
     }
 
@@ -85,18 +85,16 @@ public class PlantRepository {
      */
     public PlantDetails getPlantDetails(Plant plant) {
         PlantDetails plantDetails = getPlantDetailsFromApi(plant.getSpeciesId());
-        String query = "SELECT genus, scientific_name, light, water_frequency, family " +
-                "FROM Species WHERE id = " + plant.getSpeciesId() + ";";
+        String query = "SELECT genus, scientific_name, family " +
+            "FROM Species WHERE id = " + plant.getSpeciesId() + ";";
         try (ResultSet resultSet = queryExecutor.executeQuery(query)) {
             if (resultSet.next()) {
                 String genus = resultSet.getString("genus");
                 String scientificName = resultSet.getString("scientific_name");
-                String lightText = resultSet.getString("light");
-                String waterText = resultSet.getString("water_frequency");
                 String family = resultSet.getString("family");
 
-                int light = isNumeric(lightText) ? Integer.parseInt(lightText) : -1;
-                int water = isNumeric(waterText) ? Integer.parseInt(waterText) : -1;
+                int light = -1;
+                int water = -1;
 
                 plantDetails = new PlantDetails(genus, scientificName, light, water, family);
             }
@@ -157,10 +155,10 @@ public class PlantRepository {
             e.printStackTrace();
         }
         String query = "INSERT INTO Species (id, scientific_name, genus, family, common_name, image_url, synonyms) " +
-                "VALUES (" + plant.getSpeciesId() + ", '" + escapeString(plant.getScientificName()) + "', '" +
-                escapeString(plant.getGenus()) + "', '" + escapeString(plant.getFamily()) + "', '" +
-                escapeString(plant.getCommonName()) + "', '" + escapeString(plant.getImageURL()) + "', " +
-                (synonymsJson != null ? "'" + escapeString(synonymsJson) + "'" : "NULL") + ");";
+            "VALUES (" + plant.getSpeciesId() + ", '" + escapeString(plant.getScientificName()) + "', '" +
+            escapeString(plant.getGenus()) + "', '" + escapeString(plant.getFamily()) + "', '" +
+            escapeString(plant.getCommonName()) + "', '" + escapeString(plant.getImageURL()) + "', " +
+            (synonymsJson != null ? "'" + escapeString(synonymsJson) + "'" : "NULL") + ");";
         queryExecutor.executeUpdate(query);
     }
 
@@ -190,7 +188,7 @@ public class PlantRepository {
      */
     public Plant getSpeciesById(int speciesId) {
         String query = "SELECT id, common_name, scientific_name, genus, family, image_url, synonyms " +
-                "FROM Species WHERE id = " + speciesId + ";";
+            "FROM Species WHERE id = " + speciesId + ";";
         try (ResultSet resultSet = queryExecutor.executeQuery(query)) {
             if (resultSet.next()) {
                 String commonName = resultSet.getString("common_name");
@@ -205,7 +203,7 @@ public class PlantRepository {
                 List<String> synonyms = null;
                 if (synonymsJson != null) {
                     synonyms = objectMapper.readValue(synonymsJson,
-                            objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
+                        objectMapper.getTypeFactory().constructCollectionType(List.class, String.class));
                 }
                 return new Plant(speciesId, commonName, scientificName, genus, family, imageUrl, synonyms);
             }

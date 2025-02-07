@@ -185,4 +185,15 @@ public class UserRepository {
     private String escapeString(String input) {
         return input == null ? null : input.replace("'", "''");
     }
+
+    public boolean updateUserPassword(int userId, String hashedPassword) {
+        String query = "UPDATE Users SET password = '" + hashedPassword + "' WHERE id = " + userId + ";";
+        try {
+            queryExecutor.executeUpdate(query);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

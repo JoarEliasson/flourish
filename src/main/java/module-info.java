@@ -10,6 +10,8 @@ module se.myhappyplants {
     requires com.fasterxml.jackson.databind;
     requires java.net.http;
     requires java.sql;
+    requires mysql.connector.j;
+    requires java.mail;
 
     exports se.myhappyplants.client.controller;
     exports se.myhappyplants.client.model;
@@ -24,4 +26,5 @@ module se.myhappyplants {
 
     opens se.myhappyplants.client.controller to javafx.fxml;
     opens se.myhappyplants.api to com.fasterxml.jackson.databind;
+    
 }

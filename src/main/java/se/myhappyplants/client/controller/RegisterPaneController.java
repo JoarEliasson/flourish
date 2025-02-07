@@ -40,7 +40,7 @@ public class RegisterPaneController {
     @FXML
     public void initialize() {
         verifier = new Verifier();
-        goBackIcon.setFocusTraversable(true); //sets the goback button on focus to remove from first textfield
+        goBackIcon.setFocusTraversable(false);
     }
 
     @FXML
@@ -52,7 +52,7 @@ public class RegisterPaneController {
                 if (!verifiedRegistration) {
                     return;
                 }
-                Message registerRequest = new Message(MessageType.register, new User(txtFldNewEmail.getText(), txtFldNewUsername.getText(), passFldNewPassword.getText(), true));
+                Message registerRequest = new Message(MessageType.REGISTER, new User(txtFldNewEmail.getText(), txtFldNewUsername.getText(), passFldNewPassword.getText(), true));
                 ServerConnection connection = ServerConnection.getClientConnection();
                 Message registerResponse = connection.makeRequest(registerRequest);
 
@@ -80,12 +80,12 @@ public class RegisterPaneController {
 
     @FXML
     private void switchToMainPane() throws IOException {
-        StartClient.setRoot(String.valueOf(RootName.mainPane));
+        ClientApplication.setRoot(String.valueOf(RootName.mainPane));
     }
 
     public void swapToLogin(MouseEvent mouseEvent) {
         try {
-            StartClient.setRoot(RootName.loginPane.toString());
+            ClientApplication.setRoot(RootName.loginPane.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }

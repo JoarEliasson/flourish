@@ -1,8 +1,8 @@
 package se.myhappyplants.client.controller;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -28,12 +28,17 @@ import java.io.IOException;
  */
 public class LoginPaneController {
 
-    @FXML
-    public Hyperlink registerLink;
+
     @FXML
     private TextField txtFldEmail;
     @FXML
     private PasswordField passFldPassword;
+    @FXML
+    public Button btnLogin;
+    @FXML
+    public Button btnForgotPassword;
+    @FXML
+    public Hyperlink registerLink;
 
 
     /**
@@ -67,7 +72,7 @@ public class LoginPaneController {
     @FXML
     private void loginButtonPressed() {
         Thread loginThread = new Thread(() -> {
-            Message loginMessage = new Message(MessageType.login, new User(txtFldEmail.getText(), passFldPassword.getText()));
+            Message loginMessage = new Message(MessageType.LOGIN, new User(txtFldEmail.getText(), passFldPassword.getText()));
             ServerConnection connection = ServerConnection.getClientConnection();
             Message loginResponse = connection.makeRequest(loginMessage);
 
@@ -98,21 +103,26 @@ public class LoginPaneController {
      */
     @FXML
     private void switchToMainPane() throws IOException {
-        StartClient.setRoot(String.valueOf(RootName.mainPane));
+        ClientApplication.setRoot(String.valueOf(RootName.mainPane));
     }
 
     /**
      * Method to switch to the registerPane
-     *
-     * @param actionEvent
      */
-    public void swapToRegister(ActionEvent actionEvent) {
+    public void swapToRegister() {
         try {
-            StartClient.setRoot(RootName.registerPane.toString());
+            ClientApplication.setRoot(RootName.registerPane.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
 
+    public void swapToForgotPassword() {
+        try {
+            ClientApplication.setRoot(RootName.forgotPasswordPane.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

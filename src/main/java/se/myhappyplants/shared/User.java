@@ -118,4 +118,5 @@ public class User implements Serializable {
     public void setFunFactsActivated(boolean funFactsActivated) {
         this.funFactsActivated = funFactsActivated;
     }
+
 }

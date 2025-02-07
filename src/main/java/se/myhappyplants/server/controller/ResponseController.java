@@ -1,5 +1,6 @@
 package se.myhappyplants.server.controller;
 
+import se.myhappyplants.server.db.PasswordResetTokenRepository;
 import se.myhappyplants.server.db.PlantRepository;
 import se.myhappyplants.server.db.UserPlantRepository;
 import se.myhappyplants.server.db.UserRepository;
@@ -17,11 +18,12 @@ import java.io.IOException;
  */
 
 public class ResponseController {
+
     private ResponseContext responseContext;
 
 
-    public ResponseController(UserRepository userRepository, UserPlantRepository userPlantRepository, PlantRepository plantRepository) {
-        responseContext = new ResponseContext(userRepository, userPlantRepository, plantRepository);
+    public ResponseController(UserRepository userRepository, UserPlantRepository userPlantRepository, PlantRepository plantRepository, PasswordResetTokenRepository tokenRepository) {
+        responseContext = new ResponseContext(userRepository, userPlantRepository, plantRepository, tokenRepository);
     }
 
     /**

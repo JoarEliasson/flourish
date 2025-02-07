@@ -151,7 +151,7 @@ public class MyPlantsTabPaneController {
     @FXML
     public void createCurrentUserLibraryFromDB() {
         Thread getLibraryThread = new Thread(() -> {
-            Message getLibrary = new Message(MessageType.getLibrary, LoggedInUser.getInstance().getUser());
+            Message getLibrary = new Message(MessageType.GET_LIBRARY, LoggedInUser.getInstance().getUser());
             ServerConnection connection = ServerConnection.getClientConnection();
             Message response = connection.makeRequest(getLibrary);
 
@@ -177,7 +177,7 @@ public class MyPlantsTabPaneController {
         Thread removePlantThread = new Thread(() -> {
             currentUserLibrary.remove(plant);
             addCurrentUserLibraryToHomeScreen();
-            Message deletePlant = new Message(MessageType.deletePlant, LoggedInUser.getInstance().getUser(), plant);
+            Message deletePlant = new Message(MessageType.DELETE_PLANT, LoggedInUser.getInstance().getUser(), plant);
             ServerConnection connection = ServerConnection.getClientConnection();
             Message response = connection.makeRequest(deletePlant);
 
@@ -206,9 +206,10 @@ public class MyPlantsTabPaneController {
             }
         }
         long currentDateMilli = System.currentTimeMillis();
-        LocalDate date = new Date(currentDateMilli).toLocalDate();
+        Date date = new Date(currentDateMilli);
         String imageURL = PictureRandomizer.getRandomPictureURL();
-        Plant plantToAdd = new Plant(selectedPlant.getSpeciesId(), uniqueNickName, date, selectedPlant.getWaterFrequencyDays(), imageURL);
+        //int strng localdate String
+        Plant plantToAdd = new Plant(selectedPlant.getSpeciesId(), uniqueNickName, selectedPlant.getLastWatered(), selectedPlant.getWaterFrequencyDays(), imageURL);
         PopupBox.display(MessageText.sucessfullyAddPlant.toString());
         addPlantToDB(plantToAdd);
     }
@@ -222,7 +223,7 @@ public class MyPlantsTabPaneController {
     public void addPlantToDB(Plant plant) {
         Thread addPlantThread = new Thread(() -> {
             currentUserLibrary.add(plant);
-            Message savePlant = new Message(MessageType.savePlant, LoggedInUser.getInstance().getUser(), plant);
+            Message savePlant = new Message(MessageType.SAVE_PLANT, LoggedInUser.getInstance().getUser(), plant);
             ServerConnection connection = ServerConnection.getClientConnection();
             Message response = connection.makeRequest(savePlant);
             if (!response.isSuccess()) {
@@ -250,7 +251,7 @@ public class MyPlantsTabPaneController {
      * @param date  new date to change to
      */
     public void changeLastWateredInDB(Plant plant, LocalDate date) {
-        Message changeLastWatered = new Message(MessageType.changeLastWatered, LoggedInUser.getInstance().getUser(), plant, date);
+        Message changeLastWatered = new Message(MessageType.CHANGE_LAST_WATERED, LoggedInUser.getInstance().getUser(), plant, date);
         ServerConnection connection = ServerConnection.getClientConnection();
         Message response = connection.makeRequest(changeLastWatered);
         PopupBox.display(MessageText.sucessfullyChangedDate.toString());
@@ -269,7 +270,7 @@ public class MyPlantsTabPaneController {
      * @return if it's successful. true or false
      */
     public boolean changeNicknameInDB(Plant plant, String newNickname) {
-        Message changeNicknameInDB = new Message(MessageType.changeNickname, LoggedInUser.getInstance().getUser(), plant, newNickname);
+        Message changeNicknameInDB = new Message(MessageType.CHANGE_NICKNAME, LoggedInUser.getInstance().getUser(), plant, newNickname);
         ServerConnection connection = ServerConnection.getClientConnection();
         Message response = connection.makeRequest(changeNicknameInDB);
         PopupBox.display(MessageText.sucessfullyChangedPlant.toString());
@@ -310,7 +311,7 @@ public class MyPlantsTabPaneController {
      */
     public PlantDetails getPlantDetails(Plant plant) {
         PlantDetails plantDetails = null;
-        Message getInfoSearchedPlant = new Message(MessageType.getMorePlantInfo, plant);
+        Message getInfoSearchedPlant = new Message(MessageType.GET_MORE_PLANT_INFO, plant);
         ServerConnection connection = ServerConnection.getClientConnection();
         Message response = connection.makeRequest(getInfoSearchedPlant);
         if (response != null) {
@@ -366,7 +367,7 @@ public class MyPlantsTabPaneController {
      */
     private void changeAllToWateredInDB() {
         Thread waterAllThread = new Thread(() -> {
-            Message changeAllToWatered = new Message(MessageType.changeAllToWatered, LoggedInUser.getInstance().getUser());
+            Message changeAllToWatered = new Message(MessageType.CHANGE_ALL_TO_WATERED, LoggedInUser.getInstance().getUser());
             ServerConnection connection = ServerConnection.getClientConnection();
             Message response = connection.makeRequest(changeAllToWatered);
             if (!response.isSuccess()) {
@@ -396,10 +397,10 @@ public class MyPlantsTabPaneController {
                     Files.delete(newPictureFile.toPath());
                     Files.copy(selectedImage.toPath(), newPictureFile.toPath());
                 }
-                lpp.getPlant().setCustomImageURL(newPictureFile.toURI().toURL().toString());
+                lpp.getPlant().setCustomImageURL(newPictureFile.toURI().toString());
                 lpp.updateImage();
                 Thread changePlantPictureThread = new Thread(() -> {
-                    Message changePlantPicture = new Message(MessageType.changePlantPicture, LoggedInUser.getInstance().getUser(), lpp.getPlant());
+                    Message changePlantPicture = new Message(MessageType.CHANGE_PLANT_PICTURE, LoggedInUser.getInstance().getUser(), lpp.getPlant());
                     ServerConnection connection = ServerConnection.getClientConnection();
                     Message response = connection.makeRequest(changePlantPicture);
                     if (!response.isSuccess()) {

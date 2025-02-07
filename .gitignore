@@ -152,3 +152,4 @@ documents/
 
 # local storage files
 resources/lastLogin.txt
+resources/searchHistory.txt

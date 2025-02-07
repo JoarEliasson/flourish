@@ -124,31 +124,31 @@ public class SearchTabPaneController {
         listViewResult.setItems(searchPlantPanes);
 
         Task getImagesTask =
-                new Task() {
-                    @Override
-                    protected Object call() {
-                        long i = 1;
-                        for (SearchPlantPane spp : searchPlantPanes) {
-                            Plant Plant = spp.getPlant();
-                            if (Plant.getImageURL().equals("")) {
+            new Task() {
+                @Override
+                protected Object call() {
+                    long i = 1;
+                    for (SearchPlantPane spp : searchPlantPanes) {
+                        Plant Plant = spp.getPlant();
+                        if (Plant.getImageURL().equals("")) {
+                            spp.setDefaultImage(ImageLibrary.getDefaultPlantImage());
+                        } else {
+                            try {
+                                spp.updateImage();
+                            } catch (IllegalArgumentException e) {
                                 spp.setDefaultImage(ImageLibrary.getDefaultPlantImage());
-                            } else {
-                                try {
-                                    spp.updateImage();
-                                } catch (IllegalArgumentException e) {
-                                    spp.setDefaultImage(ImageLibrary.getDefaultPlantImage());
-                                }
                             }
-                            updateProgress(i++, searchPlantPanes.size());
                         }
-                        Text text = (Text) progressIndicator.lookup(".percentage");
-                        if (text.getText().equals("90%") || text.getText().equals("Done")) {
-                            text.setText("Done");
-                            progressIndicator.setPrefWidth(text.getLayoutBounds().getWidth());
-                        }
-                        return true;
+                        updateProgress(i++, searchPlantPanes.size());
                     }
-                };
+                    Text text = (Text) progressIndicator.lookup(".percentage");
+                    if (text.getText().equals("90%") || text.getText().equals("Done")) {
+                        text.setText("Done");
+                        progressIndicator.setPrefWidth(text.getLayoutBounds().getWidth());
+                    }
+                    return true;
+                }
+            };
         Thread imageThread = new Thread(getImagesTask);
         progressIndicator.progressProperty().bind(getImagesTask.progressProperty());
         imageThread.start();
@@ -163,7 +163,7 @@ public class SearchTabPaneController {
         txtFldSearchText.addToHistory();
         PopupBox.display(MessageText.holdOnGettingInfo.toString());
         Thread searchThread = new Thread(() -> {
-            Message apiRequest = new Message(MessageType.search, txtFldSearchText.getText());
+            Message apiRequest = new Message(MessageType.SEARCH, txtFldSearchText.getText());
             ServerConnection connection = ServerConnection.getClientConnection();
             Message apiResponse = connection.makeRequest(apiRequest);
 
@@ -201,7 +201,7 @@ public class SearchTabPaneController {
     public PlantDetails getPlantDetails(Plant plant) {
         PopupBox.display(MessageText.holdOnGettingInfo.toString());
         PlantDetails plantDetails = null;
-        Message getInfoSearchedPlant = new Message(MessageType.getMorePlantInfo, plant);
+        Message getInfoSearchedPlant = new Message(MessageType.GET_MORE_PLANT_INFO, plant);
         ServerConnection connection = ServerConnection.getClientConnection();
         Message response = connection.makeRequest(getInfoSearchedPlant);
         if (response != null) {
