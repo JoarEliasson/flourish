@@ -151,5 +151,6 @@ replay_pid*
 documents/
 
 # local storage files
-resources/lastLogin.txt
-resources/searchHistory.txt
+local_variables/lastLogin.txt
+local_variables/searchHistory.txt
+local_variables/

@@ -50,12 +50,12 @@ public class LoginPaneController {
     public void initialize() throws IOException {
         String lastLoggedInUser;
 
-        File file = new File("resources/lastLogin.txt");
+        File file = new File("local_variables/lastLogin.txt");
         if (!file.exists()) {
             file.createNewFile();
 
         } else if (file.exists()) {
-            try (BufferedReader br = new BufferedReader(new FileReader("resources/lastLogin.txt"));) {
+            try (BufferedReader br = new BufferedReader(new FileReader("local_variables/lastLogin.txt"));) {
                 lastLoggedInUser = br.readLine();
                 txtFldEmail.setText(lastLoggedInUser);
             } catch (IOException e) {

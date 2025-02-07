@@ -124,6 +124,11 @@ public class LibraryPlantPane extends Pane implements PlantPane {
         this.getChildren().addAll(image, lblEmptyInfo, btnSearchPlants);
     }
 
+    private Image getRandomPicture() {
+        File fileImg = new File("resources/images/img.png");
+        return new Image(fileImg.toURI().toString());
+    }
+
 
     public void updateImage() {
         Image img = new Image(plant.getImageURL());
@@ -401,7 +406,7 @@ public class LibraryPlantPane extends Pane implements PlantPane {
         if (progress < 0.15) {
             progressBar.setStyle("-fx-accent: #BE4052");
         } else {
-            progressBar.setStyle("-fx-accent: 2D88AA");
+            progressBar.setStyle("-fx-accent: #2D88AA");
         }
     }
 

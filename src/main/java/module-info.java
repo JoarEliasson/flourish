@@ -5,6 +5,7 @@ module se.myhappyplants {
     requires javafx.media;
     requires javafx.swing;
     requires javafx.web;
+    requires java.net.http;
     requires java.mail;
     requires java.sql;
     requires jbcrypt;
@@ -12,7 +13,7 @@ module se.myhappyplants {
     requires mysql.connector.j;
     requires com.google.gson;
 
-    exports se.myhappyplants.client.controller;
+  exports se.myhappyplants.client.controller;
     exports se.myhappyplants.client.model;
     exports se.myhappyplants.client.view;
     exports se.myhappyplants.server;
