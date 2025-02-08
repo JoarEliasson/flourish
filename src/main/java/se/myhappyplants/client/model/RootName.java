@@ -12,7 +12,9 @@ public enum RootName {
     settingsTabPane("settingsTabPane"),
     myPlantsTabPane("myPlantsTabPane"),
     registerPane("registerPane"),
-    forgotPasswordPane("forgotPasswordPane");
+    forgotPasswordPane("forgotPasswordPane"),
+    resetPasswordPane("resetPasswordPane");
+
 
     private final String name;
 

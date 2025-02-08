@@ -64,9 +64,13 @@ public class ForgotPasswordPaneController {
         String email = txtFieldUserEmail.getText();
         Message msg = new Message(MessageType.FORGOT_PASSWORD, new User(email, null));
         Message response = ServerConnection.getClientConnection().makeRequest(msg);
-
         if (response.isSuccess()) {
             MessageBox.display(BoxTitle.Success, response.getMessageText());
+            try {
+                ClientApplication.setRoot(String.valueOf(RootName.resetPasswordPane.toString()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             MessageBox.display(BoxTitle.Failed, response.getMessageText());
         }
