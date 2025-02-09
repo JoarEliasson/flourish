@@ -44,13 +44,13 @@ public class SearchPlantPane extends Pane implements PlantPane {
      * Constructor to initialize some variables and sets off the initialization
      *
      * @param searchTabPaneController
-     * @param imgPath
+     * @param img
      * @param plant
      */
-    public SearchPlantPane(SearchTabPaneController searchTabPaneController, String imgPath, Plant plant) {
+    public SearchPlantPane(SearchTabPaneController searchTabPaneController, Image img, Plant plant) {
         this.searchTabPaneController = searchTabPaneController;
         this.plant = plant;
-        initImage(imgPath);
+        initImage(img);
         initCommonName();
         initScientificName();
         initInfoButton();
@@ -63,10 +63,9 @@ public class SearchPlantPane extends Pane implements PlantPane {
     /**
      * Method to initialize the image
      *
-     * @param imgPath
+     * @param img
      */
-    private void initImage(String imgPath) {
-        Image img = new Image(imgPath);
+    private void initImage(Image img) {
         this.image = new ImageView();
         image.setFitHeight(50.0);
         image.setFitWidth(50.0);
@@ -200,9 +199,8 @@ public class SearchPlantPane extends Pane implements PlantPane {
      *
      * @param defaultImage
      */
-    public void setDefaultImage(String defaultImage) {
-        Image img = new Image(defaultImage);
-        image.setImage(img);
+    public void setDefaultImage(Image defaultImage) {
+        image.setImage(defaultImage);
     }
 
     /**
@@ -211,7 +209,7 @@ public class SearchPlantPane extends Pane implements PlantPane {
     public void extendPaneMoreInfoPlant() {
         AtomicReference<Double> height = new AtomicReference<>(this.getHeight());
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.millis(7.5), event -> this.setPrefHeight(height.updateAndGet(v -> (double) (v + 6.25))))
+            new KeyFrame(Duration.millis(7.5), event -> this.setPrefHeight(height.updateAndGet(v -> (double) (v + 6.25))))
         );
         timeline.setCycleCount(32);
         timeline.play();
@@ -235,7 +233,7 @@ public class SearchPlantPane extends Pane implements PlantPane {
 
         AtomicReference<Double> height = new AtomicReference<>(this.getHeight());
         Timeline timeline = new Timeline(
-                new KeyFrame(Duration.millis(7.5), event -> this.setPrefHeight(height.updateAndGet(v -> (double) (v - 6.25))))
+            new KeyFrame(Duration.millis(7.5), event -> this.setPrefHeight(height.updateAndGet(v -> (double) (v - 6.25))))
         );
         timeline.setCycleCount(32);
         timeline.play();
@@ -248,4 +246,3 @@ public class SearchPlantPane extends Pane implements PlantPane {
         gotInfoOnPlant = false;
     }
 }
-

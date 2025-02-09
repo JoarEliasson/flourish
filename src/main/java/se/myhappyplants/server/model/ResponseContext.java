@@ -1,17 +1,20 @@
 package se.myhappyplants.server.model;
 
+import se.myhappyplants.server.db.PasswordResetTokenRepository;
+import se.myhappyplants.server.db.PlantRepository;
+import se.myhappyplants.server.db.UserPlantRepository;
+import se.myhappyplants.server.db.UserRepository;
 import se.myhappyplants.server.model.ResponseHandlers.*;
-import se.myhappyplants.server.services.PlantRepository;
-import se.myhappyplants.server.services.UserPlantRepository;
-import se.myhappyplants.server.services.UserRepository;
 import se.myhappyplants.shared.MessageType;
 
 import java.util.HashMap;
 
 /**
  * Class that stores all the different handlers for database requests
- * Created by: Christopher O'Driscoll
- * Updated by:
+ *
+ * <p>Updated with password reset functionality</p>
+ * @author Joar Eliasson
+ * @since 2025-02-05
  */
 public class ResponseContext {
 
@@ -19,12 +22,15 @@ public class ResponseContext {
     private UserRepository userRepository;
     private UserPlantRepository userPlantRepository;
     private PlantRepository plantRepository;
+    private PasswordResetTokenRepository tokenRepository;
 
-    public ResponseContext(UserRepository userRepository, UserPlantRepository userPlantRepository, PlantRepository plantRepository) {
+    public ResponseContext(UserRepository userRepository, UserPlantRepository userPlantRepository, PlantRepository plantRepository, PasswordResetTokenRepository tokenRepository) {
 
         this.userRepository = userRepository;
         this.userPlantRepository = userPlantRepository;
         this.plantRepository = plantRepository;
+        this.tokenRepository = tokenRepository;
+
         createResponders();
     }
 
@@ -32,20 +38,22 @@ public class ResponseContext {
      * Links the relevant ResponseHandlers to each MessageType
      */
     private void createResponders() {
-        responders.put(MessageType.changeAllToWatered, new ChangeAllToWatered(userPlantRepository));
-        responders.put(MessageType.changeFunFacts, new ChangeFunFacts(userRepository));
-        responders.put(MessageType.changeLastWatered, new ChangeLastWatered(userPlantRepository));
-        responders.put(MessageType.changeNickname, new ChangeNickname(userPlantRepository));
-        responders.put(MessageType.changeNotifications, new ChangeNotifications(userRepository));
-        responders.put(MessageType.changePlantPicture, new ChangePlantPicture(userPlantRepository));
-        responders.put(MessageType.deleteAccount, new DeleteAccount(userRepository));
-        responders.put(MessageType.deletePlant, new DeletePlant(userPlantRepository));
-        responders.put(MessageType.getLibrary, new GetLibrary(userPlantRepository));
-        responders.put(MessageType.getMorePlantInfo, new GetPlantDetails(plantRepository));
-        responders.put(MessageType.login, new Login(userRepository));
-        responders.put(MessageType.register, new Register(userRepository));
-        responders.put(MessageType.savePlant, new SavePlant(userPlantRepository));
-        responders.put(MessageType.search, new Search(plantRepository));
+        responders.put(MessageType.CHANGE_ALL_TO_WATERED, new ChangeAllToWatered(userPlantRepository));
+        responders.put(MessageType.CHANGE_FUN_FACTS, new ChangeFunFacts(userRepository));
+        responders.put(MessageType.CHANGE_LAST_WATERED, new ChangeLastWatered(userPlantRepository));
+        responders.put(MessageType.CHANGE_NICKNAME, new ChangeNickname(userPlantRepository));
+        responders.put(MessageType.CHANGE_NOTIFICATIONS, new ChangeNotifications(userRepository));
+        responders.put(MessageType.CHANGE_PLANT_PICTURE, new ChangePlantPicture(userPlantRepository));
+        responders.put(MessageType.DELETE_ACCOUNT, new DeleteAccount(userRepository));
+        responders.put(MessageType.DELETE_PLANT, new DeletePlant(userPlantRepository));
+        responders.put(MessageType.GET_LIBRARY, new GetLibrary(userPlantRepository));
+        responders.put(MessageType.GET_MORE_PLANT_INFO, new GetPlantDetails(plantRepository));
+        responders.put(MessageType.LOGIN, new Login(userRepository));
+        responders.put(MessageType.REGISTER, new Register(userRepository));
+        responders.put(MessageType.SAVE_PLANT, new SavePlant(userPlantRepository));
+        responders.put(MessageType.SEARCH, new Search(plantRepository));
+        responders.put(MessageType.FORGOT_PASSWORD, new ForgotPassword(userRepository, tokenRepository));
+        responders.put(MessageType.RESET_PASSWORD, new ResetPassword(tokenRepository, userRepository));
     }
 
     public IResponseHandler getResponseHandler(MessageType messageType) {

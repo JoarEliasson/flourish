@@ -14,7 +14,7 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import se.myhappyplants.client.controller.StartClient;
+import se.myhappyplants.client.controller.ClientApplication;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -42,7 +42,7 @@ public class PopupBox extends Popup {
         window.setMinWidth(190);
         window.setMinHeight(70);
 
-        Stage mainStage = StartClient.getStage();
+        Stage mainStage = ClientApplication.getStage();
         double x = mainStage.getX() + mainStage.getWidth() - 222;
         double y = mainStage.getY() + mainStage.getHeight() - 110;
         window.setX(x);

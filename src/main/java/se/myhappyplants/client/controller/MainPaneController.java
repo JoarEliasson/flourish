@@ -19,6 +19,8 @@ public class MainPaneController {
     @FXML
     public TabPane mainPane;
 
+
+
     @FXML
     private MyPlantsTabPaneController myPlantsTabPaneController;
     @FXML
@@ -71,7 +73,7 @@ public class MainPaneController {
             e.printStackTrace();
         }
         LoggedInUser.getInstance().setUser(null);
-        StartClient.setRoot(String.valueOf(RootName.loginPane));
+        ClientApplication.setRoot(String.valueOf(RootName.loginPane));
     }
 
     /**

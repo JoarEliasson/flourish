@@ -1,191 +1,288 @@
 package se.myhappyplants.shared;
 
-import se.myhappyplants.client.model.PictureRandomizer;
-
 import java.io.Serializable;
-import java.sql.Date;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 /**
- * Class defining a plant
- * Created by: Frida Jacobsson
- * Updated by: Linn Borgström, Eric Simonson, Susanne Vikström
+ * Represents a plant, including both species-level data and user-specific details.
+ * <p>
+ * This class is used to represent data obtained from the Species table (immutable species information)
+ * as well as a user's specific plant instance (which includes a nickname, last watered date, and recommended
+ * watering frequency in days).
+ * </p>
+ *
+ * @author  Joar Eliasson
+ * @since   2025-02-03
  */
 public class Plant implements Serializable {
 
     private static final long serialVersionUID = 867522155232174497L;
-    private String plantId;
-    private String commonName;
-    private String scientificName;
-    private String familyName;
-    private String imageURL;
+
+    // --- Species-level data (immutable once set) ---
+    private final int speciesId;
+    private final String commonName;
+    private final String scientificName;
+    private final String genus;
+    private final String family;
+    private final String imageUrl;
+    private final List<String> synonyms;
+
+    // --- User-specific data ---
     private String nickname;
-    private Date lastWatered;
-    private long waterFrequency;
+    private LocalDate lastWatered;
+    private int waterFrequencyDays;
+    private String customImageURL;
+
+    // ===================== Constructors =====================
 
     /**
-     * Creates a plant object from information
-     * in the Species database
+     * Constructs a Plant object using species-level data only.
+     * <p>
+     * This constructor is used when retrieving species data.
+     * </p>
      *
-     * @param plantId        Unique plant id in Species database
-     * @param commonName     Common name
-     * @param scientificName Scientific name
-     * @param familyName     Family name
-     * @param imageURL       Image location
+     * @param speciesId       the unique species identifier (from the Species table)
+     * @param commonName      the common name of the species
+     * @param scientificName  the scientific name of the species
+     * @param family      the family name of the species
+     * @param imageUrl the default image URL for the species
      */
-    public Plant(String plantId, String commonName, String scientificName, String familyName, String imageURL) {
-        this.plantId = plantId;
+    public Plant(int speciesId, String commonName, String scientificName, String genus, String family, String imageUrl, List<String> synonyms) {
+        this.speciesId = speciesId;
         this.commonName = commonName;
         this.scientificName = scientificName;
-        this.familyName = familyName;
-        this.imageURL = imageURL;
-    }
-
-    public Plant(String nickname, String plantId, Date lastWatered, long waterFrequency) {
-        this.nickname = nickname;
-        this.plantId = plantId;
-        this.lastWatered = lastWatered;
-        this.waterFrequency = waterFrequency;
-    }
-
-    public Plant(String nickname, String plantID, Date lastWatered) {
-        this.nickname = nickname;
-        this.plantId = plantID;
-        this.lastWatered = lastWatered;
+        this.genus = genus;
+        this.family = family;
+        this.imageUrl = imageUrl;
+        this.synonyms = synonyms;
     }
 
     /**
-     * Creates a plant object from a users library
-     * in the MyHappyPlants database
+     * Constructs a Plant object representing a user's plant.
+     * <p>
+     * This constructor adds user-specific data (nickname, last watered date,
+     * and watering frequency) to the species information.
+     * </p>
      *
-     * @param nickname
-     * @param plantId        Unique plant id in Species database
-     * @param lastWatered    Date the plant was last watered
-     * @param waterFrequency How often the plant needs water in milliseconds
-     * @param imageURL       Image location
+     * @param speciesId          the unique species identifier (from the Species table)
+     * @param nickname           the user's nickname for the plant
+     * @param lastWatered        the date the plant was last watered
+     * @param waterFrequencyDays the recommended watering frequency in days
+     * @param customImageURL     the image URL for the user's plant; if null, the species default image is used
      */
-    public Plant(String nickname, String plantId, Date lastWatered, long waterFrequency, String imageURL) {
-
+    public Plant(int speciesId, String nickname, LocalDate lastWatered, int waterFrequencyDays, String customImageURL) {
+        this.speciesId = speciesId;
         this.nickname = nickname;
-        this.plantId = plantId;
         this.lastWatered = lastWatered;
-        this.waterFrequency = waterFrequency;
-        this.imageURL = imageURL;
+        this.waterFrequencyDays = waterFrequencyDays;
+        this.customImageURL = customImageURL;
+        this.commonName = null;
+        this.scientificName = null;
+        this.genus = null;
+        this.family = null;
+        this.imageUrl = null;
+        this.synonyms = null;
+    }
+
+    // ===================== Getters & Setters =====================
+
+    /**
+     * Returns the unique species identifier.
+     *
+     * @return speciesId as an integer.
+     */
+    public int getSpeciesId() {
+        return speciesId;
     }
 
     /**
-     * Creates a plant object that can be used to update
-     * a users library in the MyHappyPlants database
+     * Returns the common name of the species.
      *
-     * @param nickname
-     * @param plantId     Unique plant id in Species database
-     * @param lastWatered Date the plant was last watered
-     * @param imageURL    Image location
+     * @return the common name, or null if not set.
      */
-    public Plant(String nickname, String plantId, Date lastWatered, String imageURL) {
-
-        this.nickname = nickname;
-        this.plantId = plantId;
-        this.lastWatered = lastWatered;
-        this.imageURL = imageURL;
-    }
-
-    public String toString() {
-        String toString = String.format("Common name: %s \tFamily name: %s \tScientific name: %s ", commonName, familyName, scientificName);
-        return toString;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
     public String getCommonName() {
         return commonName;
     }
 
+    /**
+     * Returns the scientific name of the species.
+     *
+     * @return the scientific name, or null if not set.
+     */
     public String getScientificName() {
         return scientificName;
     }
 
-    public String getPlantId() {
-        return plantId;
+    /**
+     * Returns the genus name of the species.
+     *
+     * @return the genus name, or null if not set.
+     */
+    public String getGenus() {
+        return genus;
     }
 
     /**
-     * Image location for selected plant
+     * Returns the family name of the species.
      *
-     * @return URL location of image
+     * @return the family name, or null if not set.
+     */
+    public String getFamily() {
+        return family;
+    }
+
+    /**
+     * Returns the image URL for the plant.
+     * <p>
+     * If a custom image URL is set for the user’s plant, it is returned; otherwise,
+     * the default species image is returned. If neither is set, a random image is provided.
+     * Additionally, this method converts any “https” protocol to “http”.
+     * </p>
+     *
+     * @return a valid image URL.
      */
     public String getImageURL() {
-        if (imageURL == null) {
-            imageURL = PictureRandomizer.getRandomPictureURL();
+        String image = (customImageURL != null) ? customImageURL : imageUrl;
+        if (image == null) {
+            image = "https://source.unsplash.com/featured/?plant";
         }
-        String httpImageURL = imageURL.replace("https", "http");
-        return httpImageURL;
+        return image.replace("https", "http");
     }
 
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
+    /**
+     * Returns the list of synonyms for the species.
+     *
+     * @return the list of synonyms, or an empty list if not set.
+     */
+    public List<String> getSynonyms() {
+        return synonyms;
     }
 
-    public Date getLastWatered() {
+    /**
+     * Sets the custom image URL for the user's plant.
+     *
+     * @param customImageURL the new image URL.
+     */
+    public void setCustomImageURL(String customImageURL) {
+        this.customImageURL = customImageURL;
+    }
+
+    /**
+     * Returns the user's nickname for the plant.
+     *
+     * @return the nickname, or null if not set.
+     */
+    public String getNickname() {
+        return nickname;
+    }
+
+    /**
+     * Sets the user's nickname for the plant.
+     *
+     * @param nickname the new nickname.
+     */
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    /**
+     * Returns the date the plant was last watered.
+     *
+     * @return the last watered date, or null if not set.
+     */
+    public LocalDate getLastWatered() {
         return lastWatered;
     }
 
-    public void setLastWatered(LocalDate localDate) {
-        Date date = java.sql.Date.valueOf(localDate);
-        this.lastWatered = date;
+    /**
+     * Sets the date the plant was last watered.
+     *
+     * @param lastWatered the new last watered date.
+     */
+    public void setLastWatered(LocalDate lastWatered) {
+        this.lastWatered = lastWatered;
     }
 
     /**
-     * Compares the length of time since the plant was watered
-     * with recommended frequency of watering. Returns a decimal value
-     * that can be used in a progress bar or indicator
+     * Returns the recommended watering frequency in days.
      *
-     * @return Double between 0.02 (max time elapsed) and 1.0 (min time elapsed)
+     * @return the watering frequency.
+     */
+    public int getWaterFrequencyDays() {
+        return waterFrequencyDays;
+    }
+
+    /**
+     * Sets the recommended watering frequency (in days).
+     *
+     * @param waterFrequencyDays the new watering frequency.
+     */
+    public void setWaterFrequencyDays(int waterFrequencyDays) {
+        this.waterFrequencyDays = waterFrequencyDays;
+    }
+
+    // ===================== Business Methods =====================
+
+    /**
+     * Calculates the watering progress as a fraction of days elapsed since the plant was last watered
+     * relative to the recommended watering interval.
+     * <p>
+     * The returned value is clamped between 0.02 (minimum) and 1.0 (if the plant is overdue for watering).
+     * </p>
+     *
+     * @return a double between 0.02 and 1.0 indicating the progress.
      */
     public double getProgress() {
-        long difference = System.currentTimeMillis() - lastWatered.getTime();
-        difference -= 43000000l;
-        double progress = 1.0 - ((double) difference / (double) waterFrequency);
-        if (progress <= 0.02) {
-            progress = 0.02;
-        } else if (progress >= 0.95) {
-            progress = 1.0;
+        if (lastWatered == null || waterFrequencyDays <= 0) {
+            return 0.02;
         }
-        return progress;
+        long daysElapsed = ChronoUnit.DAYS.between(lastWatered, LocalDate.now());
+        double progress = (double) daysElapsed / waterFrequencyDays;
+        if (progress < 0.02) {
+            return 0.02;
+        } else if (progress > 1.0) {
+            return 1.0;
+        } else {
+            return progress;
+        }
     }
 
     /**
-     * Converts time since last water from milliseconds
-     * into days, then returns the value as
-     * an explanation text
+     * Provides a user-friendly message indicating how many days until the plant needs watering.
      *
-     * @return Days since last water
+     * @return a message such as "Needs water in X days" or "You need to water this plant now!".
      */
     public String getDaysUntilWater() {
-        long millisSinceLastWatered = System.currentTimeMillis() - lastWatered.getTime();
-        long millisUntilNextWatering = waterFrequency - millisSinceLastWatered;
-        long millisInADay = 86400000;
-
-        double daysExactlyUntilWatering = (double) millisUntilNextWatering / (double) millisInADay;
-
-        int daysUntilWatering = (int) daysExactlyUntilWatering;
-        double decimals = daysExactlyUntilWatering - (int) daysExactlyUntilWatering;
-
-        if (decimals > 0.5) {
-            daysUntilWatering = (int) daysExactlyUntilWatering + 1;
+        if (lastWatered == null || waterFrequencyDays <= 0) {
+            return "Watering information unavailable.";
         }
-
-        String strToReturn = String.format("Needs water in %d days", daysUntilWatering);
-        if (getProgress() == 0.02 || daysUntilWatering == 0) {
-            strToReturn = "You need to water this plant now!";
+        long daysElapsed = ChronoUnit.DAYS.between(lastWatered, LocalDate.now());
+        long daysUntilWatering = waterFrequencyDays - daysElapsed;
+        if (daysUntilWatering <= 0) {
+            return "You need to water this plant now!";
+        } else {
+            return String.format("Needs water in %d day%s", daysUntilWatering, daysUntilWatering > 1 ? "s" : "");
         }
+    }
 
-        return strToReturn;
+    /**
+     * Returns a string representation of the plant.
+     * <p>
+     * If species-level data is available, it returns common, family, and scientific names.
+     * Otherwise, it shows the species ID and the user-assigned nickname.
+     * </p>
+     *
+     * @return a formatted string.
+     */
+    @Override
+    public String toString() {
+        if (commonName != null && scientificName != null && family != null) {
+            return String.format("Common name: %s\tFamily name: %s\tScientific name: %s",
+                    commonName, family, scientificName);
+        } else {
+            return "Plant [Species ID: " + speciesId + ", Nickname: " + nickname + "]";
+        }
     }
 }

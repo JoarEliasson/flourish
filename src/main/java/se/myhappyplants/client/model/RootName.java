@@ -11,7 +11,10 @@ public enum RootName {
     searchTabPane("searchTabPane"),
     settingsTabPane("settingsTabPane"),
     myPlantsTabPane("myPlantsTabPane"),
-    registerPane("registerPane");
+    registerPane("registerPane"),
+    forgotPasswordPane("forgotPasswordPane"),
+    resetPasswordPane("resetPasswordPane");
+
 
     private final String name;
 

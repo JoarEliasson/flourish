@@ -46,11 +46,11 @@ public class AutocompleteSearchField extends TextField {
     public void populateSearchHistory() throws IOException {
         searchHistory = new ArrayList<>();
 
-        File file = new File("resources/searchHistory.txt");
+        File file = new File("local_variables/searchHistory.txt");
         if (!file.exists()) {
             file.createNewFile();
         } else if (file.exists()) {
-            try (BufferedReader br = new BufferedReader(new FileReader("resources/searchHistory.txt"));) {
+            try (BufferedReader br = new BufferedReader(new FileReader("local_variables/searchHistory.txt"));) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     searchHistory.add(line);
@@ -139,7 +139,7 @@ public class AutocompleteSearchField extends TextField {
     public void addToHistory() {
         String searchText = getText();
         if (!searchHistory.contains(searchText)) {
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter("resources/searchHistory.txt", true))) {
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("local_variables/searchHistory.txt", true))) {
                 bw.write(searchText + "\n");
                 bw.flush();
                 populateSearchHistory();

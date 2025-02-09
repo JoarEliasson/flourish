@@ -1,7 +1,7 @@
 package se.myhappyplants.server.model.ResponseHandlers;
 
+import se.myhappyplants.server.db.PlantRepository;
 import se.myhappyplants.server.model.IResponseHandler;
-import se.myhappyplants.server.services.PlantRepository;
 import se.myhappyplants.shared.Message;
 import se.myhappyplants.shared.Plant;
 import se.myhappyplants.shared.PlantDetails;

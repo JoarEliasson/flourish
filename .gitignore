@@ -4,6 +4,7 @@
 .vscode/
 /shelf/
 /.idea/workspace.xml
+/target/
 
 # Editor-based HTTP Client requests
 /httpRequests/
@@ -148,3 +149,8 @@ replay_pid*
 
 # documents folder
 documents/
+
+# local storage files
+local_variables/lastLogin.txt
+local_variables/searchHistory.txt
+local_variables/
