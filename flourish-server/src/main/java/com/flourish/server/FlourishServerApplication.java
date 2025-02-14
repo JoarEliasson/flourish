@@ -3,12 +3,13 @@ package com.flourish.server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * The main entry point for the Flourish Server application.
  * <p>
  * This class bootstraps the Spring Boot application and instructs Spring
- * to scan the package {@code com.flourish.domain.model} for JPA entity classes.
+ * to scan the packages for JPA entities and UI components.
  * </p>
  *
  * @author Joar Eliasson
@@ -17,6 +18,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
  */
 @SpringBootApplication
 @EntityScan(basePackages = "com.flourish.domain.model")
+@ComponentScan(basePackages = {"com.flourish.server", "com.flourish.client", "com.flourish.domain"})
 public class FlourishServerApplication {
 
     /**

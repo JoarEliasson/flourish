@@ -5,8 +5,7 @@ import com.flourish.domain.model.User;
 /**
  * Service interface for user-related operations.
  * <p>
- * This interface defines the contract for user authentication and potentially
- * other user management functionalities.
+ * This interface defines the contract for user authentication and registration.
  * </p>
  *
  * @author Joar Eliasson
@@ -16,14 +15,27 @@ import com.flourish.domain.model.User;
 public interface UserService {
 
     /**
-     * Authenticates a user with the provided credentials.
+     * Authenticates a user by comparing the provided raw password with the stored encrypted password.
      *
      * @param username the username of the user
-     * @param password the raw (unencrypted) password of the user
-     * @return the authenticated {@link User} object if credentials are valid
+     * @param password the raw password provided for authentication
+     * @return the authenticated {@link User} if credentials are valid
      * @throws Exception if authentication fails due to invalid credentials or other issues
      */
     User authenticate(String username, String password) throws Exception;
 
-    // Additional methods (e.g., registration, password reset) can be defined here.
+    /**
+     * Registers a new user with the provided details.
+     *
+     * @param username              the desired username
+     * @param email                 the user's email address
+     * @param password              the raw password (to be encrypted before storage)
+     * @param notificationActivated whether notifications are activated
+     * @param funFactsActivated     whether fun facts are activated
+     * @return the newly registered {@link User}
+     * @throws Exception if registration fails (e.g., if username or email already exists)
+     */
+    User register(String username, String email, String password,
+                  Boolean notificationActivated, Boolean funFactsActivated) throws Exception;
+
 }

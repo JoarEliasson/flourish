@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST controller for handling authentication-related requests.
+ * REST controller for handling user authentication (sign‐in).
  * <p>
- * Provides endpoints to authenticate users. Uses the {@link UserService} to
- * validate user credentials.
+ * Provides an endpoint to authenticate a user using their username and password.
+ * Uses the {@link UserService} to validate user credentials.
+ * The password provided is compared (using BCrypt) with the encrypted password stored in the database.
  * </p>
+ *
  *
  * @author Joar Eliasson
  * @version 1.0
@@ -27,7 +29,7 @@ public class AuthController {
     private final UserService userService;
 
     /**
-     * Constructs an {@code AuthController} with the specified {@code UserService}.
+     * Constructs an AuthController with the specified UserService.
      *
      * @param userService the service responsible for user authentication
      */
@@ -37,16 +39,16 @@ public class AuthController {
     }
 
     /**
-     * Handles a login request.
+     * Handles a sign-in (login) request.
      * <p>
-     * Expects {@code username} and {@code password} as request parameters and attempts
-     * to authenticate the user.
+     * Expects {@code username} and {@code password} as request parameters. The method calls
+     * the {@link UserService#authenticate(String, String)} method to verify the credentials.
      * </p>
      *
      * @param username the username provided by the client
      * @param password the raw password provided by the client
      * @return a {@link ResponseEntity} containing the authenticated {@link User} if successful,
-     * or an error message if authentication fails
+     *         or an error message if authentication fails
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestParam String username,

@@ -5,20 +5,23 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route("")
-@PageTitle("Home")
 /**
- * The main view of the Flourish application.
+ * Main view displayed after successful login.
  * <p>
- * This view is the entry point of the application.
+ * This view serves as the application's landing page for authenticated users.
  * </p>
  *
  * @author Joar Eliasson
  * @version 1.0
  * @since 2025-02-13
  */
+@Route("main")
+@PageTitle("Home")
 public class MainView extends VerticalLayout {
 
+    /**
+     * Constructs the main view.
+     */
     public MainView() {
         add(new H1("Welcome to Flourish!"));
     }

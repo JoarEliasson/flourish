@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 /**
  * Implementation of the {@link UserService} interface.
  * <p>
- * Handles user authentication by verifying that the provided raw password matches
- * the encrypted password stored in the database.
+ * Provides functionality to authenticate and register users by interacting with the database.
+ * The registration process encrypts the raw password using BCrypt before storage.
  * </p>
  *
  * @author Joar Eliasson
@@ -38,12 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Authenticates a user by comparing the provided raw password with the stored encrypted password.
-     *
-     * @param username the username of the user
-     * @param password the raw (unencrypted) password provided for authentication
-     * @return the authenticated {@link User} if the credentials are valid
-     * @throws Exception if authentication fails due to invalid credentials or if the user is not found
+     * {@inheritDoc}
      */
     @Override
     public User authenticate(String username, String password) throws Exception {
@@ -54,5 +49,21 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new Exception("Invalid username or password");
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public User register(String username, String email, String password, Boolean notificationActivated, Boolean funFactsActivated) throws Exception {
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new Exception("Username already exists");
+        }
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new Exception("Email already exists");
+        }
+        String encryptedPassword = passwordEncoder.encode(password);
+        User newUser = new User(username, email, encryptedPassword, notificationActivated, funFactsActivated);
+        return userRepository.save(newUser);
     }
 }
