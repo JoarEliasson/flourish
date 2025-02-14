@@ -58,10 +58,11 @@ public class MailService {
         properties.put("mail.smtp.auth", MailConfig.MAIL_SMTP_AUTH);
 
         Session session = Session.getInstance(properties, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(MailConfig.MAIL_USER, MailConfig.MAIL_AUTH_PASSWORD);
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(MailConfig.MAIL_USER, MailConfig.MAIL_AUTH_PASSWORD);
+                    }
             }
-        });
+        );
 
         try {
             MimeMessage message = new MimeMessage(session);

@@ -26,7 +26,7 @@ public class FunFacts {
         factsArray = new ArrayList<>();
         //print the location runtime
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
-       /* try (BufferedReader br = new BufferedReader(new FileReader("/com/flourish/client/controller/texts/fun_facts.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("/com/flourish/client/controller/texts/fun_facts.txt"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 factsArray.add(line);
@@ -34,7 +34,7 @@ public class FunFacts {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        */
+
     }
 
     /**

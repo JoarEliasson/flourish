@@ -10,15 +10,15 @@ import java.util.Random;
 public class PictureRandomizer {
 
     private static final String[] IMAGE_PATHS = {
-            "/images/blomma2.jpg",
-            "/images/blomma5.jpg",
-            "/images/blomma6.jpg",
-            "/images/blomma9.jpg",
-            "/images/blomma10.jpg",
-            "/images/blomma17.jpg",
-            "/images/blomma18.jpg",
-            "/images/blomma19.jpg",
-            "/images/blomma21.jpg"
+            "/com/flourish/client/controller/images/blomma2.jpg",
+            "/com/flourish/client/controller/images/blomma5.jpg",
+            "/com/flourish/client/controller/images/blomma6.jpg",
+            "/com/flourish/client/controller/images/blomma9.jpg",
+            "/com/flourish/client/controller/images/blomma10.jpg",
+            "/com/flourish/client/controller/images/blomma17.jpg",
+            "/com/flourish/client/controller/images/blomma18.jpg",
+            "/com/flourish/client/controller/images/blomma19.jpg",
+            "/com/flourish/client/controller/images/blomma21.jpg"
     };
 
     private static final Image[] FLOWER_IMAGES = new Image[IMAGE_PATHS.length];

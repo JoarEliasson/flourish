@@ -90,7 +90,7 @@ public class SearchTabPaneController {
         FunFacts funFacts = new FunFacts();
         if (factsActivated) {
             imgFunFactTitle.setVisible(true);
-            lstFunFacts.setItems(funFacts.getRandomFact());
+//            lstFunFacts.setItems(funFacts.getRandomFact());
         } else {
             imgFunFactTitle.setVisible(false);
             lstFunFacts.setItems(null);

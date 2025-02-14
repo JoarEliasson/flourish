@@ -112,7 +112,7 @@ public class User implements Serializable {
     }
 
     public boolean areFunFactsActivated() {
-        return funFactsActivated;
+        return false;
     }
 
     public void setFunFactsActivated(boolean funFactsActivated) {

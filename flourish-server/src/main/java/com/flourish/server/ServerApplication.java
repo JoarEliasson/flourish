@@ -13,7 +13,8 @@ import java.sql.SQLException;
  *
  * <p>Temporary solution before major refactoring of server logic</p>
  *
- * @author Joar Eliasson
+ * @author Joar
+ *
  * @since 2025-02-03
  */
 public class ServerApplication {
