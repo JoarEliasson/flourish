@@ -13,8 +13,8 @@ import java.util.List;
  * watering frequency in days).
  * </p>
  *
- * @author  Joar Eliasson
- * @since   2025-02-03
+ * @author Joar Eliasson
+ * @since 2025-02-03
  */
 public class Plant implements Serializable {
 
@@ -43,11 +43,11 @@ public class Plant implements Serializable {
      * This constructor is used when retrieving species data.
      * </p>
      *
-     * @param speciesId       the unique species identifier (from the Species table)
-     * @param commonName      the common name of the species
-     * @param scientificName  the scientific name of the species
-     * @param family      the family name of the species
-     * @param imageUrl the default image URL for the species
+     * @param speciesId      the unique species identifier (from the Species table)
+     * @param commonName     the common name of the species
+     * @param scientificName the scientific name of the species
+     * @param family         the family name of the species
+     * @param imageUrl       the default image URL for the species
      */
     public Plant(int speciesId, String commonName, String scientificName, String genus, String family, String imageUrl, List<String> synonyms) {
         this.speciesId = speciesId;

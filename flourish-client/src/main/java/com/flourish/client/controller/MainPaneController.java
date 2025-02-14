@@ -20,7 +20,6 @@ public class MainPaneController {
     public TabPane mainPane;
 
 
-
     @FXML
     private MyPlantsTabPaneController myPlantsTabPaneController;
     @FXML

@@ -15,8 +15,9 @@ import java.util.List;
  * from the Trefle API into the local database. It fetches data one page at a time,
  * tracks progress, and uses additional delays so that API rate limits are not exceeded.
  * <p>
- * @author  Joar Eliasson
- * @since   2025-02-04
+ *
+ * @author Joar Eliasson
+ * @since 2025-02-04
  */
 public class TreflePlantSyncRunner {
     private final TrefleApiClient apiClient;

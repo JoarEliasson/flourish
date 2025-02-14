@@ -209,7 +209,7 @@ public class SearchPlantPane extends Pane implements PlantPane {
     public void extendPaneMoreInfoPlant() {
         AtomicReference<Double> height = new AtomicReference<>(this.getHeight());
         Timeline timeline = new Timeline(
-            new KeyFrame(Duration.millis(7.5), event -> this.setPrefHeight(height.updateAndGet(v -> (double) (v + 6.25))))
+                new KeyFrame(Duration.millis(7.5), event -> this.setPrefHeight(height.updateAndGet(v -> (double) (v + 6.25))))
         );
         timeline.setCycleCount(32);
         timeline.play();
@@ -233,7 +233,7 @@ public class SearchPlantPane extends Pane implements PlantPane {
 
         AtomicReference<Double> height = new AtomicReference<>(this.getHeight());
         Timeline timeline = new Timeline(
-            new KeyFrame(Duration.millis(7.5), event -> this.setPrefHeight(height.updateAndGet(v -> (double) (v - 6.25))))
+                new KeyFrame(Duration.millis(7.5), event -> this.setPrefHeight(height.updateAndGet(v -> (double) (v - 6.25))))
         );
         timeline.setCycleCount(32);
         timeline.play();

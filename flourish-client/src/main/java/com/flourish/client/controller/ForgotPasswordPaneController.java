@@ -17,7 +17,6 @@ import javafx.scene.input.MouseEvent;
 import java.io.IOException;
 
 /**
- *
  * @author Joar Eliasson, Christoffer Salomonsson
  */
 public class ForgotPasswordPaneController {

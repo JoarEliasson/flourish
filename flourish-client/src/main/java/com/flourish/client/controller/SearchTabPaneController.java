@@ -125,31 +125,31 @@ public class SearchTabPaneController {
         listViewResult.setItems(searchPlantPanes);
 
         Task getImagesTask =
-            new Task() {
-                @Override
-                protected Object call() {
-                    long i = 1;
-                    for (SearchPlantPane spp : searchPlantPanes) {
-                        Plant Plant = spp.getPlant();
-                        if (Plant.getImageURL().equals("")) {
-                            spp.setDefaultImage(ImageLibrary.getDefaultPlantImage());
-                        } else {
-                            try {
-                                spp.updateImage();
-                            } catch (IllegalArgumentException e) {
+                new Task() {
+                    @Override
+                    protected Object call() {
+                        long i = 1;
+                        for (SearchPlantPane spp : searchPlantPanes) {
+                            Plant Plant = spp.getPlant();
+                            if (Plant.getImageURL().equals("")) {
                                 spp.setDefaultImage(ImageLibrary.getDefaultPlantImage());
+                            } else {
+                                try {
+                                    spp.updateImage();
+                                } catch (IllegalArgumentException e) {
+                                    spp.setDefaultImage(ImageLibrary.getDefaultPlantImage());
+                                }
                             }
+                            updateProgress(i++, searchPlantPanes.size());
                         }
-                        updateProgress(i++, searchPlantPanes.size());
+                        Text text = (Text) progressIndicator.lookup(".percentage");
+                        if (text.getText().equals("90%") || text.getText().equals("Done")) {
+                            text.setText("Done");
+                            progressIndicator.setPrefWidth(text.getLayoutBounds().getWidth());
+                        }
+                        return true;
                     }
-                    Text text = (Text) progressIndicator.lookup(".percentage");
-                    if (text.getText().equals("90%") || text.getText().equals("Done")) {
-                        text.setText("Done");
-                        progressIndicator.setPrefWidth(text.getLayoutBounds().getWidth());
-                    }
-                    return true;
-                }
-            };
+                };
         Thread imageThread = new Thread(getImagesTask);
         progressIndicator.progressProperty().bind(getImagesTask.progressProperty());
         imageThread.start();

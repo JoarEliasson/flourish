@@ -13,6 +13,7 @@ import java.util.HashMap;
  * Class that stores all the different handlers for database requests
  *
  * <p>Updated with password reset functionality</p>
+ *
  * @author Joar Eliasson
  * @since 2025-02-05
  */

@@ -7,8 +7,8 @@ import java.util.Properties;
 /**
  * Loads API configuration values from the .env file in the project root.
  *
- * @author  Joar Eliasson
- * @since   2025-02-04
+ * @author Joar Eliasson
+ * @since 2025-02-04
  */
 public final class ApiConfig {
 
@@ -28,5 +28,6 @@ public final class ApiConfig {
      */
     public static final String TREFLE_API_TOKEN = properties.getProperty("TREFLE_API_TOKEN");
 
-    private ApiConfig() {}
+    private ApiConfig() {
+    }
 }

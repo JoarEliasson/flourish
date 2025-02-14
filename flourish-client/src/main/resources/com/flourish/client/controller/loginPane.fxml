@@ -35,6 +35,8 @@
                                 prefHeight="36.0" prefWidth="158.0" text="Forgot password"/>
                     </children>
                 </HBox>
+                <Hyperlink fx:id="registerLink" layoutX="387.0" layoutY="407.0" onAction="#swapToRegister" text="No account? Register here!">
+                </Hyperlink>
                 <ImageView fitHeight="300.0" fitWidth="105.0" layoutX="632.0" layoutY="121.0" pickOnBounds="true"
                            preserveRatio="true">
                     <image>

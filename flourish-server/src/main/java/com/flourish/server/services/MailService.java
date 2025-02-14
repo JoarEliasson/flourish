@@ -10,7 +10,7 @@ import java.util.Properties;
 public class MailService {
 
 
-    private String to = "joar@bomikael.se" ;
+    private String to = "joar@bomikael.se";
     private Session session;
 
 

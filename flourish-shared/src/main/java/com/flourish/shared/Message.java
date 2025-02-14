@@ -9,6 +9,7 @@ import java.util.ArrayList;
  * Client/Server via TCP
  * <p>
  * Updated with new constructors and methods
+ *
  * @author Joar Eliasson
  * @since 2025-02-05
  * </p>

@@ -6,8 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * DTO representing the family information from Trefle.
  * <p>
- * @author  Joar Eliasson
- * @since   2025-02-04
+ *
+ * @author Joar Eliasson
+ * @since 2025-02-04
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FamilyDto {

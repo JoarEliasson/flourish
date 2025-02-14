@@ -6,6 +6,7 @@ import com.flourish.shared.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
@@ -42,9 +43,17 @@ public class UserPlantRepository {
      */
     public boolean savePlant(User user, Plant plant) {
         String safeNickname = escapeString(plant.getNickname());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        String formattedDate = LocalDate.now().format(formatter);
+
+        String safeImageUrl = (plant.getImageURL() != null) ? escapeString(plant.getImageURL()) : "";
+
         String query = "INSERT INTO Plants (user_id, nickname, species_id, last_watered, image_url) " +
                 "VALUES (" + user.getUniqueId() + ", '" + safeNickname + "', " + plant.getSpeciesId() +
-                ", '" + plant.getLastWatered() + "', '" + plant.getImageURL() + "');";
+                ", '" + formattedDate + "', '" + safeImageUrl + "');";
+        System.out.println(String.format("Query: \nFields:\nuser_id: %d\nnickname: %s\nspecies_id: %d\nlast_watered: %s\nimage_url: %s\n",
+                user.getUniqueId(), safeNickname, plant.getSpeciesId(), formattedDate, safeImageUrl));
         try {
             queryExecutor.executeUpdate(query);
             return true;

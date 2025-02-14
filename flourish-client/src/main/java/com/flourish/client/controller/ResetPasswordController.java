@@ -24,6 +24,7 @@ public class ResetPasswordController {
         verifier = new Verifier();
         //goBackIcon.setFocusTraversable(false); //sets the goback button on focus to remove from first textfield
     }
+
     public void registerNewPass() {
 
     }

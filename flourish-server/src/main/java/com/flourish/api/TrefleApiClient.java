@@ -23,8 +23,9 @@ import java.util.List;
  * from a specified URL. It also provides a main method for testing the integration of API retrieval
  * and database insertion.
  * <p>
- * @author  Joar Eliasson
- * @since   2025-02-04
+ *
+ * @author Joar Eliasson
+ * @since 2025-02-04
  */
 public class TrefleApiClient {
 
@@ -50,7 +51,7 @@ public class TrefleApiClient {
      *
      * @param speciesId the unique species identifier.
      * @return a PlantDetails object containing detailed information.
-     * @throws IOException if an I/O error occurs.
+     * @throws IOException          if an I/O error occurs.
      * @throws InterruptedException if the request is interrupted.
      */
     public PlantDetails fetchPlantDetails(int speciesId) throws IOException, InterruptedException {
@@ -77,7 +78,7 @@ public class TrefleApiClient {
      * Fetches one page of plant data from the Trefle API.
      *
      * @return a list of PlantObj representing one page of plant species data.
-     * @throws IOException if an I/O error occurs.
+     * @throws IOException          if an I/O error occurs.
      * @throws InterruptedException if the request is interrupted.
      */
     public List<PlantDto> fetchOnePage() throws IOException, InterruptedException {
@@ -102,7 +103,7 @@ public class TrefleApiClient {
      * while respecting rate limits.
      *
      * @return a list of PlantObj representing all species retrieved.
-     * @throws IOException if an I/O error occurs.
+     * @throws IOException          if an I/O error occurs.
      * @throws InterruptedException if the request is interrupted.
      */
     public List<PlantDto> fetchAllPlants() throws IOException, InterruptedException {
@@ -176,7 +177,7 @@ public class TrefleApiClient {
      *
      * @param url the full URL for the API request.
      * @return the TrefleApiResponse.
-     * @throws IOException if an I/O error occurs.
+     * @throws IOException          if an I/O error occurs.
      * @throws InterruptedException if the request is interrupted.
      */
     public PlantDataResponse fetchPageResponse(String url) throws IOException, InterruptedException {

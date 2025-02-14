@@ -16,8 +16,9 @@ import java.io.IOException;
 /**
  * Class that starts the client application.
  * <p>
- * @author  Joar Eliasson
- * @since   2025-02-07
+ *
+ * @author Joar Eliasson
+ * @since 2025-02-07
  */
 public class ClientApplication extends Application {
 

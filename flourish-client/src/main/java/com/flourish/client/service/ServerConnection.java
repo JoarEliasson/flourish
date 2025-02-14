@@ -37,8 +37,8 @@ public class ServerConnection {
     public Message makeRequest(Message request) {
 
         Message response = null;
-        try {
-            Socket socket = new Socket(ipAddress, port);
+        try (Socket socket = new Socket(ipAddress, port)) {
+            ;
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             oos.writeObject(request);

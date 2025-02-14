@@ -11,8 +11,9 @@ import java.util.Map;
  * <p>
  * Used as a wrapper for the list of PlantObj objects returned by the API.
  * <p>
- * @author  Joar Eliasson
- * @since   2025-02-04
+ *
+ * @author Joar Eliasson
+ * @since 2025-02-04
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlantDataResponse {

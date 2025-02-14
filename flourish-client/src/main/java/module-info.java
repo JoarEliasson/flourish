@@ -20,4 +20,5 @@ module flourish.client {
     exports com.flourish.client.service;
 
     opens com.flourish.client.controller to javafx.fxml;
+
 }

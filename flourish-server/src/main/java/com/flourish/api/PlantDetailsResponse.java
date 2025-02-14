@@ -6,8 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * DTO for the API response when retrieving plant details.
  * <p>
- * @author  Joar Eliasson
- * @since   2025-02-04
+ *
+ * @author Joar Eliasson
+ * @since 2025-02-04
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlantDetailsResponse {

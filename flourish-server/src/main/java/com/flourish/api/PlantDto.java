@@ -11,8 +11,9 @@ import java.util.List;
  * The object contains fields for the plant's ID, common name, scientific name, genus, family,
  * image URL, and synonyms.
  * <p>
- * @author  Joar Eliasson
- * @since   2025-02-04
+ *
+ * @author Joar Eliasson
+ * @since 2025-02-04
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlantDto {
@@ -32,26 +33,61 @@ public class PlantDto {
 
     private List<String> synonyms;
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public String getCommonName() { return commonName; }
-    public void setCommonName(String commonName) { this.commonName = commonName; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getScientificName() { return scientificName; }
-    public void setScientificName(String scientificName) { this.scientificName = scientificName; }
+    public String getCommonName() {
+        return commonName;
+    }
 
-    public String getGenus() { return genus; }
-    public void setGenus(String genus) { this.genus = genus; }
+    public void setCommonName(String commonName) {
+        this.commonName = commonName;
+    }
 
-    public String getFamily() { return family; }
-    public void setFamily(String family) { this.family = family; }
+    public String getScientificName() {
+        return scientificName;
+    }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public void setScientificName(String scientificName) {
+        this.scientificName = scientificName;
+    }
 
-    public List<String> getSynonyms() { return synonyms; }
-    public void setSynonyms(List<String> synonyms) { this.synonyms = synonyms; }
+    public String getGenus() {
+        return genus;
+    }
+
+    public void setGenus(String genus) {
+        this.genus = genus;
+    }
+
+    public String getFamily() {
+        return family;
+    }
+
+    public void setFamily(String family) {
+        this.family = family;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public List<String> getSynonyms() {
+        return synonyms;
+    }
+
+    public void setSynonyms(List<String> synonyms) {
+        this.synonyms = synonyms;
+    }
 
     @Override
     public String toString() {

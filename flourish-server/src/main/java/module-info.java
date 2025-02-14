@@ -15,4 +15,5 @@ module flourish.server {
     exports com.flourish.api;
 
     opens com.flourish.api to com.fasterxml.jackson.databind;
+
 }
