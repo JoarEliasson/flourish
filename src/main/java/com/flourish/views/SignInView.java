@@ -1,48 +1,58 @@
 package com.flourish.views;
 
-import com.flourish.domain.User;
-import com.flourish.service.UserService;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.security.PermitAll;
 
 /**
- * A custom sign-in view at "/signin".
- * <p>
- * Uses a Vaadin {@link LoginForm} that, by default, posts credentials to "/login",
- * which VaadinWebSecurity handles.
- * </p>
+ * A Vaadin view for signing into the application.
+ *
+ * <p>This view is shown for unauthorized users.
+ * It leverages Vaadin's LoginForm and integrates with Spring Security
+ * via the VaadinWebSecurity configuration in SecurityConfig.</p>
+ *
+ * <p>Uses a centered layout for responsiveness.</p>
  */
 @Route("signin")
-public class SignInView extends VerticalLayout {
+@PermitAll
+@CssImport("./styles/views/signin/sign-in-view.css") // Optional custom CSS
+public class SignInView extends FlexLayout {
 
-    private final UserService userService;
+    private final LoginForm loginForm = new LoginForm();
 
-    @Autowired
-    public SignInView(UserService userService) {
-        this.userService = userService;
-        initLayout();
-    }
-
-    private void initLayout() {
-        H1 heading = new H1("Sign In");
-        LoginForm loginForm = new LoginForm();
-
-        Button testLoginButton = new Button("Manual Test Login", e -> {
-            try {
-                User user = userService.authenticate("test", "pass");
-                getUI().ifPresent(ui -> ui.navigate("main"));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
-
-        add(heading, loginForm, testLoginButton);
+    /**
+     * Constructs a new SignInView.
+     */
+    public SignInView() {
         setSizeFull();
-        setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
+        setAlignItems(Alignment.CENTER);
+        setFlexDirection(FlexDirection.COLUMN);
+
+        H1 title = new H1("Please Sign In");
+
+        LoginI18n i18n = LoginI18n.createDefault();
+        i18n.setHeader(new LoginI18n.Header());
+        i18n.getHeader().setTitle("Flourish Application");
+        i18n.getHeader().setDescription("Enter your credentials to continue");
+        loginForm.setI18n(i18n);
+        loginForm.setAction("login");
+
+        Button registerButton = new Button("Register", e ->
+                getUI().ifPresent(ui -> ui.navigate("register"))
+        );
+
+        Label registerLabel = new Label("Don't have an account?");
+        VerticalLayout registerLayout = new VerticalLayout(registerLabel, registerButton);
+        registerLayout.setAlignItems(Alignment.CENTER);
+
+        add(title, loginForm, registerLayout);
     }
 }
