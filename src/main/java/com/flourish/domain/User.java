@@ -1,15 +1,13 @@
 package com.flourish.domain;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 /**
  * Represents a user in the Flourish application.
  *
- * <p>This entity stores user credentials and other profile details.
- * Passwords are encrypted using BCrypt. A password reset token is optional
- * but included to support password-reset functionality in the future.</p>
+ * <p>This entity stores user credentials, including an encrypted password,
+ * and optionally a reset token for password resetting in the future.</p>
  *
  * @author
  *   Your Name
@@ -19,76 +17,51 @@ import java.time.LocalDateTime;
  *   1.0.0
  */
 @Entity
-@Table(name = "users")
+@Table(name = "users") // Optional explicit table name
 public class User {
 
-    /**
-     * The unique identifier for this User.
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * The user's first name.
-     */
     @Column(nullable = false)
     private String firstName;
 
-    /**
-     * The user's last name.
-     */
     @Column(nullable = false)
     private String lastName;
 
     /**
-     * The user's email address.
-     * This should be unique and is used as login principal.
+     * The user's email address. Must be unique and is used for login.
      */
     @Column(nullable = false, unique = true)
     private String email;
 
     /**
-     * The encrypted user password.
+     * The encrypted (BCrypt) password.
      */
     @Column(nullable = false)
     private String password;
 
     /**
-     * (Optional) The user's role, e.g. "USER" or "ADMIN".
-     * Default can be "USER".
+     * The user’s role (e.g. "USER" or "ADMIN").
      */
     @Column(nullable = false)
     private String role = "USER";
 
     /**
-     * (Optional) A token for password-reset functionality.
+     * (Optional) Token for password reset flows.
      */
-    @Column
     private String resetToken;
 
     /**
-     * (Optional) Expiration date/time for the password reset token.
+     * (Optional) When the reset token expires.
      */
-    @Column
     private LocalDateTime resetTokenExpiry;
 
-    /**
-     * Default constructor for JPA.
-     */
     protected User() {
-        // Default no-arg constructor required by JPA
+        // Required by JPA
     }
 
-    /**
-     * Constructs a new user with the given data.
-     *
-     * @param firstName The user's first name.
-     * @param lastName  The user's last name.
-     * @param email     The user's email address.
-     * @param password  The user's (encrypted) password.
-     * @param role      The user's role.
-     */
     public User(String firstName, String lastName, String email, String password, String role) {
         this.firstName = firstName;
         this.lastName = lastName;

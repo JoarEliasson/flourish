@@ -12,6 +12,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 
@@ -41,7 +42,6 @@ public class RegistrationView extends VerticalLayout {
     public RegistrationView(UserService userService) {
         this.userService = userService;
 
-        // Center the form in the page
         setSizeFull();
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
@@ -49,28 +49,21 @@ public class RegistrationView extends VerticalLayout {
         H1 heading = new H1("Register New Account");
         add(heading);
 
-        // Create a form layout
         FormLayout formLayout = new FormLayout();
-        // Add fields
         formLayout.add(firstNameField, lastNameField, emailField, passwordField);
 
-        // Configure responsive steps
         formLayout.setResponsiveSteps(
-                // min-width 0px: 1 column
                 new FormLayout.ResponsiveStep("0", 1),
-                // min-width 600px: 2 columns
                 new FormLayout.ResponsiveStep("600px", 2)
         );
 
-        // Add some recommended widths
         firstNameField.setWidthFull();
         lastNameField.setWidthFull();
         emailField.setWidthFull();
         passwordField.setWidthFull();
 
-        // We can wrap the formLayout + button in a VerticalLayout
         VerticalLayout formWrapper = new VerticalLayout(formLayout);
-        formWrapper.setWidth("400px"); // optional fixed max width
+        formWrapper.setWidth("400px");
         formWrapper.setAlignItems(Alignment.STRETCH);
 
         Button registerButton = new Button("Register", event -> handleRegister());

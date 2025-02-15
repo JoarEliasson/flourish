@@ -14,12 +14,6 @@ import java.util.Optional;
  * <p>Uses a {@code UserRepository} for database operations
  * and a {@code PasswordEncoder} for password encryption.</p>
  *
- * <p>Adheres to the SOLID principle of Single Responsibility:
- * this class’s only job is to manage user business logic.</p>
- *
- * <p>Following TDD, tests can be written to verify the correctness
- * of each method with mock or in-memory DB approaches.</p>
- *
  * @see com.flourish.service.UserService
  * @see com.flourish.domain.User
  * @see <a href="https://docs.spring.io/spring-data/jpa/docs/current/reference/html/">Spring Data JPA Reference</a>
@@ -67,8 +61,6 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User updateUser(User user) {
-        // If updating password, ensure it is already encoded
-        // or re-encoded depending on your logic
         return userRepository.save(user);
     }
 

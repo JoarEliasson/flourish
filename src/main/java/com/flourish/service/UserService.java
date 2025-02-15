@@ -9,12 +9,6 @@ import java.util.Optional;
  * creating new users, fetching existing users, and handling
  * password reset tokens.
  *
- * <p>Following the SOLID principle of Single Responsibility, this
- * service encapsulates all user-related business logic.</p>
- *
- * <p>Following TDD, you can create tests that verify each
- * method independently.</p>
- *
  * @author
  *   Your Name
  * @version
