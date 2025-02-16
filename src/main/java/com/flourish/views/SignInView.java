@@ -18,10 +18,12 @@ import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * A single Vaadin view handling both sign-in and registration.
@@ -31,7 +33,8 @@ import org.springframework.security.core.Authentication;
  */
 @Route("signin")
 @PermitAll
-@CssImport("./styles/views/signin/sign-in-view.css") // optional styling
+@AnonymousAllowed
+@CssImport("./styles/views/signin/sign-in-view.css")
 public class SignInView extends FlexLayout {
 
     private final LoginForm loginForm = new LoginForm();
@@ -164,7 +167,7 @@ public class SignInView extends FlexLayout {
             UsernamePasswordAuthenticationToken authRequest =
                     new UsernamePasswordAuthenticationToken(newUser.getEmail(), passwordField.getValue());
             Authentication authResult = authenticationManager.authenticate(authRequest);
-            org.springframework.security.core.context.SecurityContextHolder.getContext()
+            SecurityContextHolder.getContext()
                     .setAuthentication(authResult);
 
             Notification.show("Registration successful. You're now logged in!");

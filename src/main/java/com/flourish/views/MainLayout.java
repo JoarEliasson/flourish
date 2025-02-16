@@ -19,7 +19,7 @@ import jakarta.annotation.security.RolesAllowed;
  * @since
  *   1.0.0
  */
-//@RolesAllowed("USER")
+@RolesAllowed("USER")
 public class MainLayout extends AppLayout {
 
     /**

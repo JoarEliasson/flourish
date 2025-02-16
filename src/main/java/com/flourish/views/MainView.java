@@ -1,29 +1,24 @@
 package com.flourish.views;
 
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
 /**
- * Main application view shown to authenticated users.
+ * A protected main view for authenticated users with role USER.
  *
- * <p>This view is displayed within the {@link MainLayout}, ensuring
- * a consistent header/navigation structure. Only "USER" roles
- * can access.</p>
- *
- * @see MainLayout
+ * <p>Shown at "/main" using MainLayout. If an unauthenticated user
+ * attempts to access it, they are redirected to "/login".</p>
  */
 @Route(value = "", layout = MainLayout.class)
 @RolesAllowed("USER")
 public class MainView extends VerticalLayout {
 
     /**
-     * Constructs a new MainView.
+     * Constructs a new MainView with a welcome message.
      */
     public MainView() {
-        add(new H2("Welcome to the Flourish Application!"));
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        setSizeFull();
+        add(new H1("Welcome to the Main View!"));
     }
 }

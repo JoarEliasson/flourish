@@ -15,8 +15,7 @@
         <target.version>17</target.version>
         <source.version>17</source.version>
         <spring-boot.version>3.0.5</spring-boot.version>
-        <vaadin.version>24.0.5</vaadin.version>
-        <!-- specify a valid version for vaadin-spring-security -->
+        <vaadin.version>24.0.6</vaadin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

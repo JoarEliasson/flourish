@@ -133,7 +133,7 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
         grid.$connector.hasParentRequestQueue = tryCatchWrapper(() => parentRequestQueue.length > 0);
 
         grid.$connector.hasRootRequestQueue = tryCatchWrapper(() => {
-          return Object.keys(rootPageCallbacks).length > 0 || (rootRequestDebouncer && rootRequestDebouncer.isActive());
+          return Object.keys(rootPageCallbacks).length > 0 || (!!rootRequestDebouncer && rootRequestDebouncer.isActive());
         });
 
         grid.$connector.beforeEnsureSubCacheForScaledIndex = tryCatchWrapper(function (targetCache, scaledIndex) {
@@ -157,14 +157,8 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
             return;
           }
           if (selectionMode === 'SINGLE') {
-            grid.selectedItems = [];
             selectedKeys = {};
           }
-
-          // For single selection mode, "deselect all" selects a single item `null`,
-          // which should not end up in the selected items
-          const sanitizedItems = items.filter((item) => item !== null);
-          grid.selectedItems = grid.selectedItems.concat(sanitizedItems);
 
           items.forEach((item) => {
             if (item) {
@@ -174,11 +168,16 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
                 grid.$server.select(item.key);
               }
             }
+
+            // FYI: In single selection mode, the server can send items = [null]
+            // which means a "Deselect All" command.
             const isSelectedItemDifferentOrNull = !grid.activeItem || !item || item.key != grid.activeItem.key;
             if (!userOriginated && selectionMode === 'SINGLE' && isSelectedItemDifferentOrNull) {
               grid.activeItem = item;
             }
           });
+
+          grid.selectedItems = Object.values(selectedKeys);
         });
 
         grid.$connector.doDeselection = tryCatchWrapper(function (items, userOriginated) {
@@ -400,6 +399,18 @@ import { isFocusable } from '@vaadin/grid/src/vaadin-grid-active-item-mixin.js';
           } else {
             // workaround: sometimes grid-element gives page index that overflows
             page = Math.min(page, Math.floor(grid.size / grid.pageSize));
+
+            // size is controlled by the server (data communicator), so if the
+            // size is zero, we know that there is no data to fetch.
+            // This also prevents an empty grid getting stuck in a loading state.
+            // The connector does not cache empty pages, so if the grid requests
+            // data again, there would be no cache entry, causing a request to
+            // the server. However, the data communicator will never respond,
+            // as it assumes that the data is already cached.
+            if (grid.size === 0) {
+              callback([], 0);
+              return;
+            }
 
             if (cache[root] && cache[root][page]) {
               callback(cache[root][page]);

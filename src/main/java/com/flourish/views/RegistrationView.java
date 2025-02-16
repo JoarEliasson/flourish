@@ -4,27 +4,38 @@ import com.flourish.domain.User;
 import com.flourish.service.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import jakarta.annotation.security.PermitAll;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+
+import java.util.Map;
 
 /**
- * A Vaadin view for registering new users.
+ * A view for new users to register an account.
  *
- * <p>Provides a responsive form layout, so fields
- * appear in one column on narrow screens and two
- * columns on wider screens.</p>
+ * <p>Available at "/register". After successful registration,
+ * we navigate to "/login?email=<theUserEmail>" to prefill
+ * the login form with the newly created email.</p>
+ *
+ * <p>This view is fully accessible to anonymous users.</p>
+ *
+ * <p>Follows a typical pattern of collecting first/last name,
+ * email, and password. Email is stored as the username in DB.</p>
+ *
+ * @author
+ *   Your Name
+ * @version
+ *   1.0.0
+ * @since
+ *   1.0.0
  */
 @Route("register")
-@PermitAll
+@AnonymousAllowed
 public class RegistrationView extends VerticalLayout {
 
     private final UserService userService;
@@ -37,56 +48,40 @@ public class RegistrationView extends VerticalLayout {
     /**
      * Constructs a new RegistrationView.
      *
-     * @param userService The service handling user creation logic.
+     * @param userService The service to save new users.
      */
     public RegistrationView(UserService userService) {
         this.userService = userService;
 
         setSizeFull();
-        setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
+        setJustifyContentMode(JustifyContentMode.CENTER);
 
-        H1 heading = new H1("Register New Account");
-        add(heading);
+        add(new H2("Register New Account"));
 
-        FormLayout formLayout = new FormLayout();
-        formLayout.add(firstNameField, lastNameField, emailField, passwordField);
-
+        FormLayout formLayout = new FormLayout(
+                firstNameField, lastNameField, emailField, passwordField
+        );
         formLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
                 new FormLayout.ResponsiveStep("600px", 2)
         );
 
-        firstNameField.setWidthFull();
-        lastNameField.setWidthFull();
-        emailField.setWidthFull();
-        passwordField.setWidthFull();
+        Button registerButton = new Button("Register", e -> handleRegister());
+        formLayout.add(registerButton);
+        add(formLayout);
 
-        VerticalLayout formWrapper = new VerticalLayout(formLayout);
-        formWrapper.setWidth("400px");
-        formWrapper.setAlignItems(Alignment.STRETCH);
-
-        Button registerButton = new Button("Register", event -> handleRegister());
-        registerButton.setWidthFull();
-
-        formWrapper.add(registerButton);
-        add(formWrapper);
-
-        // Link back to sign in
-        Button signInButton = new Button("Back to Sign In",
-                e -> getUI().ifPresent(ui -> ui.navigate("signin"))
-        );
-        add(new Paragraph("Already have an account?"), signInButton);
+        setWidth("400px");
     }
 
     /**
-     * Handles registration by collecting form data and creating a new User
-     * via the UserService.
+     * Handles the registration logic: creates a new user in DB,
+     * takes the user to the login page.
      */
     private void handleRegister() {
         if (firstNameField.isEmpty() || lastNameField.isEmpty() ||
                 emailField.isEmpty() || passwordField.isEmpty()) {
-            Notification.show("Please fill in all fields.");
+            Notification.show("Please fill all fields.");
             return;
         }
 
@@ -100,8 +95,11 @@ public class RegistrationView extends VerticalLayout {
 
         try {
             userService.createUser(newUser);
-            Notification.show("Registration successful. Please log in.");
-            getUI().ifPresent(ui -> ui.navigate("signin"));
+            Notification.show("Registration successful!");
+            getUI().ifPresent(ui -> {
+                ui.navigate("login");
+            });
+
         } catch (Exception ex) {
             Notification.show("Registration failed: " + ex.getMessage());
         }
