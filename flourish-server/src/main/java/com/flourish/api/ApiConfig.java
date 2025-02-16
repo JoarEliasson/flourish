@@ -28,5 +28,15 @@ public final class ApiConfig {
      */
     public static final String TREFLE_API_TOKEN = properties.getProperty("TREFLE_API_TOKEN");
 
+    /**
+     * Written for Testing purposes.
+     *
+     * @Author Martin Frick
+     * @return
+     */
+    public Properties getProperties() {
+        return properties;
+    }
+
     private ApiConfig() {}
 }

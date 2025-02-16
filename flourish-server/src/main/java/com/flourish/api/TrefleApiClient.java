@@ -5,8 +5,8 @@ import com.flourish.server.db.DefaultQueryExecutor;
 import com.flourish.server.db.MySQLDatabaseConnection;
 import com.flourish.server.db.PlantRepository;
 import com.flourish.server.db.QueryExecutor;
-import com.flourish.shared.Plant;
 import com.flourish.shared.PlantDetails;
+import com.flourish.shared.Plant;
 
 import java.io.IOException;
 import java.net.URI;

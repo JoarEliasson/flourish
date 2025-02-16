@@ -2,9 +2,9 @@ package com.flourish.server.services;
 
 import com.flourish.server.config.MailConfig;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import java.util.Properties;
 
 public class MailService {
@@ -22,7 +22,7 @@ public class MailService {
         properties.put("mail.smtp.ssl.enable", MailConfig.MAIL_SMTP_SSL_ENABLE);
         properties.put("mail.smtp.auth", MailConfig.MAIL_SMTP_AUTH);
 
-        this.session = Session.getInstance(System.getProperties(), new javax.mail.Authenticator() {
+        this.session = Session.getInstance(System.getProperties(), new jakarta.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(MailConfig.MAIL_USER, MailConfig.MAIL_AUTH_PASSWORD);
             }
@@ -96,7 +96,7 @@ public class MailService {
      * @author Martin Frick
      * 2025-02-14
      * */
-    private static MimeMessage buildMessage(Session session, String recipient, String subjectField, String body) throws MessagingException {
+    public static MimeMessage buildMessage(Session session, String recipient, String subjectField, String body) throws MessagingException {
 
         MimeMessage Msg = new MimeMessage(session);
 
@@ -114,7 +114,7 @@ public class MailService {
      * @author Martin Frick
      * 2025-02-14
      * */
-    private static void sendMessage(MimeMessage message) throws MessagingException {
+    public static void sendMessage(MimeMessage message) throws MessagingException {
 
         Transport.send(message);
     }

@@ -1,6 +1,6 @@
 module flourish.server {
     requires com.fasterxml.jackson.databind;
-    requires java.mail;
+    requires jakarta.mail;
     requires java.net.http;
     requires jbcrypt;
     requires flourish.shared;
