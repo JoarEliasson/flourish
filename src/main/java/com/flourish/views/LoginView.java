@@ -1,6 +1,9 @@
 package com.flourish.views;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -25,6 +28,12 @@ public class LoginView extends VerticalLayout {
      * Constructs a new LoginView with a Vaadin LoginForm.
      */
     public LoginView() {
+        VerticalLayout loginLayout = new VerticalLayout();
+        loginLayout.setWidth("400px");
+        loginLayout.setPadding(true);
+        loginLayout.setSpacing(true);
+        loginLayout.setAlignItems(Alignment.CENTER);
+
         LoginForm loginForm = new LoginForm();
         loginForm.setAction("login");
 
@@ -39,16 +48,20 @@ public class LoginView extends VerticalLayout {
 
         loginForm.addForgotPasswordListener(e -> getUI().ifPresent(ui -> ui.navigate("forgotpassword")));
 
-
-        Button forgotPasswordButton = new Button("Forgot Password?", e ->
-                getUI().ifPresent(ui -> ui.navigate("forgotpassword"))
+        Button registerButton = new Button("Register", e ->
+                getUI().ifPresent(ui -> ui.navigate("register"))
         );
-        forgotPasswordButton.getStyle().set("cursor", "pointer");
 
-        add(loginForm,forgotPasswordButton);
+        H3 header = new H3("New to Flourish?");
+
+        registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+        registerButton.getStyle().set("cursor", "pointer");
+        loginLayout.add(loginForm, header, registerButton);
+        add(loginLayout);
+
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
     }
 }
-
