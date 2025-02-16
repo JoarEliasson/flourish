@@ -2,6 +2,7 @@ package com.flourish.security;
 
 import com.flourish.views.LandingView;
 import com.flourish.views.LoginView;
+import com.flourish.views.MainView;
 import com.flourish.views.SignInView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
@@ -77,6 +78,7 @@ public class SecurityConfig extends VaadinWebSecurity {
         http.authorizeHttpRequests(auth -> {
             auth.requestMatchers("/images/**").permitAll();
         });
+
         super.configure(http);
 
         setLoginView(http, LoginView.class);

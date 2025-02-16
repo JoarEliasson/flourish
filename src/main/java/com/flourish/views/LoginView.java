@@ -1,5 +1,6 @@
 package com.flourish.views;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -33,9 +34,18 @@ public class LoginView extends VerticalLayout {
         }
         i18n.getHeader().setTitle("Please Log In");
         i18n.getHeader().setDescription("Enter your credentials");
+        i18n.getForm().setForgotPassword("NYTT LÖSENORD TACK");
         loginForm.setI18n(i18n);
 
-        add(loginForm);
+        loginForm.addForgotPasswordListener(e -> getUI().ifPresent(ui -> ui.navigate("forgotpassword")));
+
+
+        Button forgotPasswordButton = new Button("Forgot Password?", e ->
+                getUI().ifPresent(ui -> ui.navigate("forgotpassword"))
+        );
+        forgotPasswordButton.getStyle().set("cursor", "pointer");
+
+        add(loginForm,forgotPasswordButton);
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
