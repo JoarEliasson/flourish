@@ -7,6 +7,13 @@ import org.springframework.stereotype.Repository;
  * Repository interface for accessing and managing User entities.
  *
  * <p>Uses Spring Data JPA to provide basic CRUD operations.</p>
+ *
+ * @author
+ *   Joar Eliasson
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-15
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {

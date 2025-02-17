@@ -18,6 +18,13 @@ import java.util.Optional;
  * @see com.flourish.domain.User
  * @see <a href="https://docs.spring.io/spring-data/jpa/docs/current/reference/html/">Spring Data JPA Reference</a>
  * @see <a href="https://vaadin.com/docs/latest/security/spring-security">Vaadin Spring Security</a>
+ *
+ * @author
+ *   Joar Eliasson
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-15
  */
 @Service
 public class UserServiceImpl implements UserService {

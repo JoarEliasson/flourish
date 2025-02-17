@@ -1,4 +1,5 @@
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import com.flourish.domain.User;
 import com.flourish.domain.UserRepository;
@@ -19,8 +20,8 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userRepositoryMock = Mockito.mock(UserRepository.class);
-        passwordEncoderMock = Mockito.mock(PasswordEncoder.class);
+        userRepositoryMock = mock(UserRepository.class);
+        passwordEncoderMock = mock(PasswordEncoder.class);
         userService = new UserServiceImpl(userRepositoryMock, passwordEncoderMock);
     }
 
@@ -30,12 +31,12 @@ class UserServiceTest {
         User inputUser = new User("John", "Doe", "john.doe@example.com", "plainpass", "USER");
 
         // Mock password encoding
-        Mockito.when(passwordEncoderMock.encode("plainpass")).thenReturn("encodedpass");
+        when(passwordEncoderMock.encode("plainpass")).thenReturn("encodedpass");
         // Mock repository save
         User savedUser = new User("John", "Doe", "john.doe@example.com", "encodedpass", "USER");
         savedUser.setId(1L);
 
-        Mockito.when(userRepositoryMock.save(Mockito.any(User.class))).thenReturn(savedUser);
+        when(userRepositoryMock.save(Mockito.any(User.class))).thenReturn(savedUser);
 
         // When
         User result = userService.createUser(inputUser);
@@ -51,7 +52,7 @@ class UserServiceTest {
         // Given
         User existingUser = new User("Jane", "Doe", "jane.doe@example.com", "secret", "USER");
         existingUser.setId(2L);
-        Mockito.when(userRepositoryMock.findByEmail("jane.doe@example.com")).thenReturn(existingUser);
+        when(userRepositoryMock.findByEmail("jane.doe@example.com")).thenReturn(existingUser);
 
         // When
         Optional<User> result = userService.findByEmail("jane.doe@example.com");

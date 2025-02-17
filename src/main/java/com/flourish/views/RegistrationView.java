@@ -28,11 +28,11 @@ import java.util.Map;
  * email, and password. Email is stored as the username in DB.</p>
  *
  * @author
- *   Your Name
+ *   Joar Eliasson
  * @version
- *   1.0.0
+ *   1.1.0
  * @since
- *   1.0.0
+ *   2025-02-15
  */
 @Route("register")
 @AnonymousAllowed

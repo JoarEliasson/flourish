@@ -11,6 +11,13 @@ import java.util.Collections;
 /**
  * Loads user data from a MariaDB-based UserRepository.
  * Replaces the default in-memory approach from the Vaadin docs.
+ *
+ * @author
+ *   Joar Eliasson
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-15
  */
 @Service
 public class MyCustomUserDetailsService implements UserDetailsService {

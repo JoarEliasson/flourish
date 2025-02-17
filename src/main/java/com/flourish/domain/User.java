@@ -10,14 +10,14 @@ import java.time.LocalDateTime;
  * and optionally a reset token for password resetting in the future.</p>
  *
  * @author
- *   Your Name
+ *   Joar Eliasson
  * @version
- *   1.0.0
+ *   1.1.0
  * @since
- *   1.0.0
+ *   2025-02-15
  */
 @Entity
-@Table(name = "users") // Optional explicit table name
+@Table(name = "users")
 public class User {
 
     @Id
@@ -58,9 +58,7 @@ public class User {
      */
     private LocalDateTime resetTokenExpiry;
 
-    protected User() {
-        // Required by JPA
-    }
+    protected User() {}
 
     public User(String firstName, String lastName, String email, String password, String role) {
         this.firstName = firstName;

@@ -19,6 +19,13 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
  * they're redirected here.</p>
  *
  * <p>This route is "login", matching setLoginView in SecurityConfig.</p>
+ *
+ * @author
+ *   Joar Eliasson
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-15
  */
 @Route("login")
 @AnonymousAllowed

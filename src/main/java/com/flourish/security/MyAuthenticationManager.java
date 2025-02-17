@@ -9,6 +9,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * A custom authentication manager that checks the user's password against the
+ * hashed password in the database.
+ *
+ * <p>It uses the provided UserDetailsService to load the user's hashed password
+ * from the database, then compares it to the password provided by the user.</p>
+ *
+ * @author
+ *   Joar Eliasson
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-15
+ */
 public class MyAuthenticationManager implements AuthenticationManager {
 
     private final UserDetailsService userDetailsService;

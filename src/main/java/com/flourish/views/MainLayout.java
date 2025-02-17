@@ -13,11 +13,11 @@ import jakarta.annotation.security.RolesAllowed;
  * <p>This layout can wrap other views via the <code>@Route</code> annotation.</p>
  *
  * @author
- *   Your Name
+ *   Joar Eliasson
  * @version
- *   1.0.0
+ *   1.1.0
  * @since
- *   1.0.0
+ *   2025-02-15
  */
 @RolesAllowed("USER")
 public class MainLayout extends AppLayout {

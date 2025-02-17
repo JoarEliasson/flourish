@@ -11,6 +11,13 @@ import jakarta.annotation.security.RolesAllowed;
  *
  * <p>Shown at "/main" using MainLayout. If an unauthenticated user
  * attempts to access it, they are redirected to "/login".</p>
+ *
+ * @author
+ *   Joar Eliasson
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-15
  */
 @Route(value = "", layout = MainLayout.class)
 @RolesAllowed("USER")

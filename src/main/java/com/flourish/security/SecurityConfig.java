@@ -1,15 +1,9 @@
 package com.flourish.security;
 
-import com.flourish.service.MailService;
-import com.flourish.views.LandingView;
 import com.flourish.views.LoginView;
-import com.flourish.views.MainView;
-import com.flourish.views.SignInView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -26,6 +20,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * then call setLoginView(http, LoginView.class).
  * Unauthenticated users trying to access
  * other routes will be redirected to /login.</p>
+ *
+ * @author
+ *   Joar Eliasson
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-16
  */
 @Configuration
 public class SecurityConfig extends VaadinWebSecurity {
@@ -88,11 +89,6 @@ public class SecurityConfig extends VaadinWebSecurity {
     }
 
     @Bean
-    GrantedAuthorityDefaults grantedAuthorityDefaults() {
-        return new GrantedAuthorityDefaults("");
-    }
-
-    @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -100,6 +96,11 @@ public class SecurityConfig extends VaadinWebSecurity {
     @Bean
     public AuthenticationManager authenticationManager() {
         return new MyAuthenticationManager(myUserDetailsService, bCryptPasswordEncoder());
+    }
+
+    @Bean
+    GrantedAuthorityDefaults grantedAuthorityDefaults() {
+        return new GrantedAuthorityDefaults("");
     }
 
 }

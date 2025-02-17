@@ -8,7 +8,7 @@ development mode.
 
 - **Java JDK 17** (or higher)
 - **Maven** (3.8.x or later)
-- **MySQL Database** (with the appropriate database configuration set in `application.properties`)
+- **MariaDB Database** (with the appropriate database configuration set in `application.properties`)
 
 ## Building the Project
 
@@ -31,7 +31,7 @@ The application runs from the flourish-server module. Two convenience scripts ha
 3. A command prompt window will open and run the following command:
 
 ```bash
-  mvn -pl flourish-server spring-boot:run
+  mvn spring-boot:run
 ```
 
 4. Once the server starts, open your browser and navigate to http://localhost:8080/login.
