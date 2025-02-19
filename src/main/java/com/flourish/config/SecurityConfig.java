@@ -1,5 +1,7 @@
-package com.flourish.security;
+package com.flourish.config;
 
+import com.flourish.security.MyAuthenticationManager;
+import com.flourish.security.MyCustomUserDetailsService;
 import com.flourish.views.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
@@ -99,7 +101,7 @@ public class SecurityConfig extends VaadinWebSecurity {
     }
 
     @Bean
-    GrantedAuthorityDefaults grantedAuthorityDefaults() {
+    static GrantedAuthorityDefaults grantedAuthorityDefaults() {
         return new GrantedAuthorityDefaults("");
     }
 

@@ -1,14 +1,15 @@
 package com.flourish;
 
+import com.flourish.config.SecurityConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * The main entry point of the Flourish application.
  * <p>
- * The initial route of the application is the {@link com.flourish.security.SecurityConfig} class.
+ * The initial route of the application is the {@link SecurityConfig} class.
  *
- * @see com.flourish.security.SecurityConfig
+ * @see SecurityConfig
  *
  * @author
  *   Joar Eliasson
