@@ -1,25 +1,49 @@
-# MyHappyPlants
+# Flourish Application 🌱
 
-### Länk till repot på github
+This project is a multi-module Vaadin 24 and Spring Boot application with integrated user sign-in and registration
+functionality. The application uses Spring Security for route protection and Spring Boot DevTools for live reload in
+development mode.
 
-https://github.com/antonholmCO/MyHappyPlants
+## Prerequisites
 
-### Produktbeskrivning
+- **Java JDK 17** (or higher)
+- **Maven** (3.8.x or later)
+- **MariaDB Database** (with the appropriate database configuration set in `application.properties`)
 
-My Happy Plants är en applikation tänkt att hjälpa en användare att ta hand om sina växter i hemmet samt ge användaren
-information om växterna. My Happy Plants använder sig av information hämtad från Trefle.io, som var ett öppet och gratis
-API som erbjöd information om en miljon växtarter och hybrider. Applikationen omfattar ett färgglatt grafiskt
-användargränssnitt utvecklat i JavaFX med bilder av illustrerade växter, och ger möjlighet för användaren att söka bland
-tiotusentals växter, döpa dem och lägga till dem i sitt personliga bibliotek.
-Applikationen påminner även användaren när det är tid att vattna, enligt appens beräkning.
+## Building the Project
 
-### Instruktioner för att köra programmet
+From the project root directory, run:
 
-1. Se till att alla maven dependencies har laddats in
-2. Execute maven goal "mvn javafx:compile"
-3. Execute maven goal "mvn javafx:run" för att starta klienten
-4. Kör main-metoden i se/myhappyplants/server/StartServer.java för att starta servern
+```bash
+  mvn clean install
+```
 
-Bilden nedan visar hur man exekverar ett maven goal.
+This will compile the modules and create the necessary artifacts.
 
-![bild](https://user-images.githubusercontent.com/77005138/114137664-cd6c0d80-990c-11eb-8350-bdc3172e48d7.png)
+## Running the Application
+
+The application runs from the flourish-server module. Two convenience scripts have been provided:
+
+### Windows
+
+1. Open the project folder in Windows Explorer.
+2. Double-click the `run.bat` file.
+3. A command prompt window will open and run the following command:
+
+```bash
+  mvn spring-boot:run
+```
+
+4. Once the server starts, open your browser and navigate to http://localhost:8080/login.
+
+### Mac/Linux
+
+1. Open a terminal in the project root directory.
+2. Make sure the `run.sh` script is executable (if not, run `chmod +x run.sh`).
+3. Start the application by executing:
+
+```bash
+  ./run.sh
+```
+
+4. Once the server starts, open your browser and navigate to http://localhost:8080/login.
