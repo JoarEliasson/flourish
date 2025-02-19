@@ -14,7 +14,7 @@
         <target.version>17</target.version>
         <source.version>17</source.version>
         <spring-boot.version>3.4.2</spring-boot.version>
-        <vaadin.version>24.0.6</vaadin.version>
+        <vaadin.version>24.6.5</vaadin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
