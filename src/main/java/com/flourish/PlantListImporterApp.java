@@ -12,10 +12,6 @@ import org.springframework.context.annotation.Bean;
  * <p>This application starts up, calls the method to fetch plant data for IDs between 0 and 2999,
  * and then prints the last plant ID processed.</p>
  *
- * @author
- *   Your Name
- * @version 1.0.0
- * @since 1.0.0
  */
 @SpringBootApplication
 public class PlantListImporterApp {
@@ -33,8 +29,8 @@ public class PlantListImporterApp {
     @Bean
     public CommandLineRunner importPlantList(PlantDataService plantDataService) {
         return args -> {
-            int startId = 0;
-            int endId = 2999;
+            int startId = 2900;
+            int endId = 3001;
             plantDataService.fetchAndStorePlantListLimited(startId, endId);
         };
     }

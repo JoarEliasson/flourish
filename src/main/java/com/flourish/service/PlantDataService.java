@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,7 @@ public class PlantDataService {
      * @param endId the ending plant ID (inclusive).
      */
     public void fetchAndStorePlantListLimited(int startId, int endId) {
-        int currentPage = 1;
+        int currentPage = 99;
         int apiRequestCount = 0;
         boolean morePages = true;
         long lastIdProcessed = 0;
@@ -91,12 +92,6 @@ public class PlantDataService {
                     .map(dto -> {
                         try {
                             // Build a JSON string for image URLs.
-                            var imageMap = new java.util.HashMap<String, String>();
-                            imageMap.put("regular", dto.getRegularUrl());
-                            imageMap.put("medium", dto.getMediumUrl());
-                            imageMap.put("small", dto.getSmallUrl());
-                            imageMap.put("thumbnail", dto.getThumbnail());
-                            String imageJson = objectMapper.writeValueAsString(imageMap);
 
                             // For fields that are lists, join them into a comma-separated string.
                             String scientificName = (dto.getScientificName() != null)
@@ -105,20 +100,20 @@ public class PlantDataService {
                             String otherName = (dto.getOtherName() != null)
                                     ? String.join(", ", dto.getOtherName())
                                     : "";
-
+                            System.out.printf("Plant ID: %d, Common Name: %s, Scientific Name: %s, Other Name: %s%n",
+                                    dto.getId(), dto.getCommonName(), scientificName, otherName);
                             return new PlantIndex(
                                     dto.getId(),
                                     dto.getCommonName() != null ? dto.getCommonName() : "",
                                     scientificName,
-                                    otherName,
-                                    imageJson
+                                    otherName
                             );
-                        } catch (JsonProcessingException e) {
-                            System.err.println("Error converting image URLs to JSON for plant ID " + dto.getId());
+                        } catch (Exception e) {
+                            System.out.println("Error mapping plant data: " + e.getMessage());
                             return null;
                         }
                     })
-                    .filter(pi -> pi != null)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
             if (!plantsToSave.isEmpty()) {

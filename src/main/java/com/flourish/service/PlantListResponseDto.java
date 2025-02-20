@@ -42,8 +42,6 @@ public class PlantListResponseDto {
     @JsonProperty("total")
     private Integer total;
 
-    // Getters and setters
-
     public List<PlantListDto> getData() {
         return data;
     }

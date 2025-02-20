@@ -35,18 +35,6 @@ public class PlantListDto {
     @JsonProperty("other_name")
     private List<String> otherName;
 
-    @JsonProperty("regular_url")
-    private String regularUrl;
-
-    @JsonProperty("medium_url")
-    private String mediumUrl;
-
-    @JsonProperty("small_url")
-    private String smallUrl;
-
-    private String thumbnail;
-
-    // Getters and setters
 
     public Long getId() {
         return id;
@@ -80,35 +68,4 @@ public class PlantListDto {
         this.otherName = otherName;
     }
 
-    public String getRegularUrl() {
-        return regularUrl;
-    }
-
-    public void setRegularUrl(String regularUrl) {
-        this.regularUrl = regularUrl;
-    }
-
-    public String getMediumUrl() {
-        return mediumUrl;
-    }
-
-    public void setMediumUrl(String mediumUrl) {
-        this.mediumUrl = mediumUrl;
-    }
-
-    public String getSmallUrl() {
-        return smallUrl;
-    }
-
-    public void setSmallUrl(String smallUrl) {
-        this.smallUrl = smallUrl;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
 }
