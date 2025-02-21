@@ -37,7 +37,7 @@ import java.util.List;
  *   2025-02-21
  */
 @Configuration
-public class BackupService implements CommandLineRunner {
+public class BackupService {
 
     private final PlantIndexRepository plantIndexRepository;
     private final PlantDetailsRepository plantDetailsRepository;
@@ -66,7 +66,7 @@ public class BackupService implements CommandLineRunner {
      * @param args command-line arguments (not used).
      * @throws Exception if an error occurs during backup.
      */
-    @Override
+    //@Override
     public void run(String... args) throws Exception {
         backupPlantIndexToFile("var/app/backups/plant_index_backup.txt");
         backupPlantDetailsToFile("var/app/backups/plant_details_backup.txt");

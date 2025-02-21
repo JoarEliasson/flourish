@@ -159,3 +159,4 @@ author_tag.txt
 # Vaadin Generated Files
 frontend/node_modules/*
 frontend/generated/*
+frontend/generated/jar-resources/*
