@@ -19,8 +19,10 @@ import jakarta.annotation.security.RolesAllowed;
  * @since
  *   2025-02-15
  */
+/*
 @Route(value = "", layout = MainLayout.class)
-@RolesAllowed("USER")
+@RolesAllowed("USER")*/
+
 public class MainView extends VerticalLayout {
 
     /**

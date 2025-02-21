@@ -17,11 +17,14 @@ import com.vaadin.flow.router.Route;
 import com.flourish.views.components.AvatarItem;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import java.util.List;
-import org.vaadin.lineawesome.LineAwesomeIconUrl;
+
+import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("My Plants")
 @Route("")
-@Menu(order = 0, icon = LineAwesomeIconUrl.PENCIL_RULER_SOLID)
+//@Route(value = "", layout = MainLayout.class)
+@RolesAllowed("USER")
+
 public class MyPlantsView extends Composite<VerticalLayout> {
 
     public MyPlantsView() {
@@ -84,7 +87,6 @@ public class MyPlantsView extends Composite<VerticalLayout> {
     private void setAvatarItemsSampleData(MultiSelectListBox multiSelectListBox) {
         record Person(String name, String profession) {
         }
-        ;
         List<Person> data = List.of(new Person("Aria Bailey", "Endocrinologist"), new Person("Aaliyah Butler", "Nephrologist"), new Person("Eleanor Price", "Ophthalmologist"), new Person("Allison Torres", "Allergist"), new Person("Madeline Lewis", "Gastroenterologist"));
         multiSelectListBox.setItems(data);
         multiSelectListBox.setRenderer(new ComponentRenderer(item -> {
