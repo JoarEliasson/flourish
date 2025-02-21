@@ -11,89 +11,89 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.flourish.views.components.AvatarItem;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-import java.util.List;
-
 import jakarta.annotation.security.RolesAllowed;
+
+import java.util.List;
 
 @PageTitle("My Plants")
 @Route("")
-//@Route(value = "", layout = MainLayout.class)
 @RolesAllowed("USER")
-
 public class MyPlantsView extends Composite<VerticalLayout> {
 
-    public MyPlantsView() {
-        HorizontalLayout layoutRow = new HorizontalLayout();
-        HorizontalLayout layoutRow2 = new HorizontalLayout();
-        Button buttonPrimary = new Button();
-        Button buttonPrimary2 = new Button();
-        Button buttonPrimary3 = new Button();
-        Button buttonPrimary4 = new Button();
-        H1 h1 = new H1();
-        H2 h2 = new H2();
-        VerticalLayout layoutColumn2 = new VerticalLayout();
-        TextField textField = new TextField();
-        MultiSelectListBox avatarItems = new MultiSelectListBox();
-        getContent().setWidth("100%");
-        getContent().getStyle().set("flex-grow", "1");
-        layoutRow.addClassName(Gap.MEDIUM);
-        layoutRow.setWidth("100%");
-        layoutRow.setHeight("min-content");
-        layoutRow2.setHeightFull();
-        layoutRow.setFlexGrow(1.0, layoutRow2);
-        layoutRow2.addClassName(Gap.MEDIUM);
-        layoutRow2.setWidth("100%");
-        layoutRow2.getStyle().set("flex-grow", "1");
-        buttonPrimary.setText("My Plants");
-        buttonPrimary.setWidth("200px");
-        buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonPrimary2.setText("All Plants");
-        buttonPrimary2.setWidth("150px");
-        buttonPrimary2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonPrimary3.setText("Settings");
-        buttonPrimary3.setWidth("150px");
-        buttonPrimary3.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        buttonPrimary4.setText("Notifications");
-        buttonPrimary4.setWidth("150px");
-        buttonPrimary4.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        h1.setText("Flowrish");
-        h1.setWidth("max-content");
-        h2.setText("My Plants");
-        h2.setWidth("max-content");
-        layoutColumn2.setWidth("100%");
-        layoutColumn2.getStyle().set("flex-grow", "1");
-        textField.setLabel("Text field");
-        textField.setWidth("min-content");
-        avatarItems.setWidth("min-content");
-        setAvatarItemsSampleData(avatarItems);
-        getContent().add(layoutRow);
-        layoutRow.add(layoutRow2);
-        layoutRow2.add(buttonPrimary);
-        layoutRow2.add(buttonPrimary2);
-        layoutRow2.add(buttonPrimary3);
-        layoutRow2.add(buttonPrimary4);
-        layoutRow2.add(h1);
-        getContent().add(h2);
-        getContent().add(layoutColumn2);
-        layoutColumn2.add(textField);
-        layoutColumn2.add(avatarItems);
+    // Define Plant record at the class level
+    public record Plant(String name, String description) {
     }
 
-    private void setAvatarItemsSampleData(MultiSelectListBox multiSelectListBox) {
-        record Person(String name, String profession) {
-        }
-        List<Person> data = List.of(new Person("Aria Bailey", "Endocrinologist"), new Person("Aaliyah Butler", "Nephrologist"), new Person("Eleanor Price", "Ophthalmologist"), new Person("Allison Torres", "Allergist"), new Person("Madeline Lewis", "Gastroenterologist"));
-        multiSelectListBox.setItems(data);
-        multiSelectListBox.setRenderer(new ComponentRenderer(item -> {
+    public MyPlantsView() {
+        // Set page background color to light green
+        getContent().getStyle()
+                .set("background-color", "#e8f5e9") // Light green shade
+                .set("padding", "20px");
+
+        H1 title = new H1("Flowrish");
+        title.getStyle().set("color", "#2e7d32") // Dark green text
+                .set("font-size", "36px");
+
+        H2 subtitle = new H2("My Plants");
+        subtitle.getStyle().set("color", "#388e3c") // Green shade
+                .set("font-size", "28px");
+
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+        buttonLayout.setJustifyContentMode(HorizontalLayout.JustifyContentMode.CENTER);
+
+        // Creating styled buttons
+        Button myPlantsButton = createStyledButton("My Plants");
+        Button allPlantsButton = createStyledButton("All Plants");
+        Button settingsButton = createStyledButton("Settings");
+        Button notificationsButton = createStyledButton("Notifications");
+
+        buttonLayout.add(myPlantsButton, allPlantsButton, settingsButton, notificationsButton);
+
+        // Search field
+        TextField searchField = new TextField("Search Plants");
+        searchField.setWidth("100%");
+        searchField.getStyle().set("font-size", "18px");
+
+        // List box to display plant information
+        MultiSelectListBox<Plant> plantList = new MultiSelectListBox<>();
+        plantList.setWidth("100%");
+        plantList.getStyle().set("font-size", "18px")
+                .set("padding", "10px");
+
+        setPlantSampleData(plantList);
+
+        getContent().add(title, subtitle, buttonLayout, searchField, plantList);
+    }
+
+    private Button createStyledButton(String text) {
+        Button button = new Button(text);
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        button.getStyle().set("background-color", "#66bb6a") // Light green
+                .set("color", "white")
+                .set("font-size", "18px");
+        return button;
+    }
+
+    private void setPlantSampleData(MultiSelectListBox<Plant> plantList) {
+        List<Plant> data = List.of(
+                new Plant("Aloe Vera", "Healing plant, easy to maintain"),
+                new Plant("Snake Plant", "Air purifier, requires little sunlight"),
+                new Plant("Monstera", "Tropical, large green leaves"),
+                new Plant("Pothos", "Fast-growing vine, low maintenance")
+        );
+
+        plantList.setItems(data);
+        plantList.setRenderer(new ComponentRenderer<>(plant -> {
             AvatarItem avatarItem = new AvatarItem();
-            avatarItem.setHeading(((Person) item).name);
-            avatarItem.setDescription(((Person) item).profession);
-            avatarItem.setAvatar(new Avatar(((Person) item).name));
+            avatarItem.setHeading(plant.name);
+            avatarItem.setDescription(plant.description);
+            avatarItem.setAvatar(new Avatar(plant.name)); // Placeholder avatar
+            avatarItem.getStyle().set("font-size", "20px")
+                    .set("padding", "10px");
             return avatarItem;
         }));
     }
