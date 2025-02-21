@@ -1,7 +1,7 @@
 package com.flourish.security;
 
 import com.flourish.domain.User;
-import com.flourish.domain.UserRepository;
+import com.flourish.repository.UserRepository;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;

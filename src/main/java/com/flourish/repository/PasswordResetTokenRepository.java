@@ -1,5 +1,6 @@
-package com.flourish.domain;
+package com.flourish.repository;
 
+import com.flourish.domain.PasswordResetToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

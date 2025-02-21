@@ -1,30 +1,35 @@
-package com.flourish.service;
+package com.flourish.integration.plantdata;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flourish.domain.PlantDetails;
-import com.flourish.domain.PlantDetailsRepository;
+import com.flourish.repository.PlantDetailsRepository;
 import com.flourish.domain.PlantIndex;
-import com.flourish.domain.PlantIndexRepository;
+import com.flourish.repository.PlantIndexRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.util.retry.Retry;
-
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.Map;
 
 /**
+ * Service for fetching and storing plant data from the Perenual API.
  *
  * @see PlantIndex
  * @see PlantIndexRepository
  * @see PlantListResponseDto
  * @see PlantListDto
+ *
+ * @author
+ *   Joar Eliasson
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-20
  */
 @Service
 public class PlantDataService {
@@ -32,8 +37,8 @@ public class PlantDataService {
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
 
-    private PlantIndexRepository plantIndexRepository;
-    private PlantDetailsRepository plantDetailsRepository;
+    private final PlantIndexRepository plantIndexRepository;
+    private final PlantDetailsRepository plantDetailsRepository;
 
     @Value("${perenual.api.key}")
     private String perenualApiKey;
@@ -132,9 +137,8 @@ public class PlantDataService {
 
     /**
      * Retrieves detailed plant data for plant IDs between startId and endId by sending individual API requests.
-     * The process stops after making 99 API requests. For each request, the API response is first retrieved as a String.
-     * If the response starts with a '{', it is treated as JSON and is deserialized and mapped into a PlantDetails entity;
-     * otherwise, that plant ID is skipped.
+     * <p>The process stops after making 99 API requests.
+     * For each request, the API response is first retrieved as a String.</p>
      *
      * @param startId the starting plant ID (inclusive)
      * @param endId the ending plant ID (inclusive)
@@ -185,7 +189,8 @@ public class PlantDataService {
      */
     private PlantDetails mapToPlantDetails(String json) {
         try {
-            Map<String, Object> map = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> map = objectMapper.readValue(json, new TypeReference<>() {
+            });
 
             Long id = map.get("id") != null ? ((Number) map.get("id")).longValue() : null;
             String commonName = map.get("common_name") != null ? map.get("common_name").toString() : null;
@@ -246,7 +251,9 @@ public class PlantDataService {
                     Map<String, Object> hl = (Map<String, Object>) map.get("hardiness_location");
                     hardinessLocationFullUrl = hl.get("full_url") != null ? hl.get("full_url").toString() : null;
                     hardinessLocationFullIframe = hl.get("full_iframe") != null ? hl.get("full_iframe").toString() : null;
-                } catch (Exception e) { }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
             }
             String plantAnatomy = map.get("plant_anatomy") != null ? objectMapper.writeValueAsString(map.get("plant_anatomy")) : null;
             Boolean leaf = map.get("leaf") != null ? Boolean.valueOf(map.get("leaf").toString()) : null;
@@ -258,7 +265,9 @@ public class PlantDataService {
                     Map<String, Object> h = (Map<String, Object>) map.get("hardiness");
                     hardinessMin = h.get("min") != null ? h.get("min").toString() : null;
                     hardinessMax = h.get("max") != null ? h.get("max").toString() : null;
-                } catch (Exception e) { }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
             }
             Boolean tropical = map.get("tropical") != null ? Boolean.valueOf(map.get("tropical").toString()) : null;
             String sunlight = map.get("sunlight") != null ? objectMapper.writeValueAsString(map.get("sunlight")) : null;

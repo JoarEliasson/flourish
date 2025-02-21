@@ -1,9 +1,9 @@
 package com.flourish.service;
 
 import com.flourish.domain.PasswordResetToken;
-import com.flourish.domain.PasswordResetTokenRepository;
+import com.flourish.repository.PasswordResetTokenRepository;
 import com.flourish.domain.User;
-import com.flourish.domain.UserRepository;
+import com.flourish.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
