@@ -93,6 +93,12 @@ replay_pid*
 documents/
 local_variables/
 
+# Vaadin Generated Files
+frontend/node_modules/*
+frontend/generated/*
+frontend/generated/jar-resources/*
+=======
+
 # Maven target directory (includes generated Vaadin files)
 target/
 # Include Maven Wrapper jar in VCS (if present)
@@ -125,3 +131,4 @@ target/
 node_modules/
 frontend/generated/
 frontend/cache/
+

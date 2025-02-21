@@ -1,13 +1,11 @@
 package com.flourish.views;
 
 import com.flourish.domain.User;
-import com.flourish.domain.UserRepository;
+import com.flourish.repository.UserRepository;
 import com.flourish.service.MailService;
 import com.flourish.service.PasswordResetService;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;

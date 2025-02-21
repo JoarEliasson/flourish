@@ -2,7 +2,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.flourish.domain.User;
-import com.flourish.domain.UserRepository;
+import com.flourish.repository.UserRepository;
 import com.flourish.service.UserService;
 import com.flourish.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
