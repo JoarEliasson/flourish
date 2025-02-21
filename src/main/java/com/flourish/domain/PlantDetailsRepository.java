@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
  * <p>Provides CRUD operations for detailed plant data stored as a JSON blob,
  * while relational fields (id, commonName, scientificName, otherName) remain separate.</p>
  *
- * @see PlantDetailsJson
+ * @see PlantDetails
  *
  * @author
  *   Joar Eliasson
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Repository;
  *   2025-02-19
  */
 @Repository
-public interface PlantDetailsJsonRepository extends JpaRepository<PlantDetailsJson, Long> {
+public interface PlantDetailsRepository extends JpaRepository<PlantDetails, Long> {
     
     /**
      * Finds a PlantDetailsJson entry by its common name.
@@ -27,6 +27,6 @@ public interface PlantDetailsJsonRepository extends JpaRepository<PlantDetailsJs
      * @param commonName the common name to search by.
      * @return the matching PlantDetailsJson entity, or null if none found.
      */
-    PlantDetailsJson findByCommonName(String commonName);
+    PlantDetails findByCommonName(String commonName);
 
 }
