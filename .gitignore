@@ -157,4 +157,5 @@ local_variables/
 author_tag.txt
 
 # Vaadin Generated Files
-frontend/generated/
+frontend/node_modules/*
+frontend/generated/*
