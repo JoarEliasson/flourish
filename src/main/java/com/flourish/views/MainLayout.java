@@ -25,7 +25,10 @@ public class MainLayout extends AppLayout {
 
     private void createHeader() {
         H1 logo = new H1("Flourish");
-        logo.getStyle().set("color", "#2e7d32").set("font-size", "28px").set("margin", "0");
+        logo.getStyle()
+                .set("color", "white")
+                .set("font-size", "28px")
+                .set("margin", "0");
 
         Avatar profileAvatar = new Avatar("USER");
         ContextMenu menu = new ContextMenu(profileAvatar);
@@ -36,22 +39,22 @@ public class MainLayout extends AppLayout {
 
         // Navigation buttons
         HorizontalLayout navBar = new HorizontalLayout(
+                logo,
                 createNavButton("Home", ""),
                 createNavButton("My Plants", "my-plants"),
                 createNavButton("All Plants", "all-plants"),
                 createNavButton("Settings", "settings"),
-                createNavButton("Notifications", "notifications")
+                createNavButton("Notifications", "notifications"),
+                profileAvatar
         );
         navBar.setWidthFull();
-        navBar.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        navBar.getStyle().set("background-color", "#e8f5e9").set("padding", "10px");
+        navBar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        navBar.setAlignItems(FlexComponent.Alignment.CENTER);
+        navBar.getStyle()
+                .set("background-color", "#66bb6a") // Match button background
+                .set("padding", "10px");
 
-        HorizontalLayout header = new HorizontalLayout(logo, navBar, profileAvatar);
-        header.setWidthFull();
-        header.setAlignItems(FlexComponent.Alignment.CENTER);
-        header.setPadding(true);
-
-        addToNavbar(header);
+        addToNavbar(navBar);
     }
 
     private Button createNavButton(String text, String route) {

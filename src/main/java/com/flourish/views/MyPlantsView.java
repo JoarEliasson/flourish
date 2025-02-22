@@ -24,11 +24,8 @@ public class MyPlantsView extends Composite<VerticalLayout> {
     public MyPlantsView() {
         getContent().getStyle().set("background-color", "#e8f5e9").set("padding", "20px");
 
-        H1 title = new H1("Flourish");
-        title.getStyle().set("color", "#2e7d32").set("font-size", "36px");
-
-        H2 subtitle = new H2("My Plants");
-        subtitle.getStyle().set("color", "#388e3c").set("font-size", "28px");
+        H2 title = new H2("My Plants");
+        title.getStyle().set("color", "#388e3c").set("font-size", "28px");
 
         TextField searchField = new TextField("Search Plants");
         searchField.setWidth("100%");
@@ -40,7 +37,7 @@ public class MyPlantsView extends Composite<VerticalLayout> {
 
         setPlantSampleData(plantList);
 
-        getContent().add(title, subtitle, searchField, plantList);
+        getContent().add(title, searchField, plantList);
     }
 
     private void setPlantSampleData(MultiSelectListBox<Plant> plantList) {
