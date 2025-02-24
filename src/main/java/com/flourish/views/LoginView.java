@@ -10,16 +10,10 @@ import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-<<<<<<< HEAD
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
-=======
-import com.vaadin.flow.router.Menu;
->>>>>>> main
 import com.vaadin.flow.router.Route;
-
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-
 import java.util.List;
 import java.util.Map;
 
