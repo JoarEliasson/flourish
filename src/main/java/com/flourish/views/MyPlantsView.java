@@ -14,6 +14,17 @@ import com.flourish.views.components.AvatarItem;
 import jakarta.annotation.security.RolesAllowed;
 import java.util.List;
 
+/**
+ * A view for My plants to view and edit the user's plants.
+ *
+ * @author
+ *   Kenan Al Tal
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-21
+ */
+
 @PageTitle("My Plants")
 @Route(value = "my-plants", layout = MainLayout.class)
 @RolesAllowed("USER")

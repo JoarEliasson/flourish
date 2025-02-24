@@ -12,6 +12,17 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
+/**
+ * A view for Settings to view and edit the user's settings.
+ *
+ * @author
+ *   Kenan Al Tal
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-21
+ */
+
 @PageTitle("Settings")
 @Route(value = "settings", layout = MainLayout.class)
 @RolesAllowed("USER")
