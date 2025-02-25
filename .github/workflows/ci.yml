@@ -30,7 +30,7 @@ jobs:
       - name: Build & Test with Maven
         run: mvn clean verify
 
-        uses: actions/upload-artifact@v4
+      - name: Upload Test Results
         with:
           name: test-results
           path: target/surefire-reports
