@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: '17'
+          distribution: 'temurin'
 
       - name: Cache Maven packages
         uses: actions/cache@v3
@@ -30,8 +30,6 @@ jobs:
       - name: Build & Test with Maven
         run: mvn clean verify
 
-      - name: Upload Test Results
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
