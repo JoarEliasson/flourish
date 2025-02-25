@@ -38,7 +38,7 @@ class UserServiceImplTest {
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-    private UserService userService;
+    private UserServiceImpl userService;
 
     /**
      * Sets up the mocks and the UserService.

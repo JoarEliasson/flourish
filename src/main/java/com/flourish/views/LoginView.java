@@ -32,6 +32,8 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @AnonymousAllowed
 public class LoginView extends VerticalLayout {
 
+    Button registerButton;
+
     /**
      * Constructs a new LoginView with a Vaadin LoginForm.
      */
@@ -56,7 +58,7 @@ public class LoginView extends VerticalLayout {
 
         loginForm.addForgotPasswordListener(e -> getUI().ifPresent(ui -> ui.navigate("forgotpassword")));
 
-        Button registerButton = new Button("Register", e ->
+        registerButton = new Button("Register", e ->
                 getUI().ifPresent(ui -> ui.navigate("register"))
         );
 
@@ -72,4 +74,9 @@ public class LoginView extends VerticalLayout {
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
     }
+
+    protected LoginForm getLoginForm() {
+        return (LoginForm) this.getComponentAt(0);
+    }
+
 }

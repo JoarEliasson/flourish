@@ -68,7 +68,7 @@ class MailServiceTest {
      * Verifies that the method throws MessagingException if the mailSender fails to send.
      */
     @Test
-    void testSendPasswordResetToken_ThrowsMessagingException() throws MessagingException {
+    void testSendPasswordResetToken_ThrowsMessagingException() {
         String recipient = "fail@example.com";
         String token = "fail-token";
 
