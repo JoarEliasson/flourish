@@ -79,6 +79,6 @@ public class AllPlantsView extends Composite<VerticalLayout> {
 
     private void addSelectedPlants() {
         List<PlantIndex> selectedPlants = plantList.getSelectedItems().stream().toList();
-        // TODO: Implement logic to add selected plants to user's "My Plants" list
+        // TODO: Add selected plant to my plants
     }
 }
