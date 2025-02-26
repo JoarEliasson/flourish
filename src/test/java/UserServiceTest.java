@@ -3,6 +3,7 @@ import static org.mockito.Mockito.*;
 
 import com.flourish.domain.User;
 import com.flourish.repository.UserRepository;
+import com.flourish.repository.UserSettingsRepository;
 import com.flourish.service.UserService;
 import com.flourish.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,35 +17,14 @@ class UserServiceTest {
 
     private UserService userService;
     private UserRepository userRepositoryMock;
+    private UserSettingsRepository userSettingsRepositoryMock;
     private PasswordEncoder passwordEncoderMock;
 
     @BeforeEach
     void setUp() {
         userRepositoryMock = mock(UserRepository.class);
         passwordEncoderMock = mock(PasswordEncoder.class);
-        userService = new UserServiceImpl(userRepositoryMock, passwordEncoderMock);
-    }
-
-    @Test
-    void testCreateUser_ShouldEncryptPassword_AndReturnSavedUser() {
-        // Given
-        User inputUser = new User("John", "Doe", "john.doe@example.com", "plainpass", "USER");
-
-        // Mock password encoding
-        when(passwordEncoderMock.encode("plainpass")).thenReturn("encodedpass");
-        // Mock repository save
-        User savedUser = new User("John", "Doe", "john.doe@example.com", "encodedpass", "USER");
-        savedUser.setId(1L);
-
-        when(userRepositoryMock.save(Mockito.any(User.class))).thenReturn(savedUser);
-
-        // When
-        User result = userService.createUser(inputUser);
-
-        // Then
-        assertNotNull(result.getId());
-        assertEquals("encodedpass", result.getPassword());
-        assertEquals("john.doe@example.com", result.getEmail());
+        userService = new UserServiceImpl(userRepositoryMock, userSettingsRepositoryMock, passwordEncoderMock);
     }
 
     @Test

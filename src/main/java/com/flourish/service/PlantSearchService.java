@@ -124,4 +124,8 @@ public class PlantSearchService {
         }
         return score == Integer.MAX_VALUE ? 100 : score;
     }
+
+    public void setPlantIndexList(List<PlantIndex> mockData) {
+        plantIndexList = mockData;
+    }
 }
