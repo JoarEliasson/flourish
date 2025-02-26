@@ -74,16 +74,12 @@ public class SettingsView extends VerticalLayout {
 
     private void loadUserSettings() {
         Optional<UserSettings> settingsOpt = userSettingsService.getUserSettings(loggedInUserId);
-        if (settingsOpt.isPresent()) {
             userSettings = settingsOpt.get();
             languageSelector.setValue(userSettings.getLanguage());
             emailNotifications.setValue(userSettings.isEmailNotificationEnabled());
             notifications.setValue(userSettings.isInAppNotificationEnabled());
             loginNotifications.setValue(userSettings.isLoginNotificationEnabled());
-        } else {
-            userSettings = new UserSettings(loggedInUserId, "English", false, false, false);
-            userSettingsService.saveUserSettings(userSettings);
-        }
+
     }
 
     private void saveUserSettings() {
