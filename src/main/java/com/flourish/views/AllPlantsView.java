@@ -1,13 +1,14 @@
 package com.flourish.views;
 
+import com.flourish.domain.PlantDetails;
+import com.flourish.service.PlantDetailsService;
 import com.flourish.service.PlantSearchService;
 import com.flourish.domain.PlantIndex;
-import com.flourish.views.components.AvatarItem;
 import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.listbox.MultiSelectListBox;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -15,7 +16,10 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A view for displaying all available plants with a search function.
@@ -34,10 +38,13 @@ import java.util.List;
 public class AllPlantsView extends Composite<VerticalLayout> {
 
     private final PlantSearchService plantSearchService;
-    private final MultiSelectListBox<PlantIndex> plantList;
+    private final PlantDetailsService plantDetailsService;
+    private final Grid<PlantIndex> plantGrid;
+    private final List<PlantIndex> myPlants = new ArrayList<>();
 
-    public AllPlantsView(PlantSearchService plantSearchService) {
+    public AllPlantsView(PlantSearchService plantSearchService, PlantDetailsService plantDetailsService) {
         this.plantSearchService = plantSearchService;
+        this.plantDetailsService = plantDetailsService;
 
         getContent().getStyle().set("background-color", "#e8f5e9").set("padding", "20px");
 
@@ -49,36 +56,45 @@ public class AllPlantsView extends Composite<VerticalLayout> {
         searchField.getStyle().set("font-size", "18px");
         searchField.addValueChangeListener(event -> updatePlantList(event.getValue()));
 
-        plantList = new MultiSelectListBox<>();
-        plantList.setWidth("100%");
-        plantList.getStyle().set("font-size", "18px").set("padding", "10px");
+        plantGrid = new Grid<>(PlantIndex.class, false);
+        plantGrid.setWidth("100%");
+        plantGrid.addColumn(PlantIndex::getCommonName).setHeader("Common Name").setAutoWidth(true);
+        plantGrid.addColumn(PlantIndex::getScientificName).setHeader("Scientific Name").setAutoWidth(true);
 
-        Button addButton = new Button("Add to My Plants", event -> addSelectedPlants());
-        addButton.getStyle().set("background-color", "#388e3c").set("color", "white").set("font-size", "16px");
+        plantGrid.setItemDetailsRenderer(new ComponentRenderer<>(plant -> {
+            VerticalLayout detailsLayout = new VerticalLayout();
+            detailsLayout.setPadding(false);
+            detailsLayout.setSpacing(false);
 
-        HorizontalLayout controls = new HorizontalLayout(searchField, addButton);
-        controls.setWidth("100%");
+            Optional<PlantDetails> detailsOpt = plantDetailsService.getPlantDetailsByPlantIndex(plant);
+            detailsOpt.ifPresentOrElse(details -> {
+                detailsLayout.add("Description: " + details.getDescription());
+            }, () -> {
+                detailsLayout.add("Description not available.");
+            });
+
+            Button addButton = new Button("Add to My Plants", event -> addToMyPlants(plant));
+            detailsLayout.add(addButton);
+
+            return detailsLayout;
+        }));
 
         updatePlantList("");
 
-        getContent().add(title, controls, plantList);
+        getContent().add(title, searchField, plantGrid);
     }
 
     private void updatePlantList(String query) {
         List<PlantIndex> plants = plantSearchService.search(query);
-        plantList.setItems(plants);
-        plantList.setRenderer(new ComponentRenderer<>(plant -> {
-            AvatarItem avatarItem = new AvatarItem();
-            avatarItem.setHeading(plant.getCommonName());
-            avatarItem.setDescription(plant.getScientificName());
-            avatarItem.setAvatar(new Avatar(plant.getCommonName()));
-            avatarItem.getStyle().set("font-size", "20px").set("padding", "10px");
-            return avatarItem;
-        }));
+        plantGrid.setItems(plants);
     }
 
-    private void addSelectedPlants() {
-        List<PlantIndex> selectedPlants = plantList.getSelectedItems().stream().toList();
-        // TODO: Add selected plant to my plants
+    private void addToMyPlants(PlantIndex plant) {
+        if (!myPlants.contains(plant)) {
+            myPlants.add(plant);
+            Notification.show(plant.getCommonName() + " added to My Plants!", 3000, Notification.Position.TOP_CENTER);
+        } else {
+            Notification.show(plant.getCommonName() + " is already in My Plants!", 3000, Notification.Position.TOP_CENTER);
+        }
     }
 }
