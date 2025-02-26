@@ -4,6 +4,7 @@ import com.flourish.domain.PlantDetails;
 import com.flourish.service.PlantDetailsService;
 import com.flourish.service.PlantSearchService;
 import com.flourish.domain.PlantIndex;
+import com.flourish.service.UserPlantLibraryService;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -39,12 +40,16 @@ public class AllPlantsView extends Composite<VerticalLayout> {
 
     private final PlantSearchService plantSearchService;
     private final PlantDetailsService plantDetailsService;
+    private final UserPlantLibraryService userPlantLibraryService;
+    private final Long userId = 1L; // Temporary placeholder, late replaced with the actual ID
     private final Grid<PlantIndex> plantGrid;
     private final List<PlantIndex> myPlants = new ArrayList<>();
 
-    public AllPlantsView(PlantSearchService plantSearchService, PlantDetailsService plantDetailsService) {
+    public AllPlantsView(PlantSearchService plantSearchService, PlantDetailsService plantDetailsService, UserPlantLibraryService userPlantLibraryService) {
         this.plantSearchService = plantSearchService;
         this.plantDetailsService = plantDetailsService;
+        this.userPlantLibraryService = userPlantLibraryService;
+
 
         getContent().getStyle().set("background-color", "#e8f5e9").set("padding", "20px");
 
@@ -89,12 +94,11 @@ public class AllPlantsView extends Composite<VerticalLayout> {
         plantGrid.setItems(plants);
     }
 
-    private void addToMyPlants(PlantIndex plant) { // This method only shows notification right now and has no logic connected to the database
-        if (!myPlants.contains(plant)) {
-            myPlants.add(plant);
-            Notification.show(plant.getCommonName() + " added to My Plants!", 3000, Notification.Position.TOP_CENTER);
-        } else {
-            Notification.show(plant.getCommonName() + " is already in My Plants!", 3000, Notification.Position.TOP_CENTER);
-        }
+    private void addToMyPlants(PlantIndex plant) {
+        userPlantLibraryService.addPlantToLibrary(userId, plant)
+                .ifPresentOrElse(
+                        entry -> Notification.show(plant.getCommonName() + " added to My Plants!", 3000, Notification.Position.TOP_CENTER),
+                        () -> Notification.show("Failed to add " + plant.getCommonName(), 3000, Notification.Position.TOP_CENTER)
+                );
     }
 }
