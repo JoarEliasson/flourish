@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.flourish.domain.User;
 import com.flourish.repository.UserRepository;
+import com.flourish.repository.UserSettingsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,13 +17,15 @@ class ExampleUserServiceTest {
 
     private UserService userService;
     private UserRepository userRepositoryMock;
+    private UserSettingsRepository userSettingsRepository;
     private PasswordEncoder passwordEncoderMock;
 
     @BeforeEach
     void setUp() {
         userRepositoryMock = mock(UserRepository.class);
+        userSettingsRepository = mock(UserSettingsRepository.class);
         passwordEncoderMock = mock(PasswordEncoder.class);
-        userService = new UserServiceImpl(userRepositoryMock, passwordEncoderMock);
+        userService = new UserServiceImpl(userRepositoryMock, userSettingsRepository, passwordEncoderMock);
     }
 
     @Test

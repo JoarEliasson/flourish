@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.flourish.domain.User;
 import com.flourish.repository.UserRepository;
+import com.flourish.repository.UserSettingsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +38,7 @@ import java.util.Optional;
 class UserServiceImplTest {
 
     private UserRepository userRepository;
+    private UserSettingsRepository userSettingsRepository;
     private PasswordEncoder passwordEncoder;
     private UserServiceImpl userService;
 
@@ -46,8 +48,9 @@ class UserServiceImplTest {
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
+        userSettingsRepository = mock(UserSettingsRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
-        userService = new UserServiceImpl(userRepository, passwordEncoder);
+        userService = new UserServiceImpl(userRepository, userSettingsRepository, passwordEncoder);
     }
 
     /**
