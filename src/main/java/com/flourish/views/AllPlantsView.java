@@ -89,7 +89,7 @@ public class AllPlantsView extends Composite<VerticalLayout> {
         plantGrid.setItems(plants);
     }
 
-    private void addToMyPlants(PlantIndex plant) {
+    private void addToMyPlants(PlantIndex plant) { // This method only shows notification right now and has no logic connected to the database
         if (!myPlants.contains(plant)) {
             myPlants.add(plant);
             Notification.show(plant.getCommonName() + " added to My Plants!", 3000, Notification.Position.TOP_CENTER);
