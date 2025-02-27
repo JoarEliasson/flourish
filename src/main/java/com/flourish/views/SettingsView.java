@@ -1,7 +1,9 @@
 package com.flourish.views;
 
+import com.flourish.domain.User;
 import com.flourish.domain.UserSettings;
 import com.flourish.service.UserSettingsService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -11,6 +13,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,7 +36,8 @@ import java.util.Optional;
 public class SettingsView extends VerticalLayout {
 
     private final UserSettingsService userSettingsService;
-    private final Long loggedInUserId = 1L; // Temporary placeholder, late replaced with the actual ID
+    private final User user;
+    private Long userId;
 
     private ComboBox<String> languageSelector;
     private Checkbox emailNotifications;
@@ -46,6 +50,15 @@ public class SettingsView extends VerticalLayout {
     @Autowired
     public SettingsView(UserSettingsService userSettingsService) {
         this.userSettingsService = userSettingsService;
+
+        user = (User) VaadinSession.getCurrent().getAttribute("user");
+        if (user == null) {
+            Notification.show("You must be logged in to view your plants.", 3000, Notification.Position.TOP_CENTER);
+            UI.getCurrent().navigate("login");
+            return;
+        }
+
+        userId = user.getId();
 
         setupUI();
         loadUserSettings();
@@ -73,7 +86,7 @@ public class SettingsView extends VerticalLayout {
     }
 
     private void loadUserSettings() {
-        Optional<UserSettings> settingsOpt = userSettingsService.getUserSettings(loggedInUserId);
+        Optional<UserSettings> settingsOpt = userSettingsService.getUserSettings(userId);
             userSettings = settingsOpt.get();
             languageSelector.setValue(userSettings.getLanguage());
             emailNotifications.setValue(userSettings.isEmailNotificationEnabled());

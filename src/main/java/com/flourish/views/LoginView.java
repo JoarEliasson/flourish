@@ -96,7 +96,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
                 VaadinSession.getCurrent().setAttribute("userId", user.getId()); // Store the user ID
 
-
                 UI.getCurrent().navigate("dashboard");
             });
         });
