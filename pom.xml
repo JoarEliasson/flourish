@@ -37,6 +37,12 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.seleniumhq.selenium</groupId>
+                <artifactId>selenium-java</artifactId>
+                <version>4.28.0</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -82,7 +88,7 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-spring-boot-starter</artifactId>
-            <version>24.0.6</version>
+            <version>24.6.5</version>
         </dependency>
 
         <dependency>
@@ -93,9 +99,25 @@
 
         <dependency>
             <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-testbench</artifactId>
+            <version>24.6.5</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.vaadin</groupId>
             <artifactId>vaadin-testbench-unit-junit5</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>5.5.0</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>com.vaadin</groupId>
@@ -106,6 +128,7 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
+            <scope>runtime</scope>
             <version>3.4.1</version>
         </dependency>
 

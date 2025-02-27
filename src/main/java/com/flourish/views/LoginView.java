@@ -1,16 +1,21 @@
 package com.flourish.views;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.Menu;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A Vaadin view that serves as the login page.
@@ -30,22 +35,23 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
  */
 @Route("login")
 @AnonymousAllowed
-public class LoginView extends VerticalLayout {
-
-    Button registerButton;
+public class LoginView extends VerticalLayout implements BeforeEnterObserver {
+    private final LoginForm loginForm;
 
     /**
      * Constructs a new LoginView with a Vaadin LoginForm.
      */
     public LoginView() {
+        loginForm = new LoginForm();
+        loginForm.setAction("login");
+
         VerticalLayout loginLayout = new VerticalLayout();
         loginLayout.setWidth("400px");
         loginLayout.setPadding(true);
         loginLayout.setSpacing(true);
         loginLayout.setAlignItems(Alignment.CENTER);
 
-        LoginForm loginForm = new LoginForm();
-        loginForm.setAction("login");
+        System.out.println("In constructor");
 
         LoginI18n i18n = LoginI18n.createDefault();
         if (i18n.getHeader() == null) {
@@ -58,7 +64,7 @@ public class LoginView extends VerticalLayout {
 
         loginForm.addForgotPasswordListener(e -> getUI().ifPresent(ui -> ui.navigate("forgotpassword")));
 
-        registerButton = new Button("Register", e ->
+        Button registerButton = new Button("Register", e ->
                 getUI().ifPresent(ui -> ui.navigate("register"))
         );
 
@@ -74,9 +80,27 @@ public class LoginView extends VerticalLayout {
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
     }
+    @Override
+    public void beforeEnter(BeforeEnterEvent event){
 
-    protected LoginForm getLoginForm() {
-        return (LoginForm) this.getComponentAt(0);
+        // Access query parameters directly before rendering the view
+        Map<String, List<String>> queryParams = event.getLocation().getQueryParameters().getParameters();
+        System.out.println("Before Enter: Query params: " + queryParams);
+
+        // Handle the "error" query parameter
+        String query = queryParams.getOrDefault("error", List.of())
+                .stream()
+                .findFirst()
+                .orElse(null);
+        System.out.println("Before Enter: Query: " + query);
+
+        if (query != null) {
+            System.out.println("Wrong pass");
+            loginForm.setError(true);
+            Notification notification = Notification.show("Incorrect username or password", 3000, Notification.Position.TOP_CENTER);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            notification.open();
+        }
     }
 
 }

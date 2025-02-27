@@ -23,6 +23,13 @@ import org.junit.platform.suite.api.Suite;
 
 /**
  * JUnit 5 suite that runs all tests in the specified packages.
+ *
+ * @author
+ *   Joar Eliasson
+ * @version
+ *   1.1.0
+ * @since
+ *   2025-02-24
  */
 @Suite
 @SelectPackages({
