@@ -1,11 +1,13 @@
 package com.flourish.views;
 
 import com.flourish.domain.PlantDetails;
+import com.flourish.domain.User;
 import com.flourish.service.PlantDetailsService;
 import com.flourish.service.PlantSearchService;
 import com.flourish.domain.PlantIndex;
 import com.flourish.service.UserPlantLibraryService;
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
@@ -16,6 +18,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.ArrayList;
@@ -41,14 +44,27 @@ public class AllPlantsView extends Composite<VerticalLayout> {
     private final PlantSearchService plantSearchService;
     private final PlantDetailsService plantDetailsService;
     private final UserPlantLibraryService userPlantLibraryService;
-    private final Long userId = 1L; // Temporary placeholder, late replaced with the actual ID
-    private final Grid<PlantIndex> plantGrid;
     private final List<PlantIndex> myPlants = new ArrayList<>();
+    private Grid<PlantIndex> plantGrid;
+    private final User user;
+    private Long userId;
+
 
     public AllPlantsView(PlantSearchService plantSearchService, PlantDetailsService plantDetailsService, UserPlantLibraryService userPlantLibraryService) {
+
         this.plantSearchService = plantSearchService;
         this.plantDetailsService = plantDetailsService;
         this.userPlantLibraryService = userPlantLibraryService;
+
+        user = (User) VaadinSession.getCurrent().getAttribute("user");
+        if (user == null) {
+            Notification.show("You must be logged in to view your plants.", 3000, Notification.Position.TOP_CENTER);
+            UI.getCurrent().navigate("login");
+            return;
+        }
+
+        userId = user.getId();
+
 
 
         getContent().getStyle().set("background-color", "#e8f5e9").set("padding", "20px");
@@ -80,6 +96,7 @@ public class AllPlantsView extends Composite<VerticalLayout> {
 
             Button addButton = new Button("Add to My Plants", event -> addToMyPlants(plant));
             detailsLayout.add(addButton);
+
 
             return detailsLayout;
         }));
