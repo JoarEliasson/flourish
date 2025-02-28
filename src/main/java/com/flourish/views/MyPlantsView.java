@@ -1,16 +1,17 @@
 package com.flourish.views;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import com.flourish.domain.PlantDetails;
 import com.flourish.domain.User;
 import com.flourish.service.UserPlantLibraryService;
+import com.flourish.views.components.AvatarItem;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.listbox.ListBox;
-import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -19,19 +20,20 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.flourish.views.components.AvatarItem;
 import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.security.RolesAllowed;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 /**
- * A view for My plants to view and edit the user's plants.
+ * A view for displaying and managing the user's plant collection.
+ *
+ * <p>This class allows authenticated users to view, search, and delete plants
+ * from their personal library.</p>
  *
  * @author
  *   Kenan Al Tal
  * @version
- *   1.1.0
+ *   1.0.0
  * @since
  *   2025-02-21
  */
@@ -46,8 +48,22 @@ public class MyPlantsView extends Composite<VerticalLayout> {
     private final User user;
     private Long userId;
 
+    /**
+     * A record representing a plant with an ID, name, and description.
+     *
+     * @param id The unique identifier of the plant.
+     * @param name The common name of the plant.
+     * @param description A short description of the plant.
+     */
     public record Plant(long id, String name, String description) {}
 
+    /**
+     * Constructs the MyPlantsView and initializes the UI components.
+     *
+     * <p>The User id is saved using VaadinSession</p>
+     *
+     * @param userPlantLibraryService The service for managing user plant data.
+     */
     public MyPlantsView(UserPlantLibraryService userPlantLibraryService) {
         this.userPlantLibraryService = userPlantLibraryService;
 
@@ -65,24 +81,19 @@ public class MyPlantsView extends Composite<VerticalLayout> {
         H2 title = new H2("My Plants");
         title.getStyle().set("color", "#388e3c").set("font-size", "28px");
 
-        // Search field
         TextField searchField = new TextField("Search Plants");
         searchField.setWidth("100%");
         searchField.getStyle().set("font-size", "18px");
         searchField.addValueChangeListener(event -> updatePlantList(event.getValue()));
 
-        // Set up the single-selection ListBox
         plantList.setWidth("100%");
         plantList.getStyle().set("font-size", "18px").set("padding", "10px");
 
-        // Load the user's plants
         loadUserPlants();
 
-        // Add Delete Button
         Button deleteButton = new Button("Delete Selected Plant", event -> deleteSelectedPlant());
         deleteButton.getStyle().set("background-color", "#d32f2f").set("color", "white");
 
-        // Layout for search and delete button
         HorizontalLayout controlsLayout = new HorizontalLayout(searchField, deleteButton);
         controlsLayout.setWidthFull();
         controlsLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
@@ -90,6 +101,9 @@ public class MyPlantsView extends Composite<VerticalLayout> {
         getContent().add(title, controlsLayout, plantList);
     }
 
+    /**
+     * Loads the plants associated with the user and populates the plant list.
+     */
     private void loadUserPlants() {
         List<PlantDetails> userPlants = userPlantLibraryService.getAllPlantDetailsForUser(userId);
         List<Plant> plantData = userPlants.stream()
@@ -107,6 +121,14 @@ public class MyPlantsView extends Composite<VerticalLayout> {
         }));
     }
 
+    /**
+     * Filters the plant list based on the search query.
+     *
+     * @warning OBSS!!!! Implementation is NOT tested.
+     * !!!!!!!!!!!!!!!!!!!
+     *
+     * @param query The search query entered by the user.
+     */
     private void updatePlantList(String query) {
         List<PlantDetails> filteredPlants = userPlantLibraryService.getAllPlantDetailsForUser(userId).stream()
                 .filter(plant -> plant.getCommonName().toLowerCase().contains(query.toLowerCase()))
@@ -117,10 +139,15 @@ public class MyPlantsView extends Composite<VerticalLayout> {
                 .collect(Collectors.toList());
 
         plantList.setItems(plantData);
-        System.out.println(" Line 120 id: " + plantData.size());
-
     }
 
+    /**
+     * Deletes the selected plant from the user's library.
+     *
+     * @warning OBSS!!!! There is an issue with this implementation: The plants are not getting deleted,
+     * the issue is with the plantId, The Id needed is the entry Id for the plant (ID in the user_plant_library table).
+     * !!!!!!!!!!!!!!!!!!!
+     */
     private void deleteSelectedPlant() {
         Plant selectedPlant = plantList.getValue();
         if (selectedPlant == null) {
@@ -129,11 +156,9 @@ public class MyPlantsView extends Composite<VerticalLayout> {
         }
 
         userPlantLibraryService.removePlantFromLibrary(selectedPlant.id());
-        System.out.println(" Line 132 id: " + selectedPlant.id());
 
         Notification.show("Plant deleted successfully.", 3000, Notification.Position.TOP_CENTER);
 
-        // Reload the plant list after deletion
         loadUserPlants();
     }
 }

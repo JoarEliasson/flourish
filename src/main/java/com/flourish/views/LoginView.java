@@ -50,8 +50,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         loginForm.setAction("login");
         this.userService = userService;
 
-
-
         VerticalLayout loginLayout = new VerticalLayout();
         loginLayout.setWidth("400px");
         loginLayout.setPadding(true);
@@ -103,11 +101,9 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     @Override
     public void beforeEnter(BeforeEnterEvent event){
 
-        // Access query parameters directly before rendering the view
         Map<String, List<String>> queryParams = event.getLocation().getQueryParameters().getParameters();
         System.out.println("Before Enter: Query params: " + queryParams);
 
-        // Handle the "error" query parameter
         String query = queryParams.getOrDefault("error", List.of())
                 .stream()
                 .findFirst()
@@ -122,5 +118,4 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
             notification.open();
         }
     }
-
 }

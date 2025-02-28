@@ -3,6 +3,7 @@ package com.flourish.views;
 import com.flourish.domain.User;
 import com.flourish.domain.UserSettings;
 import com.flourish.service.UserSettingsService;
+import java.util.Optional;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -17,19 +18,19 @@ import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-
 /**
  * A view for Settings to view and edit the user's settings.
+ *
+ * <p>This class allows authenticated users to view and update their settings,
+ * such as language preference and notification preferences.</p>
  *
  * @author
  *   Kenan Al Tal
  * @version
- *   1.1.0
+ *   1.0.0
  * @since
  *   2025-02-21
  */
-
 @PageTitle("Settings")
 @Route(value = "settings", layout = MainLayout.class)
 @RolesAllowed("USER")
@@ -38,6 +39,7 @@ public class SettingsView extends VerticalLayout {
     private final UserSettingsService userSettingsService;
     private final User user;
     private Long userId;
+    private UserSettings userSettings;
 
     private ComboBox<String> languageSelector;
     private Checkbox emailNotifications;
@@ -45,8 +47,14 @@ public class SettingsView extends VerticalLayout {
     private Checkbox loginNotifications;
     private Button saveChanges;
 
-    private UserSettings userSettings;
 
+    /**
+     * Constructs the SettingsView and initializes the UI components.
+     *
+     * <p>The User id is saved using VaadinSession</p>
+     *
+     * @param userSettingsService The service for handling user settings.
+     */
     @Autowired
     public SettingsView(UserSettingsService userSettingsService) {
         this.userSettingsService = userSettingsService;
@@ -64,6 +72,9 @@ public class SettingsView extends VerticalLayout {
         loadUserSettings();
     }
 
+    /**
+     * Sets up the UI components for the settings page.
+     */
     private void setupUI() {
         getStyle().set("background-color", "#e8f5e9").set("padding", "20px");
 
@@ -85,6 +96,9 @@ public class SettingsView extends VerticalLayout {
         add(title, languageSelector, emailNotifications, notifications, loginNotifications, saveChanges);
     }
 
+    /**
+     * Loads the current user's settings (saved in the database) and updates the UI components accordingly.
+     */
     private void loadUserSettings() {
         Optional<UserSettings> settingsOpt = userSettingsService.getUserSettings(userId);
             userSettings = settingsOpt.get();
@@ -92,16 +106,18 @@ public class SettingsView extends VerticalLayout {
             emailNotifications.setValue(userSettings.isEmailNotificationEnabled());
             notifications.setValue(userSettings.isInAppNotificationEnabled());
             loginNotifications.setValue(userSettings.isLoginNotificationEnabled());
-
     }
 
+    /**
+     * Saves the user's updated settings to the database
+     */
     private void saveUserSettings() {
         userSettings.setLanguage(languageSelector.getValue());
         userSettings.setEmailNotificationEnabled(emailNotifications.getValue());
         userSettings.setInAppNotificationEnabled(notifications.getValue());
         userSettings.setLoginNotificationEnabled(loginNotifications.getValue());
-
         userSettingsService.saveUserSettings(userSettings);
+
         Notification.show("Settings saved successfully", 3000, Notification.Position.MIDDLE);
     }
 }
