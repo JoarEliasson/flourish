@@ -146,6 +146,7 @@ public class MyPlantsView extends Composite<VerticalLayout> {
      *
      * @warning OBSS!!!! There is an issue with this implementation: The plants are not getting deleted,
      * the issue is with the plantId, The Id needed is the entry Id for the plant (ID in the user_plant_library table).
+     * Check the getAllPlantDetailsForUser method in the userPlantLibraryService class.
      * !!!!!!!!!!!!!!!!!!!
      */
     private void deleteSelectedPlant() {

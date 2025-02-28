@@ -177,8 +177,6 @@ public class UserPlantLibraryService {
         List<PlantDetails> detailsList = new ArrayList<>();
         for (UserPlantLibrary entry : libraryEntries) {
             plantDetailsService.getPlantDetailsById(entry.getPlantId()).ifPresent(detailsList::add);
-            plantDetailsService.getPlantDetailsById(entry.getId()).ifPresent(detailsList::add);
-
         }
         return detailsList;
     }
