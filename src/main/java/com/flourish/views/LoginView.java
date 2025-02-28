@@ -14,6 +14,8 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import org.aspectj.weaver.ast.Not;
+
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +64,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         i18n.getForm().setForgotPassword("NYTT LÖSENORD TACK");
         loginForm.setI18n(i18n);
 
+        loginForm.addLoginListener(e -> validateLogin(e.getUsername(),e.getPassword()));
+
         loginForm.addForgotPasswordListener(e -> getUI().ifPresent(ui -> ui.navigate("forgotpassword")));
 
         Button registerButton = new Button("Register", e ->
@@ -80,6 +84,19 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
     }
+
+    private void validateLogin(String username, String password) {
+        if(username == null || username.trim().isEmpty()){
+            showErrorNotification("Email is required!");
+        } else if (!username.contains("@")) {
+            showErrorNotification("Invalid email format. Please enter valid email!");
+        } else if (password == null || password.trim().isEmpty()) {
+            showErrorNotification("Password is required!");
+        }
+    }
+
+
+
     @Override
     public void beforeEnter(BeforeEnterEvent event){
 
@@ -94,13 +111,17 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 .orElse(null);
         System.out.println("Before Enter: Query: " + query);
 
+
         if (query != null) {
             System.out.println("Wrong pass");
             loginForm.setError(true);
-            Notification notification = Notification.show("Incorrect username or password", 3000, Notification.Position.TOP_CENTER);
-            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-            notification.open();
+            showErrorNotification("Incorrect username or password");
         }
+    }
+    private void showErrorNotification(String errorMessage) {
+        Notification notification = Notification.show(errorMessage,3000,Notification.Position.TOP_CENTER);
+        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        notification.open();
     }
 
 }
