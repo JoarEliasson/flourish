@@ -1,29 +1,31 @@
 package com.flourish.views;
 
 import com.flourish.domain.PlantDetails;
+import com.flourish.domain.User;
 import com.flourish.service.PlantDetailsService;
 import com.flourish.service.PlantSearchService;
 import com.flourish.domain.PlantIndex;
 import com.flourish.service.UserPlantLibraryService;
+import java.util.List;
+import java.util.Optional;
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.security.RolesAllowed;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 /**
- * A view for displaying all available plants with a search function.
+ * A view for displaying all available plants with a search function. This view allows users to search for plants
+ * and view detailed information about each plant, including its description and the option to add the plant to their
+ * personal library.
  *
  * @author
  *   Kenan Al Tal
@@ -41,15 +43,35 @@ public class AllPlantsView extends Composite<VerticalLayout> {
     private final PlantSearchService plantSearchService;
     private final PlantDetailsService plantDetailsService;
     private final UserPlantLibraryService userPlantLibraryService;
-    private final Long userId = 1L; // Temporary placeholder, late replaced with the actual ID
-    private final Grid<PlantIndex> plantGrid;
-    private final List<PlantIndex> myPlants = new ArrayList<>();
+    private Grid<PlantIndex> plantGrid;
+    private final User user;
+    private Long userId;
+
 
     public AllPlantsView(PlantSearchService plantSearchService, PlantDetailsService plantDetailsService, UserPlantLibraryService userPlantLibraryService) {
+
+        /**
+         * Constructs the view for displaying all available plants. It initializes the necessary services, retrieves the
+         * current user from the Vaadin session, and sets up the components such as the search field and plant grid.
+         *.
+         * <p>The User Id is retrieved using VaadinSession to add a plant to the right user table.</p>
+         *
+         * @param plantSearchService the service to handle plant search queries
+         * @param plantDetailsService the service to retrieve plant details
+         * @param userPlantLibraryService the service to manage user's plant library
+         */
+
         this.plantSearchService = plantSearchService;
         this.plantDetailsService = plantDetailsService;
         this.userPlantLibraryService = userPlantLibraryService;
 
+        user = (User) VaadinSession.getCurrent().getAttribute("user");
+        if (user == null) {
+            Notification.show("You must be logged in to view your plants.", 3000, Notification.Position.TOP_CENTER);
+            UI.getCurrent().navigate("login");
+            return;
+        }
+        userId = user.getId();
 
         getContent().getStyle().set("background-color", "#e8f5e9").set("padding", "20px");
 
@@ -89,11 +111,22 @@ public class AllPlantsView extends Composite<VerticalLayout> {
         getContent().add(title, searchField, plantGrid);
     }
 
+    /**
+     * Updates the list of plants displayed in the grid based on the search query.
+     *
+     * @param query the search query to filter plants by name or scientific name
+     */
     private void updatePlantList(String query) {
         List<PlantIndex> plants = plantSearchService.search(query);
         plantGrid.setItems(plants);
     }
 
+    /**
+     * Adds a plant to the user's personal plant library. Displays a notification to inform the user whether the plant
+     * was successfully added or if an error occurred.
+     *
+     * @param plant the plant to be added to the library
+     */
     private void addToMyPlants(PlantIndex plant) {
         userPlantLibraryService.addPlantToLibrary(userId, plant)
                 .ifPresentOrElse(

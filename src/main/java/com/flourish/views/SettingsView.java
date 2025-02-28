@@ -1,7 +1,10 @@
 package com.flourish.views;
 
+import com.flourish.domain.User;
 import com.flourish.domain.UserSettings;
 import com.flourish.service.UserSettingsService;
+import java.util.Optional;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -11,29 +14,32 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Optional;
 
 /**
  * A view for Settings to view and edit the user's settings.
  *
+ * <p>This class allows authenticated users to view and update their settings,
+ * such as language preference and notification preferences.</p>
+ *
  * @author
  *   Kenan Al Tal
  * @version
- *   1.1.0
+ *   1.0.0
  * @since
  *   2025-02-21
  */
-
 @PageTitle("Settings")
 @Route(value = "settings", layout = MainLayout.class)
 @RolesAllowed("USER")
 public class SettingsView extends VerticalLayout {
 
     private final UserSettingsService userSettingsService;
-    private final Long loggedInUserId = 1L; // Temporary placeholder, late replaced with the actual ID
+    private final User user;
+    private Long userId;
+    private UserSettings userSettings;
 
     private ComboBox<String> languageSelector;
     private Checkbox emailNotifications;
@@ -41,16 +47,34 @@ public class SettingsView extends VerticalLayout {
     private Checkbox loginNotifications;
     private Button saveChanges;
 
-    private UserSettings userSettings;
 
+    /**
+     * Constructs the SettingsView and initializes the UI components.
+     *
+     * <p>The User id is saved using VaadinSession</p>
+     *
+     * @param userSettingsService The service for handling user settings.
+     */
     @Autowired
     public SettingsView(UserSettingsService userSettingsService) {
         this.userSettingsService = userSettingsService;
+
+        user = (User) VaadinSession.getCurrent().getAttribute("user");
+        if (user == null) {
+            Notification.show("You must be logged in to view your plants.", 3000, Notification.Position.TOP_CENTER);
+            UI.getCurrent().navigate("login");
+            return;
+        }
+
+        userId = user.getId();
 
         setupUI();
         loadUserSettings();
     }
 
+    /**
+     * Sets up the UI components for the settings page.
+     */
     private void setupUI() {
         getStyle().set("background-color", "#e8f5e9").set("padding", "20px");
 
@@ -72,23 +96,28 @@ public class SettingsView extends VerticalLayout {
         add(title, languageSelector, emailNotifications, notifications, loginNotifications, saveChanges);
     }
 
+    /**
+     * Loads the current user's settings (saved in the database) and updates the UI components accordingly.
+     */
     private void loadUserSettings() {
-        Optional<UserSettings> settingsOpt = userSettingsService.getUserSettings(loggedInUserId);
+        Optional<UserSettings> settingsOpt = userSettingsService.getUserSettings(userId);
             userSettings = settingsOpt.get();
             languageSelector.setValue(userSettings.getLanguage());
             emailNotifications.setValue(userSettings.isEmailNotificationEnabled());
             notifications.setValue(userSettings.isInAppNotificationEnabled());
             loginNotifications.setValue(userSettings.isLoginNotificationEnabled());
-
     }
 
+    /**
+     * Saves the user's updated settings to the database
+     */
     private void saveUserSettings() {
         userSettings.setLanguage(languageSelector.getValue());
         userSettings.setEmailNotificationEnabled(emailNotifications.getValue());
         userSettings.setInAppNotificationEnabled(notifications.getValue());
         userSettings.setLoginNotificationEnabled(loginNotifications.getValue());
-
         userSettingsService.saveUserSettings(userSettings);
+
         Notification.show("Settings saved successfully", 3000, Notification.Position.MIDDLE);
     }
 }
