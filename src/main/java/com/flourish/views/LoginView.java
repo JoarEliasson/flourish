@@ -1,5 +1,7 @@
 package com.flourish.views;
 
+import com.flourish.service.UserServiceImpl;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H3;
@@ -11,6 +13,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import java.util.List;
@@ -36,11 +39,13 @@ import java.util.Map;
 @AnonymousAllowed
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private final LoginForm loginForm;
+    private final UserServiceImpl userService;
 
     /**
      * Constructs a new LoginView with a Vaadin LoginForm.
      */
-    public LoginView() {
+    public LoginView(UserServiceImpl userService) {
+        this.userService = userService;
         loginForm = new LoginForm();
         loginForm.setAction("login");
 
@@ -80,6 +85,19 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
+
+        //Store the user ID
+        loginForm.addLoginListener(e -> {
+            String username = e.getUsername();
+            userService.findByEmail(username).ifPresent(user -> {
+
+                VaadinSession.getCurrent().setAttribute("user", user);  // Set the user object in the session
+
+                VaadinSession.getCurrent().setAttribute("userId", user.getId()); // Store the user ID
+
+                UI.getCurrent().navigate("dashboard");
+            });
+        });
     }
 
     private void validateLogin(String username, String password) {
