@@ -12,7 +12,6 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.aspectj.weaver.ast.Not;
 
 import java.util.List;
 import java.util.Map;
