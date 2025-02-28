@@ -44,7 +44,6 @@ public class AllPlantsView extends Composite<VerticalLayout> {
     private final PlantSearchService plantSearchService;
     private final PlantDetailsService plantDetailsService;
     private final UserPlantLibraryService userPlantLibraryService;
-    private final List<PlantIndex> myPlants = new ArrayList<>();
     private Grid<PlantIndex> plantGrid;
     private final User user;
     private Long userId;
