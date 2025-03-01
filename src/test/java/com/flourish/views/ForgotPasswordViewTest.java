@@ -117,7 +117,7 @@ class ForgotPasswordViewTest {
     @Test
     void testValidEmailTriggersPasswordReset() throws Exception {
         String validEmail = "user@example.com";
-        User mockUser = new User();
+        User mockUser = mock(User.class);
         when(userRepository.findByEmail(validEmail)).thenReturn(mockUser);
 
         // Create a PasswordResetToken with an expiration 30 minutes from now

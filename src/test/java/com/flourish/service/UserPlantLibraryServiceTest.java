@@ -201,12 +201,13 @@ class UserPlantLibraryServiceTest {
     /**
      * <p>Verifies that {@code getWateringGaugePercentage(Long)} correctly
      * calculates gauge values.</p>
-     * <strong>Scenarios:</strong>
+     * <p><strong>Scenarios:</strong>
      * <ul>
-     *     <li>Scenario 1: fraction=0 => gauge=100</li>
-     *     <li>Scenario 2: fraction>1 => gauge < -100 => clamp to -100</li>
-     *     <li>Scenario 3: extreme overdue case (3x watering interval) => clamp to -100</li>
-     * <ul>
+     *   <li>When the last watered time equals the next watering time, the gauge returns 100%.</li>
+     *   <li>When the current time equals the next watering time, the gauge returns 0%.</li>
+     *   <li>When the watering interval is partially elapsed, the gauge is linearly interpolated.</li>
+     *   <li>When the elapsed time exceeds the watering interval, the gauge is clamped at -100%.</li>
+     * </ul></p>
      */
     @Test
     @DisplayName("getWateringGaugePercentage: fraction=0 => 100, fraction>1 => -100 clamp")
@@ -235,5 +236,52 @@ class UserPlantLibraryServiceTest {
         assertTrue(gaugeOpt.isPresent());
         assertEquals(-100.0, gaugeOpt.get(), 0.01);
 
+    }
+
+    /**
+     * <p>Verifies that {@code getWateringGaugePercentage(Long)} method
+     * calculates gauge values correctly for all branches of its logic.</p>
+     * <strong>Scenarios:</strong>
+     * <ul>
+     *     <li>Scenario 1: fraction=0.5 => gauge=50</li>
+     *     <li>Scenario 2: fraction=0.25 => gauge=75</li>
+     *     <li>Scenario 3: fraction=0.75 => gauge=25</li>
+     *     <li>Scenario 4: fraction=0.1 => gauge=90</li>
+     * <ul>
+     */
+    @Test
+    @DisplayName("getWateringGaugePercentage: test all branches including interpolation and clamping")
+    void testGetWateringGaugePercentage_AllBranches() {
+        Long entryId = 55L;
+        UserPlantLibrary mockEntry = mock(UserPlantLibrary.class);
+        when(libraryRepository.findById(entryId)).thenReturn(Optional.of(mockEntry));
+
+        LocalDateTime baseNow = LocalDateTime.now();
+        when(mockEntry.getLastWatered()).thenReturn(baseNow);
+        when(mockEntry.getNextWatering()).thenReturn(baseNow);
+        Optional<Double> gaugeOpt = userPlantLibraryService.getWateringGaugePercentage(entryId);
+        assertTrue(gaugeOpt.isPresent());
+        assertEquals(100.0, gaugeOpt.get(), 0.01);
+
+        baseNow = LocalDateTime.now();
+        when(mockEntry.getLastWatered()).thenReturn(baseNow.minusDays(10));
+        when(mockEntry.getNextWatering()).thenReturn(baseNow);
+        gaugeOpt = userPlantLibraryService.getWateringGaugePercentage(entryId);
+        assertTrue(gaugeOpt.isPresent());
+        assertEquals(0.0, gaugeOpt.get(), 0.01);
+
+        baseNow = LocalDateTime.now();
+        when(mockEntry.getLastWatered()).thenReturn(baseNow.minusDays(5));
+        when(mockEntry.getNextWatering()).thenReturn(baseNow.plusDays(5));
+        gaugeOpt = userPlantLibraryService.getWateringGaugePercentage(entryId);
+        assertTrue(gaugeOpt.isPresent());
+        assertEquals(50.0, gaugeOpt.get(), 5.0);
+
+        baseNow = LocalDateTime.now();
+        when(mockEntry.getLastWatered()).thenReturn(baseNow.minusDays(30));
+        when(mockEntry.getNextWatering()).thenReturn(baseNow.minusDays(20));
+        gaugeOpt = userPlantLibraryService.getWateringGaugePercentage(entryId);
+        assertTrue(gaugeOpt.isPresent());
+        assertEquals(-100.0, gaugeOpt.get(), 0.01);
     }
 }

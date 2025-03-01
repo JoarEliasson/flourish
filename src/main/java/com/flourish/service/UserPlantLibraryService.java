@@ -156,13 +156,11 @@ public class UserPlantLibraryService {
      * <p>The gauge is calculated based on the elapsed time since the plant was last watered relative
      * to the watering frequency. The gauge returns:
      * <ul>
-     *   <li>100% if the plant was just watered (elapsed = 0)</li>
-     *   <li>0% if the current time equals the next watering date</li>
-     *   <li>-100% if the current time is one full watering interval past the next watering date</li>
+     *     <li>100% if the plant was just watered (elapsed = 0)</li>
+     *     <li>0% if the current time equals the next watering date</li>
+     *     <li>-100% if the current time is one full watering interval past the next watering date</li>
      * </ul>
-     * Values in between are linearly interpolated.
-     * </p>
-     *
+     * Values in between are linearly interpolated.</p>
      * @param libraryEntryId the ID of the library entry.
      * @return a double representing the gauge percentage.
      */
@@ -174,6 +172,7 @@ public class UserPlantLibraryService {
         UserPlantLibrary entry = opt.get();
         LocalDateTime lastWatered = entry.getLastWatered();
         LocalDateTime nextWatering = entry.getNextWatering();
+
         LocalDateTime now = LocalDateTime.now();
         if (lastWatered.equals(nextWatering)) {
             return Optional.of(100.0);
