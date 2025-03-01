@@ -5,6 +5,8 @@ import static org.mockito.Mockito.*;
 import com.flourish.service.PasswordResetService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.testbench.unit.UIUnitTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,105 +28,103 @@ import java.util.Optional;
  * @version 1.1.0
  * @since 2025-02-24
  */
-@ExtendWith(MockitoExtension.class)
 class ResetPasswordViewTest {
 
     private ResetPasswordView resetPasswordView;
-
-    @Mock
     private PasswordResetService passwordResetService;
 
-    /**
-     * Setup method to initialize the {@link ResetPasswordView} instance with mocked dependencies
-     * before each test method is executed.
-     */
     @BeforeEach
     void setUp() {
         passwordResetService = mock(PasswordResetService.class);
         resetPasswordView = new ResetPasswordView(passwordResetService);
-        UI mockUI = mock(UI.class);
-        UI.setCurrent(mockUI);  // Sets the current UI to a mock UI instance
+        // Clear any existing authentication before each test
+        SecurityContextHolder.clearContext();
+    }
+    /**
+     * Verifies that the reset password view contains the required input fields.
+     */
+    @Test
+    void testInputFieldsExist() {
+        TextField tokenField = resetPasswordView.getTokenField();
+        PasswordField newPasswordField1 = resetPasswordView.getNewPasswordField1();
+        PasswordField newPasswordField2 = resetPasswordView.getNewPasswordField2();
+
+        assertNotNull(tokenField, "Token field should not be null");
+        assertNotNull(newPasswordField1, "New password field 1 should not be null");
+        assertNotNull(newPasswordField2, "New password field 2 should not be null");
     }
 
     /**
-     * Test to verify that the reset password view contains all necessary input fields.
-     * This test checks if the token field, new password field, and confirm password field are present.
+     * Verifies that a notification is shown when any of the required fields are empty.
      */
     @Test
-    void shouldContainAllInputFields() {
-        assertNotNull(resetPasswordView.getTokenField(), "Token field should not be null.");
-        assertNotNull(resetPasswordView.getNewPasswordField1(), "New password field should not be null.");
-        assertNotNull(resetPasswordView.getNewPasswordField2(), "Confirm new password field should not be null.");
-    }
+    void testResetPasswordWithEmptyFields() {
+        resetPasswordView.getTokenField().setValue("");
+        resetPasswordView.getNewPasswordField1().setValue("");
+        resetPasswordView.getNewPasswordField2().setValue("");
 
-    /**
-     * Test to verify that the {@link UI#getCurrent()} method is called correctly.
-     * This test ensures that the current UI is being accessed as expected.
-     */
-    @Test
-    void shouldCallUIGetCurrent() {
-        try (MockedStatic<UI> mockedUI = Mockito.mockStatic(UI.class)) {
-            UI mockUI = Mockito.mock(UI.class);
-            mockedUI.when(UI::getCurrent).thenReturn(mockUI);
-
-            UI.setCurrent(mockUI);  // Set the mock UI as current
-
-            UI.getCurrent();  // Call UI.getCurrent() to verify it was invoked
-
-            mockedUI.verify(UI::getCurrent, Mockito.times(1));  // Verify that UI.getCurrent() was called exactly once
+        try (var notificationMock = mockStatic(Notification.class)) {
+            resetPasswordView.triggerResetPassword();
+            notificationMock.verify(() ->
+                    Notification.show("Please fill in all the required fields."), times(1));
         }
     }
 
     /**
-     * Test to verify that the password is reset correctly when a valid token is provided.
-     * This test checks that the password reset service is called when the provided token is valid,
-     * and ensures that the authentication context is updated with the user email.
+     * Verifies that a notification is shown when the new passwords do not match.
      */
     @Test
-    void shouldResetPasswordWhenValidTokenProvided() {
-        when(passwordResetService.resetPassword("valid-token", "newpassword")).thenReturn(true);
-        when(passwordResetService.validateToken("valid-token")).thenReturn(Optional.of("user@example.com"));
+    void testResetPasswordWithNonMatchingPasswords() {
+        resetPasswordView.getTokenField().setValue("sometoken");
+        resetPasswordView.getNewPasswordField1().setValue("password1");
+        resetPasswordView.getNewPasswordField2().setValue("password2");
 
-        resetPasswordView.getTokenField().setValue("valid-token");
-        resetPasswordView.getNewPasswordField1().setValue("newpassword");
-        resetPasswordView.getNewPasswordField2().setValue("newpassword");
-
-        resetPasswordView.triggerResetPassword();  // Trigger the reset password action
-
-        verify(passwordResetService, times(1)).resetPassword("valid-token", "newpassword");  // Verify resetPassword was called
-        assertNotNull(SecurityContextHolder.getContext().getAuthentication());
-        assertEquals("user@example.com", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        try (var notificationMock = mockStatic(Notification.class)) {
+            resetPasswordView.triggerResetPassword();
+            notificationMock.verify(() ->
+                    Notification.show("Passwords do not match."), times(1));
+        }
     }
 
     /**
-     * Test to verify that the password reset action is not triggered when the passwords do not match.
-     * This test ensures that if the new password and confirmation password do not match, the reset action is not executed.
-     */
-    @Test
-    void testPasswordsDoNotMatch() {
-        resetPasswordView.getTokenField().setValue("token");
-        resetPasswordView.getNewPasswordField1().setValue("pass1");
-        resetPasswordView.getNewPasswordField2().setValue("pass2");
-
-        resetPasswordView.triggerResetPassword();  // Trigger the reset password action
-
-        verify(passwordResetService, never()).resetPassword(any(), any());  // Ensure resetPassword is not called
-    }
-
-    /**
-     * Test to verify that the password reset process behaves correctly when an invalid token is provided.
-     * This test simulates a scenario where an invalid token is provided and ensures that the reset process is not executed.
+     * Verifies that an invalid token leads to a notification indicating failure.
      */
     @Test
     void testResetPasswordWithInvalidToken() {
-        when(passwordResetService.resetPassword(eq("invalid"), any())).thenReturn(false);
+        resetPasswordView.getTokenField().setValue("validtoken");
+        resetPasswordView.getNewPasswordField1().setValue("newpassword");
+        resetPasswordView.getNewPasswordField2().setValue("newpassword");
 
-        resetPasswordView.getTokenField().setValue("invalid");
-        resetPasswordView.getNewPasswordField1().setValue("newPass");
-        resetPasswordView.getNewPasswordField2().setValue("newPass");
+        when(passwordResetService.resetPassword("validtoken", "newpassword")).thenReturn(false);
 
-        resetPasswordView.triggerResetPassword();  // Trigger the reset password action
+        try (var notificationMock = mockStatic(Notification.class)) {
+            resetPasswordView.triggerResetPassword();
+            notificationMock.verify(() ->
+                    Notification.show("Invalid or expired token."), times(1));
+        }
+    }
 
-        verify(passwordResetService).resetPassword("invalid", "newPass");  // Verify resetPassword was called
+    /**
+     * Verifies that a successful password reset triggers the appropriate logic:
+     * updating the password, setting authentication, and displaying a success notification.
+     */
+    @Test
+    void testResetPasswordSuccess() {
+        resetPasswordView.getTokenField().setValue("validtoken");
+        resetPasswordView.getNewPasswordField1().setValue("newpassword");
+        resetPasswordView.getNewPasswordField2().setValue("newpassword");
+
+        when(passwordResetService.resetPassword("validtoken", "newpassword")).thenReturn(true);
+        when(passwordResetService.validateToken("validtoken")).thenReturn(Optional.of("user@example.com"));
+
+        try (var notificationMock = mockStatic(Notification.class)) {
+            resetPasswordView.triggerResetPassword();
+            notificationMock.verify(() ->
+                    Notification.show("Password reset successful! You are now logged in."), times(1));
+        }
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        assertNotNull(auth, "Authentication should be set after successful reset");
+        assertEquals("user@example.com", auth.getPrincipal(),
+                "Authenticated principal should be the user's email");
     }
 }

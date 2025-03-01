@@ -3,11 +3,17 @@ package com.flourish.views;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.testbench.unit.UIUnitTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Unit tests for {@link MainView}.
@@ -33,19 +39,34 @@ class MainViewTest extends UIUnitTest {
     }
 
     /**
-     * Verifies that the {@link MainView} instance is created successfully
-     * and is a subclass of {@link VerticalLayout}.
-     * This test ensures that the main view component is correctly instantiated
-     * and inherits from the appropriate layout class.
+     * Test #1: Tests that the MainView contains an H1 element with the correct welcome message.
+     * <p>
+     * This method retrieves the first child component from MainView and asserts that:
+     * <ul>
+     *   <li>The first child is an instance of H1.</li>
+     *   <li>The text of the H1 element is "Welcome to the Main View!".</li>
+     * </ul>
+     * If MainView has no child components, an {@link AssertionError} is thrown.
+     * </p>
+     *
+     * @throws AssertionError if MainView does not contain any child components.
      */
     @Test
-    void shouldCreateMainView() {
-        assertNotNull(mainView, "MainView should be instantiated.");
-        assertTrue(mainView instanceof VerticalLayout, "MainView should extend VerticalLayout.");
+    void testWelcomeMessageExistsAndInitialized() {
+        Component firstChild = mainView.getChildren()
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("MainView has no child components at all!"));
+        System.out.println("Main view first child class: " + firstChild.getClass().getName());
+        assertTrue(firstChild instanceof H1,
+                "Expected the main child to be an H1 element (the welcome message).");
+
+        H1 welcomeH1 = (H1) firstChild;
+        assertEquals("Welcome to the Main View!", welcomeH1.getText(),
+                "Expected the welcome message to be 'Welcome to the Main View!'");
     }
 
     /**
-     * Ensures that the {@link MainView} contains an {@link H1} element
+     * Test #2: Ensures that the {@link MainView} contains an {@link H1} element
      * with the expected welcome message text.
      * This test checks if the main view contains an {@link H1} component
      * with the text "Welcome to the Main View!".
@@ -59,4 +80,6 @@ class MainViewTest extends UIUnitTest {
 
         assertTrue(hasWelcomeText, "MainView should contain a welcome message.");
     }
+
+
 }
