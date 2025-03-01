@@ -23,7 +23,7 @@ import org.springframework.stereotype.Repository;
 public interface PlantDetailsRepository extends JpaRepository<PlantDetails, Long> {
     
     /**
-     * Finds a PlantDetailsJson entry by its common name.
+     * Finds a PlantDetails entry by its common name.
      *
      * @param commonName the common name to search by.
      * @return the matching PlantDetailsJson entity, or null if none found.

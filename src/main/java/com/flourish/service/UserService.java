@@ -57,4 +57,11 @@ public interface UserService {
      * For any user missing settings, a default settings record is created.
      */
     void ensureAllUsersHaveSettings();
+
+    /**
+     * Deletes a user by email.
+     *
+     * @param testUserEmail the email address of the user to delete.
+     */
+    void deleteByEmail(String testUserEmail);
 }

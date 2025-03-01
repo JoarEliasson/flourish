@@ -3,6 +3,7 @@ package com.flourish.views;
 import com.flourish.FlourishApplication;
 import com.flourish.domain.User;
 import com.flourish.service.UserService;
+import com.flourish.service.UserSettingsService;
 import com.vaadin.flow.component.login.testbench.LoginFormElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import com.vaadin.testbench.TestBench;
@@ -58,6 +59,8 @@ class LoginViewIT extends TestBenchTestCase {
 
     private static final String TEST_USER_PASSWORD = "plaintextpass";
     private String testUserEmail;
+    @Autowired
+    private UserSettingsService userSettingsService;
 
     /**
      * Global setup for the Chrome driver.
@@ -84,6 +87,7 @@ class LoginViewIT extends TestBenchTestCase {
         }
 
         ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
         setDriver(TestBench.createDriver(new ChromeDriver(options)));
 
         getDriver().get("http://localhost:" + port + "/login");
@@ -97,6 +101,7 @@ class LoginViewIT extends TestBenchTestCase {
         if (getDriver() != null) {
             getDriver().quit();
         }
+        userService.deleteByEmail(testUserEmail);
     }
 
     /**

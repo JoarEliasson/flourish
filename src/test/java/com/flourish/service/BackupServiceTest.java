@@ -62,7 +62,7 @@ class BackupServiceTest {
         );
         when(plantIndexRepository.findAll(any(org.springframework.data.domain.Sort.class))).thenReturn(indexList);
 
-        Path outputFile = tempDir.resolve("plant_index_backup.txt");
+        Path outputFile = tempDir.resolve("plant_index_backup_test.txt");
         backupService.backupPlantIndexToFile(outputFile.toString());
 
         String fileContent = Files.readString(outputFile);
@@ -126,7 +126,7 @@ class BackupServiceTest {
 
         when(plantDetailsRepository.findAll(any(org.springframework.data.domain.Sort.class))).thenReturn(detailsList);
 
-        Path outputFile = tempDir.resolve("plant_details_backup.txt");
+        Path outputFile = tempDir.resolve("plant_details_backup_test.txt");
         backupService.backupPlantDetailsToFile(outputFile.toString());
 
         String fileContent = Files.readString(outputFile);
@@ -151,5 +151,17 @@ class BackupServiceTest {
 
         String fileContent = Files.readString(outputFile);
         assertEquals("[ ]", fileContent.trim());
+    }
+
+    /**
+     * Tests the {@code run method} of the BackupService.
+     */
+    @Test
+    void testRun() {
+        try {
+            backupService.run();
+        } catch (Exception e) {
+            fail("BackupService run method should not throw an exception");
+        }
     }
 }

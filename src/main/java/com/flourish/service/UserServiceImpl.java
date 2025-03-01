@@ -140,4 +140,22 @@ public class UserServiceImpl implements UserService {
             System.out.println("Created default settings for user: " + userId);
         }
     }
+
+    /**
+     * Deletes a user by email.
+     * <p>This method deletes the user entity and the corresponding user settings record.</p>
+     *
+     * @param email the email address.
+     */
+    @Override
+    @Transactional
+    public void deleteByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+
+        if (user != null) {
+            userRepository.delete(user);
+            Long userId = user.getId();
+            userSettingsRepository.deleteById(userId);
+        }
+    }
 }
