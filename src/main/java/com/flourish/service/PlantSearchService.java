@@ -133,6 +133,12 @@ public class PlantSearchService {
         return score == Integer.MAX_VALUE ? 100 : score;
     }
 
+    /**
+     * Sets the plant index list to use for testing.
+     * <p>This method is intended for testing purposes only.</p>
+     *
+     * @param mockData the mock plant index list.
+     */
     public void setPlantIndexList(List<PlantIndex> mockData) {
         plantIndexList = mockData;
     }

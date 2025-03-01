@@ -1,16 +1,14 @@
 package com.flourish.views;
 
-import com.vaadin.flow.component.Component;
+import static org.junit.jupiter.api.Assertions.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * UI unit tests for {@link LoginView}.
@@ -103,4 +101,74 @@ class LoginViewTest {
         assertEquals("Register", registerButton.getText(),
                 "Expected the register button text to be 'Register'.");
     }
+
+    /**
+     * <h6>Test #3: Verify that the forgot password link is correctly set.</h6>
+     * @author Zahraa Alqassab
+     * @since 2025-02-27
+     * Ensures that the forgot password button exists and has the expected text.
+     */
+    @Test
+    void testForgotPasswordButtonExists() {
+        Component mainChild = loginView.getChildren().findFirst()
+                .orElseThrow(() -> new AssertionError("LoginView has no child components."));
+
+        assertTrue(mainChild instanceof VerticalLayout,
+                "Expected the main child to be a VerticalLayout.");
+
+        LoginForm loginForm = (LoginForm) mainChild.getChildren()
+                .filter(component -> component instanceof LoginForm)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("No LoginForm found in loginLayout children."));
+
+        assertNotNull(loginForm,
+                "Expected the login form to contain a forgot password button.");
+    }
+    /**
+     * <h6>Test #4: Verify that the layout contains an H3 header with the expected text.</h6>
+     * @author Zahraa Alqassab
+     * @since 2025-02-27
+     * Ensures that an H3 component exists and displays "New to Flourish?".
+     */
+    @Test
+    void testHeaderExistsWithCorrectText() {
+        Component mainChild = loginView.getChildren().findFirst()
+                .orElseThrow(() -> new AssertionError("LoginView has no child components."));
+
+        assertTrue(mainChild instanceof VerticalLayout,
+                "Expected the main child to be a VerticalLayout.");
+
+        List<Component> innerComponents = mainChild.getChildren().collect(Collectors.toList());
+
+        Component header = innerComponents.stream()
+                .filter(component -> component.getElement().getTag().equals("h3"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("No H3 header found in loginLayout children."));
+
+        assertEquals("New to Flourish?", header.getElement().getText(),
+                "Expected the H3 header text to be 'New to Flourish?'.");
+    }
+    /**
+     * <h6>Test #3: Verify that the login form action is correctly set.</h6>
+     * @author Zahraa Alqassab
+     * @since 2025-02-27
+     * Ensures that the {@link LoginForm} inside {@link LoginView} has the expected action URL.
+     */
+    @Test
+    void testLoginFormAction() {
+        Component mainChild = loginView.getChildren().findFirst()
+                .orElseThrow(() -> new AssertionError("LoginView has no child components."));
+
+        assertTrue(mainChild instanceof VerticalLayout,
+                "Expected the main child to be a VerticalLayout.");
+
+        LoginForm loginForm = (LoginForm) mainChild.getChildren()
+                .filter(component -> component instanceof LoginForm)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("No LoginForm found in loginLayout children."));
+
+        assertEquals("login", loginForm.getAction(),
+                "Expected the login form action to be 'login'.");
+    }
+
 }
