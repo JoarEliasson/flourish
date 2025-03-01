@@ -44,9 +44,9 @@ import java.util.stream.Collectors;
  * @author
  *   Zahraa Alqassab
  * @version
- *   1.1.0
+ *   1.3.0
  * @since
- *   2025-02-27
+ *   2025-03-01
  */
 class RegistrationViewTest extends UIUnitTest {
     private RegistrationView registrationView;

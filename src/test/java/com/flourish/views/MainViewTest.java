@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
  * and contains the expected welcome message.</p>
  *
  * @author Zahraa Alqassab
- * @version 1.1.0
- * @since 2025-02-24
+ * @version 1.3.0
+ * @since 2025-03-01
  */
 class MainViewTest extends UIUnitTest {
 

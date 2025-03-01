@@ -25,14 +25,18 @@ import java.util.Optional;
  * and ensuring correct behavior when a valid or invalid password reset token is provided.
  *
  * @author Zahraa Alqassab
- * @version 1.1.0
- * @since 2025-02-24
+ * @version 1.3.0
+ * @since 2025-03-01
  */
 class ResetPasswordViewTest {
 
     private ResetPasswordView resetPasswordView;
     private PasswordResetService passwordResetService;
 
+    /**
+     * Sets up a new instance of {@link ResetPasswordView} with a mocked {@link PasswordResetService}
+     * before each test, and clears the SecurityContext.
+     */
     @BeforeEach
     void setUp() {
         passwordResetService = mock(PasswordResetService.class);
@@ -41,7 +45,15 @@ class ResetPasswordViewTest {
         SecurityContextHolder.clearContext();
     }
     /**
-     * Verifies that the reset password view contains the required input fields.
+     * Test #1: Verifies that the ResetPasswordView contains the required input fields.
+     * <p>
+     * The test checks that the view includes:
+     * <ul>
+     *   <li>A token {@link TextField} for the reset token.</li>
+     *   <li>A {@link PasswordField} for the new password.</li>
+     *   <li>A {@link PasswordField} for confirming the new password.</li>
+     * </ul>
+     * </p>
      */
     @Test
     void testInputFieldsExist() {
@@ -55,7 +67,11 @@ class ResetPasswordViewTest {
     }
 
     /**
-     * Verifies that a notification is shown when any of the required fields are empty.
+     * Test #2: Verifies that a notification is shown when required fields are empty.
+     * <p>
+     * The test simulates an attempt to reset the password with empty token and password fields,
+     * and verifies that the appropriate error notification is displayed.
+     * </p>
      */
     @Test
     void testResetPasswordWithEmptyFields() {
@@ -71,7 +87,11 @@ class ResetPasswordViewTest {
     }
 
     /**
-     * Verifies that a notification is shown when the new passwords do not match.
+     * test #3:Verifies that a notification is shown when the new passwords do not match.
+     * <p>
+     * The test sets different values for the new password fields and ensures that a notification
+     * is displayed indicating that the passwords do not match.
+     * </p>
      */
     @Test
     void testResetPasswordWithNonMatchingPasswords() {
@@ -87,7 +107,11 @@ class ResetPasswordViewTest {
     }
 
     /**
-     * Verifies that an invalid token leads to a notification indicating failure.
+     * Test #4: Verifies that an invalid or expired token results in an error notification.
+     * <p>
+     * The test simulates an invalid token scenario by stubbing the resetPassword method to return false,
+     * and verifies that the appropriate error notification is displayed.
+     * </p>
      */
     @Test
     void testResetPasswordWithInvalidToken() {
@@ -105,8 +129,15 @@ class ResetPasswordViewTest {
     }
 
     /**
-     * Verifies that a successful password reset triggers the appropriate logic:
-     * updating the password, setting authentication, and displaying a success notification.
+     * Test #5:Verifies that a successful password reset triggers the correct actions.
+     * <p>
+     * The test simulates a successful password reset by stubbing the resetPassword method to return true
+     * and the validateToken method to return an Optional containing the user's email. It verifies that:
+     * <ul>
+     *   <li>A success notification is displayed.</li>
+     *   <li>An authentication token is set in the SecurityContext.</li>
+     * </ul>
+     * </p>
      */
     @Test
     void testResetPasswordSuccess() {
