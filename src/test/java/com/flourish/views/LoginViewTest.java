@@ -1,12 +1,17 @@
 package com.flourish.views;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import com.flourish.service.UserServiceImpl;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,18 +38,20 @@ import java.util.stream.Collectors;
  * @version
  *   1.1.0
  * @since
- *   2025-02-27
+ *   2025-03-02
  */
 class LoginViewTest {
 
     private LoginView loginView;
 
     /**
-     * Initializes a fresh instance of {@link LoginView} before each test.
+     * Creates a fresh instance of {@link LoginView} before each test.
+     * A dummy {@link UserServiceImpl} is provided via Mockito.
      */
     @BeforeEach
     void setUp() {
-        loginView = new LoginView();
+        UserServiceImpl dummyUserService = Mockito.mock(UserServiceImpl.class);
+        loginView = new LoginView(dummyUserService);
     }
 
     /**
@@ -57,64 +64,61 @@ class LoginViewTest {
      * </p>
      */
     @Test
+    @DisplayName("LoginForm exists and is initialized")
     void testLoginFormExistsAndInitialized() {
         Component mainChild = loginView.getChildren()
                 .findFirst()
-                .orElseThrow(() -> new AssertionError("LoginView has no child components at all!"));
+                .orElseThrow(() -> new AssertionError("LoginView has no child components."));
 
-        assertTrue(mainChild instanceof VerticalLayout,
-                "Expected the main child to be a VerticalLayout (the loginLayout).");
+        assertInstanceOf(VerticalLayout.class, mainChild, "Main child should be a VerticalLayout.");
 
-        List<Component> innerComponents = mainChild.getChildren().collect(Collectors.toList());
-
+        List<Component> innerComponents = mainChild.getChildren().toList();
         boolean hasLoginForm = innerComponents.stream()
                 .anyMatch(component -> component instanceof LoginForm);
 
-        assertTrue(hasLoginForm,
-                "Expected to find a LoginForm among the loginLayout children.");
+        assertTrue(hasLoginForm, "Expected to find a LoginForm within the layout.");
     }
 
     /**
      * <h6>Test #2: Verify the presence of a register {@link Button} with text "Register".</h5>
      *
-     * Checks for the presence of a register {@link Button} with text "Register".
+     * Verifies that the register {@link Button} exists in the view's layout and that its text is "Register".
      * <p>
      * The method locates the layout’s second-level children and searches
      * for a {@link Button} whose {@code getText()} matches "Register".
      * </p>
      */
     @Test
+    @DisplayName("Register button text is 'Register'")
     void testRegisterButtonText() {
-        Component mainChild = loginView.getChildren().findFirst()
+        Component mainChild = loginView.getChildren()
+                .findFirst()
                 .orElseThrow(() -> new AssertionError("LoginView has no child components."));
 
-        assertTrue(mainChild instanceof VerticalLayout,
-                "Expected the main child to be a VerticalLayout.");
+        assertInstanceOf(VerticalLayout.class, mainChild, "Main child should be a VerticalLayout.");
 
-        List<Component> innerComponents = mainChild.getChildren().collect(Collectors.toList());
-
+        List<Component> innerComponents = mainChild.getChildren().toList();
         Button registerButton = (Button) innerComponents.stream()
                 .filter(component -> component instanceof Button)
                 .findFirst()
-                .orElseThrow(() -> new AssertionError("No Button found in loginLayout children."));
+                .orElseThrow(() -> new AssertionError("No Button found in layout."));
 
-        assertEquals("Register", registerButton.getText(),
-                "Expected the register button text to be 'Register'.");
+        assertEquals("Register", registerButton.getText(), "Expected register button text to be 'Register'.");
     }
 
     /**
      * <h6>Test #3: Verify that the forgot password link is correctly set.</h6>
+     * Ensures that the forgot password button exists and has the expected text.
+     *
      * @author Zahraa Alqassab
      * @since 2025-02-27
-     * Ensures that the forgot password button exists and has the expected text.
      */
     @Test
     void testForgotPasswordButtonExists() {
         Component mainChild = loginView.getChildren().findFirst()
                 .orElseThrow(() -> new AssertionError("LoginView has no child components."));
 
-        assertTrue(mainChild instanceof VerticalLayout,
-                "Expected the main child to be a VerticalLayout.");
+        assertInstanceOf(VerticalLayout.class, mainChild, "Expected the main child to be a VerticalLayout.");
 
         LoginForm loginForm = (LoginForm) mainChild.getChildren()
                 .filter(component -> component instanceof LoginForm)
@@ -124,21 +128,22 @@ class LoginViewTest {
         assertNotNull(loginForm,
                 "Expected the login form to contain a forgot password button.");
     }
+
     /**
      * <h6>Test #4: Verify that the layout contains an H3 header with the expected text.</h6>
+     * Ensures that an H3 component exists and displays "New to Flourish?".
+     *
      * @author Zahraa Alqassab
      * @since 2025-02-27
-     * Ensures that an H3 component exists and displays "New to Flourish?".
      */
     @Test
     void testHeaderExistsWithCorrectText() {
         Component mainChild = loginView.getChildren().findFirst()
                 .orElseThrow(() -> new AssertionError("LoginView has no child components."));
 
-        assertTrue(mainChild instanceof VerticalLayout,
-                "Expected the main child to be a VerticalLayout.");
+        assertInstanceOf(VerticalLayout.class, mainChild, "Expected the main child to be a VerticalLayout.");
 
-        List<Component> innerComponents = mainChild.getChildren().collect(Collectors.toList());
+        List<Component> innerComponents = mainChild.getChildren().toList();
 
         Component header = innerComponents.stream()
                 .filter(component -> component.getElement().getTag().equals("h3"))
@@ -148,19 +153,20 @@ class LoginViewTest {
         assertEquals("New to Flourish?", header.getElement().getText(),
                 "Expected the H3 header text to be 'New to Flourish?'.");
     }
+
     /**
      * <h6>Test #3: Verify that the login form action is correctly set.</h6>
+     * Ensures that the {@link LoginForm} inside {@link LoginView} has the expected action URL.
+     *
      * @author Zahraa Alqassab
      * @since 2025-02-27
-     * Ensures that the {@link LoginForm} inside {@link LoginView} has the expected action URL.
      */
     @Test
     void testLoginFormAction() {
         Component mainChild = loginView.getChildren().findFirst()
                 .orElseThrow(() -> new AssertionError("LoginView has no child components."));
 
-        assertTrue(mainChild instanceof VerticalLayout,
-                "Expected the main child to be a VerticalLayout.");
+        assertInstanceOf(VerticalLayout.class, mainChild, "Expected the main child to be a VerticalLayout.");
 
         LoginForm loginForm = (LoginForm) mainChild.getChildren()
                 .filter(component -> component instanceof LoginForm)
