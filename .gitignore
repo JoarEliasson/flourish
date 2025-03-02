@@ -177,3 +177,6 @@ index.html
 # package.json and package-lock.json in root
 package.json
 package-lock.json
+*.js
+*.ts
+*.json
