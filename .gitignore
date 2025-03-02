@@ -142,6 +142,8 @@ build/
 # The following files are generated/updated by vaadin-maven-plugin or vaadin-gradle-plugin
 node_modules/
 src/main/frontend/generated/
+frontend/generated/
+frontend/cache/
 pnpmfile.js
 .npmrc
 webpack.generated.js

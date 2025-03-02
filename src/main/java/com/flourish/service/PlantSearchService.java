@@ -40,7 +40,7 @@ public class PlantSearchService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${plant.index.backup.file:plant_index_backup.txt}")
-    String plantIndexBackupFile;
+    private String plantIndexBackupFile;
 
     /**
      * Loads the plant index backup file into memory at startup.

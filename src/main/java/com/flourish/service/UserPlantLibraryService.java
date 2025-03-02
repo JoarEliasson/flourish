@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Service for managing user-specific plant library data.
@@ -151,16 +153,47 @@ public class UserPlantLibraryService {
     }
 
     /**
+     * Retrieves the public PlantDetails for a specific library entry.
+     *
+     * @param libraryEntryId the ID of the library entry.
+     * @return an Optional containing the PlantDetails if found; otherwise, an empty Optional.
+     */
+    public Optional<PlantDetails> getPlantDetailsForLibraryEntry(Long libraryEntryId) {
+        Optional<UserPlantLibrary> libraryEntryOpt = libraryRepository.findById(libraryEntryId);
+        if (!libraryEntryOpt.isPresent() || libraryEntryOpt.get().getPlantId() == null) {
+            return Optional.empty();
+        }
+        return plantDetailsService.getPlantDetailsById(libraryEntryOpt.get().getPlantId());
+    }
+
+    /**
+     * Retrieves all public PlantDetails for the plants in a user's library.
+     *
+     * @param userId the user ID.
+     * @return a List of PlantDetails for all plants in the user's library.
+     */
+    public List<PlantDetails> getAllPlantDetailsForUser(Long userId) {
+        List<UserPlantLibrary> libraryEntries = libraryRepository.findByUserId(userId);
+        List<PlantDetails> detailsList = new ArrayList<>();
+        for (UserPlantLibrary entry : libraryEntries) {
+            plantDetailsService.getPlantDetailsById(entry.getPlantId()).ifPresent(detailsList::add);
+        }
+        return detailsList;
+    }
+
+    /**
      * Computes a watering gauge percentage for the given library entry.
      *
      * <p>The gauge is calculated based on the elapsed time since the plant was last watered relative
      * to the watering frequency. The gauge returns:
      * <ul>
-     *     <li>100% if the plant was just watered (elapsed = 0)</li>
-     *     <li>0% if the current time equals the next watering date</li>
-     *     <li>-100% if the current time is one full watering interval past the next watering date</li>
+     *   <li>100% if the plant was just watered (elapsed = 0)</li>
+     *   <li>0% if the current time equals the next watering date</li>
+     *   <li>-100% if the current time is one full watering interval past the next watering date</li>
      * </ul>
-     * Values in between are linearly interpolated.</p>
+     * Values in between are linearly interpolated.
+     * </p>
+     *
      * @param libraryEntryId the ID of the library entry.
      * @return a double representing the gauge percentage.
      */

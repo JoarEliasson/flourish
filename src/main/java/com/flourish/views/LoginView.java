@@ -1,9 +1,9 @@
 package com.flourish.views;
 
+import com.flourish.service.UserServiceImpl;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
@@ -13,7 +13,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+
 import java.util.List;
 import java.util.Map;
 
@@ -37,11 +39,13 @@ import java.util.Map;
 @AnonymousAllowed
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private final LoginForm loginForm;
+    private final UserServiceImpl userService;
 
     /**
      * Constructs a new LoginView with a Vaadin LoginForm.
      */
-    public LoginView() {
+    public LoginView(UserServiceImpl userService) {
+        this.userService = userService;
         loginForm = new LoginForm();
         loginForm.setAction("login");
 
@@ -62,6 +66,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         i18n.getForm().setForgotPassword("NYTT LÖSENORD TACK");
         loginForm.setI18n(i18n);
 
+        loginForm.addLoginListener(e -> validateLogin(e.getUsername(),e.getPassword()));
+
         loginForm.addForgotPasswordListener(e -> getUI().ifPresent(ui -> ui.navigate("forgotpassword")));
 
         Button registerButton = new Button("Register", e ->
@@ -79,7 +85,33 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
+
+        //Store the user ID
+        loginForm.addLoginListener(e -> {
+            String username = e.getUsername();
+            userService.findByEmail(username).ifPresent(user -> {
+
+                VaadinSession.getCurrent().setAttribute("user", user);  // Set the user object in the session
+
+                VaadinSession.getCurrent().setAttribute("userId", user.getId()); // Store the user ID
+
+                UI.getCurrent().navigate("dashboard");
+            });
+        });
     }
+
+    private void validateLogin(String username, String password) {
+        if(username == null || username.trim().isEmpty()){
+            showErrorNotification("Email is required!");
+        } else if (!username.contains("@")) {
+            showErrorNotification("Invalid email format. Please enter valid email!");
+        } else if (password == null || password.trim().isEmpty()) {
+            showErrorNotification("Password is required!");
+        }
+    }
+
+
+
     @Override
     public void beforeEnter(BeforeEnterEvent event){
 
@@ -94,13 +126,17 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 .orElse(null);
         System.out.println("Before Enter: Query: " + query);
 
+
         if (query != null) {
             System.out.println("Wrong pass");
             loginForm.setError(true);
-            Notification notification = Notification.show("Incorrect username or password", 3000, Notification.Position.TOP_CENTER);
-            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-            notification.open();
+            showErrorNotification("Incorrect username or password");
         }
+    }
+    private void showErrorNotification(String errorMessage) {
+        Notification notification = Notification.show(errorMessage,3000,Notification.Position.TOP_CENTER);
+        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        notification.open();
     }
 
 }

@@ -38,6 +38,7 @@ public interface UserService {
 
     /**
      * Updates an existing user.
+     * This method can be used for password reset, etc.
      *
      * @param user the user to update.
      * @return the updated user.
