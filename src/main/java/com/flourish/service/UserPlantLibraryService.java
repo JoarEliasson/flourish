@@ -38,7 +38,7 @@ import java.util.List;
  * @version
  *   1.1.0
  * @since
- *   2025-02-26
+ *   2025-02-27
  */
 @Service
 public class UserPlantLibraryService {
@@ -205,9 +205,12 @@ public class UserPlantLibraryService {
         UserPlantLibrary entry = opt.get();
         LocalDateTime lastWatered = entry.getLastWatered();
         LocalDateTime nextWatering = entry.getNextWatering();
-        int frequencyDays = entry.getWateringFrequency();
 
         LocalDateTime now = LocalDateTime.now();
+        if (lastWatered.equals(nextWatering)) {
+            return Optional.of(100.0);
+        }
+
         long totalMillis = Duration.between(lastWatered, nextWatering).toMillis();
         long elapsedMillis = Duration.between(lastWatered, now).toMillis();
 

@@ -61,15 +61,15 @@ public class BackupService {
      * Runs the backup process on application startup, creating two files:
      * "plant_index_backup.txt" and "plant_details_backup.txt" in ascending order by ID.
      *
-     * <p>Uncomment {@code @Override if run on startup is enabled/class implements CommandLineRunner}</p>
+     * <p>Uncomment {@code @Override & method calls if run on startup is enabled/class implements CommandLineRunner}</p>
      *
      * @param args command-line arguments (not used).
      * @throws Exception if an error occurs during backup.
      */
     //@Override
     public void run(String... args) throws Exception {
-        backupPlantIndexToFile("var/app/backups/plant_index_backup.txt");
-        backupPlantDetailsToFile("var/app/backups/plant_details_backup.txt");
+        //backupPlantIndexToFile("var/app/backups/plant_index_backup.txt");
+        //backupPlantDetailsToFile("var/app/backups/plant_details_backup.txt");
     }
 
     /**

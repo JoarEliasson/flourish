@@ -104,4 +104,47 @@ public class RegistrationView extends VerticalLayout {
             Notification.show("Registration failed: " + ex.getMessage());
         }
     }
+
+    /**
+     *@author Zahraa Alqassab
+     **/
+    public void triggerRegistration(){
+        handleRegister();
+    }
+
+    /**
+     * Gets the first name input field.
+     *@author Zahraa Alqassab
+     * @return the text field where the user enters their first name.
+     */
+    public TextField getFirstNameField() {
+        return firstNameField;
+    }
+
+    /**
+     * Gets the last name input field.
+     *@author Zahraa Alqassab
+     * @return the text field where the user enters their last name.
+     */
+    public TextField getLastNameField() {
+        return lastNameField;
+    }
+
+    /**
+     * Gets the email input field.
+     *@author Zahraa Alqassab
+     * @return the email field where the user enters their email address.
+     */
+    public EmailField getEmailField() {
+        return emailField;
+    }
+
+    /**
+     * Gets the password input field.
+     * @author Zahraa Alqassab
+     * @return the password field where the user enters their password.
+     */
+    public PasswordField getPasswordField() {
+        return passwordField;
+    }
 }

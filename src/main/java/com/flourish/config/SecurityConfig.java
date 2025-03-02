@@ -74,7 +74,7 @@ public class SecurityConfig extends VaadinWebSecurity {
      * <p>We do not manually call .formLogin(). Instead, we rely on Vaadin
      * to automatically set up /login as the login-processing URL
      * and /login as the route for login if you specify
-     * setLoginView(http, LoginView.class).</p>
+     * {@code setLoginView(http, LoginView.class)}.</p>
      *
      * @param http the HttpSecurity instance to configure
      * @throws Exception if an error occurs during security configuration
