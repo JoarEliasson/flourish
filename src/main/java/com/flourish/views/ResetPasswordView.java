@@ -108,4 +108,35 @@ public class ResetPasswordView extends Composite<VerticalLayout> {
             Notification.show("Invalid or expired token.");
         }
     }
+
+    /**
+     * Gets the token input field.
+     * @author Zahraa Alqassab
+     * @return the token field where the user enters the reset token.
+     */
+    public TextField getTokenField() {
+        return tokenField;
+    }
+
+    /**
+     * Gets the first password input field.
+     *@author Zahraa Alqassab
+     * @return the first password field where the user enters the new password.
+     */
+    public PasswordField getNewPasswordField1() {
+        return newPasswordField1;
+    }
+
+    /**
+     * Gets the second password input field.
+     *@author Zahraa Alqassab
+     * @return the second password field where the user confirms the new password.
+     */
+    public PasswordField getNewPasswordField2() {
+        return newPasswordField2;
+    }
+    public void triggerResetPassword(){
+        handleResetPassword();
+    }
+
 }

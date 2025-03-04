@@ -38,6 +38,7 @@ public interface UserService {
 
     /**
      * Updates an existing user.
+     * This method can be used for password reset, etc.
      *
      * @param user the user to update.
      * @return the updated user.
@@ -57,4 +58,11 @@ public interface UserService {
      * For any user missing settings, a default settings record is created.
      */
     void ensureAllUsersHaveSettings();
+
+    /**
+     * Deletes a user by email.
+     *
+     * @param testUserEmail the email address of the user to delete.
+     */
+    void deleteByEmail(String testUserEmail);
 }

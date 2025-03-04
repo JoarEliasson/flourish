@@ -12,6 +12,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -132,5 +133,15 @@ public class ForgotPasswordView extends Composite<VerticalLayout> {
             Notification.show("Failed to send email: " + ex.getMessage());
         }
     }
+    public void triggerHandelForgotPassword(){
+        handleForgotPassword();
+    }
+    public void setEmailFieldValue(String value) {
+        emailField.setValue(value);
+    }
+
+
+
+
 }
 

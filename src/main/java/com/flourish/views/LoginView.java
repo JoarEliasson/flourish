@@ -63,7 +63,9 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         }
         i18n.getHeader().setTitle("Please Log In");
         i18n.getHeader().setDescription("Enter your credentials");
-        i18n.getForm().setForgotPassword("Forgot password");
+
+        i18n.getForm().setForgotPassword("Forgot password? Click here!");
+
         loginForm.setI18n(i18n);
 
         loginForm.addLoginListener(e -> validateLogin(e.getUsername(),e.getPassword()));

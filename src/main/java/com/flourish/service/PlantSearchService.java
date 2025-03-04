@@ -40,7 +40,7 @@ public class PlantSearchService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${plant.index.backup.file:plant_index_backup.txt}")
-    private String plantIndexBackupFile;
+    String plantIndexBackupFile;
 
     /**
      * Loads the plant index backup file into memory at startup.
@@ -91,40 +91,54 @@ public class PlantSearchService {
     }
 
     /**
-     * Computes a match score for the plant record based on the query.
+     * Computes a match score for the given {@link PlantIndex} record against a lower-cased query.
+     * <p>
+     * This version consolidates the repeated logic for each field:
+     * it collects non-null fields into a list, converts them to lower-case,
+     * and then finds the earliest substring position among all fields.
      *
-     * <p>If a searchable field starts with the query, a very low score is returned.
-     * Otherwise, the score is based on the position of the query substring in the field.
-     * The minimum score across all fields is returned; if none of the fields contain the query,
-     * a high score (e.g., 100) is returned.</p>
+     * <ul>
+     *   <li>If the query appears as a prefix (position = 0) in any field, returns 0 immediately.</li>
+     *   <li>If only mid-substring matches occur, returns the smallest positive position found.</li>
+     *   <li>If no matches, returns 100.</li>
+     * </ul>
+     * </p>
      *
-     * @param plant the PlantIndex record.
-     * @param lowerQuery the lower-cased query.
-     * @return the computed match score.
+     * @param plant The {@link PlantIndex} record to score.
+     * @param lowerQuery The already-lowercased query string.
+     * @return The computed match score, where 0 is best (prefix match) and 100 means no matches.
      */
     private int computeMatchScore(PlantIndex plant, String lowerQuery) {
-        int score = Integer.MAX_VALUE;
+        List<String> fields = new ArrayList<>();
         if (plant.getCommonName() != null) {
-            String field = plant.getCommonName().toLowerCase();
-            int pos = field.indexOf(lowerQuery);
-            if (pos == 0) return 0;
-            if (pos > 0 && pos < score) score = pos;
+            fields.add(plant.getCommonName().toLowerCase());
         }
         if (plant.getScientificName() != null) {
-            String field = plant.getScientificName().toLowerCase();
-            int pos = field.indexOf(lowerQuery);
-            if (pos == 0) return 0;
-            if (pos > 0 && pos < score) score = pos;
+            fields.add(plant.getScientificName().toLowerCase());
         }
         if (plant.getOtherName() != null) {
-            String field = plant.getOtherName().toLowerCase();
+            fields.add(plant.getOtherName().toLowerCase());
+        }
+
+        int score = Integer.MAX_VALUE;
+        for (String field : fields) {
             int pos = field.indexOf(lowerQuery);
-            if (pos == 0) return 0;
-            if (pos > 0 && pos < score) score = pos;
+            if (pos == 0) {
+                return 0;
+            }
+            if (pos > 0 && pos < score) {
+                score = pos;
+            }
         }
         return score == Integer.MAX_VALUE ? 100 : score;
     }
 
+    /**
+     * Sets the plant index list to use for testing.
+     * <p>This method is intended for testing purposes only.</p>
+     *
+     * @param mockData the mock plant index list.
+     */
     public void setPlantIndexList(List<PlantIndex> mockData) {
         plantIndexList = mockData;
     }
