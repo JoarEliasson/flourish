@@ -87,7 +87,7 @@ class LoginViewIT extends TestBenchTestCase {
         }
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
+        //options.addArguments("--headless");
         setDriver(TestBench.createDriver(new ChromeDriver(options)));
 
         getDriver().get("http://localhost:" + port + "/login");

@@ -171,7 +171,7 @@ public class MyPlantsView extends Composite<VerticalLayout> {
             typeOfPlant.getStyle().set("margin", "0").set("font-size", "0.8rem").set("font-style", "italic")
                     .set("color","limegreen");;
 
-            HorizontalLayout iconContainer = iconCreater(plant);
+            HorizontalLayout iconContainer = iconCreator(plant);
             iconContainer.getStyle().set("height", "60px").set("flex", "1").set("display", "flex").set("justify-content", "center").set("align-items", "center");
 
             plantImage.addClickListener(e -> showPlantDetails(plant));
@@ -228,7 +228,7 @@ public class MyPlantsView extends Composite<VerticalLayout> {
      * @param plant
      * @return
      */
-    public HorizontalLayout iconCreater(Plant plant){
+    public HorizontalLayout iconCreator(Plant plant){
         HorizontalLayout icons = new HorizontalLayout();
 
         Icon sunIcon = VaadinIcon.SUN_O.create();
