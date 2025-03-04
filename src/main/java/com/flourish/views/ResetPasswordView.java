@@ -49,6 +49,7 @@ public class ResetPasswordView extends Composite<VerticalLayout> {
     public ResetPasswordView(PasswordResetService passwordResetService) {
         this.passwordResetService = passwordResetService;
 
+        getStyle().set("background-color", "#e8f5e9");
         VerticalLayout resetPswLayout = getContent();
         resetPswLayout.setSizeFull();
         resetPswLayout.setJustifyContentMode(JustifyContentMode.CENTER);

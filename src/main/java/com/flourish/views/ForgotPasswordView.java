@@ -60,6 +60,7 @@ public class ForgotPasswordView extends Composite<VerticalLayout> {
         getContent().setAlignItems(FlexComponent.Alignment.CENTER);
         getContent().setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         getContent().setSpacing(true);
+        getStyle().set("background-color", "#e8f5e9");
 
         H2 header = new H2("Reset Your Password");
         H2 instructions = new H2("Enter your email to receive your reset code in the mail.");

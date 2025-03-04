@@ -48,7 +48,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         this.userService = userService;
         loginForm = new LoginForm();
         loginForm.setAction("login");
-
+        getStyle().set("background-color", "#e8f5e9");
         VerticalLayout loginLayout = new VerticalLayout();
         loginLayout.setWidth("400px");
         loginLayout.setPadding(true);
@@ -63,7 +63,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         }
         i18n.getHeader().setTitle("Please Log In");
         i18n.getHeader().setDescription("Enter your credentials");
-        i18n.getForm().setForgotPassword("NYTT LÖSENORD TACK");
+        i18n.getForm().setForgotPassword("Forgot password");
         loginForm.setI18n(i18n);
 
         loginForm.addLoginListener(e -> validateLogin(e.getUsername(),e.getPassword()));
