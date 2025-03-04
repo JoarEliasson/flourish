@@ -167,7 +167,7 @@ mvnw
 tsconfig.json
 types.d.ts
 index.html
-/frontend/
+frontend/
 /frontend/generated/jar-resources/
 /frontend/generated/jar-resources/vaadin-time-picker
 # all .js .ts and .tsx files in jar-resouce folder
