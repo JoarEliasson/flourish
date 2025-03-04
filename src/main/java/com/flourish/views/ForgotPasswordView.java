@@ -12,6 +12,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -60,6 +61,7 @@ public class ForgotPasswordView extends Composite<VerticalLayout> {
         getContent().setAlignItems(FlexComponent.Alignment.CENTER);
         getContent().setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         getContent().setSpacing(true);
+        getStyle().set("background-color", "#e8f5e9");
 
         H2 header = new H2("Reset Your Password");
         H2 instructions = new H2("Enter your email to receive your reset code in the mail.");
@@ -131,5 +133,15 @@ public class ForgotPasswordView extends Composite<VerticalLayout> {
             Notification.show("Failed to send email: " + ex.getMessage());
         }
     }
+    public void triggerHandelForgotPassword(){
+        handleForgotPassword();
+    }
+    public void setEmailFieldValue(String value) {
+        emailField.setValue(value);
+    }
+
+
+
+
 }
 

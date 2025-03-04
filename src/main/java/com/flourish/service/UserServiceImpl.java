@@ -1,62 +1,87 @@
 package com.flourish.service;
 
 import com.flourish.domain.User;
+import com.flourish.domain.UserSettings;
 import com.flourish.repository.UserRepository;
+import com.flourish.repository.UserSettingsRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
- * Implements the UserService interface, handling
- * user-related operations and business logic.
+ * Implements the UserService interface, handling user-related operations
+ * and ensuring that each user has a corresponding settings record.
  *
- * <p>Uses a {@code UserRepository} for database operations
- * and a {@code PasswordEncoder} for password encryption.</p>
+ * <p>This class uses a UserRepository for user data and a PasswordEncoder for password encryption.
+ * It also creates or synchronizes default user settings by calling a helper method that
+ * creates a settings record (using default values from application.properties) if one is missing.</p>
  *
- * @see com.flourish.service.UserService
  * @see com.flourish.domain.User
- * @see <a href="https://docs.spring.io/spring-data/jpa/docs/current/reference/html/">Spring Data JPA Reference</a>
- * @see <a href="https://vaadin.com/docs/latest/security/spring-security">Vaadin Spring Security</a>
+ * @see com.flourish.domain.UserSettings
+ * @see com.flourish.repository.UserRepository
+ * @see com.flourish.repository.UserSettingsRepository
  *
  * @author
  *   Joar Eliasson
  * @version
  *   1.1.0
  * @since
- *   2025-02-15
+ *   2025-02-26
  */
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserSettingsRepository userSettingsRepository;
     private final PasswordEncoder passwordEncoder;
 
-    /**
-     * Constructs a new UserServiceImpl.
-     *
-     * @param userRepository The repository for User entities.
-     * @param passwordEncoder The password encoder to encrypt passwords.
-     */
+    @Value("${user.settings.default.language}")
+    private String defaultLanguage;
+
+    @Value("${user.settings.default.loginNotificationEnabled}")
+    private boolean defaultLoginNotificationEnabled;
+
+    @Value("${user.settings.default.inAppNotificationEnabled}")
+    private boolean defaultInAppNotificationEnabled;
+
+    @Value("${user.settings.default.emailNotificationEnabled}")
+    private boolean defaultEmailNotificationEnabled;
+
     public UserServiceImpl(UserRepository userRepository,
+                           UserSettingsRepository userSettingsRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.userSettingsRepository = userSettingsRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     /**
-     * {@inheritDoc}
+     * Creates a new user by encrypting the password and saving the user entity.
+     * After saving, a default user settings record is created.
+     *
+     * @param user a User entity with a plain-text password.
+     * @return the saved User entity.
      */
     @Override
+    @Transactional
     public User createUser(User user) {
-        // Encrypt the password before saving
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        createDefaultSettingsIfNotExists(savedUser.getId());
+        return savedUser;
     }
 
     /**
-     * {@inheritDoc}
+     * Finds a User by email.
+     *
+     * @param email the email address.
+     * @return an Optional containing the User if found; otherwise, Optional.empty().
      */
     @Override
     public Optional<User> findByEmail(String email) {
@@ -64,18 +89,73 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * {@inheritDoc}
+     * Updates an existing user.
+     *
+     * @param user the user to update.
+     * @return the updated User.
      */
     @Override
+    @Transactional
     public User updateUser(User user) {
         return userRepository.save(user);
     }
 
     /**
-     * {@inheritDoc}
+     * Finds a User by a password reset token.
+     *
+     * @param token the reset token.
+     * @return an Optional containing the User if found; otherwise, Optional.empty().
      */
     @Override
     public Optional<User> findByResetToken(String token) {
         return Optional.ofNullable(userRepository.findByResetToken(token));
+    }
+
+    /**
+     * Checks all users in the system and creates a default settings record for any user missing one.
+     */
+    @Override
+    @Transactional
+    public void ensureAllUsersHaveSettings() {
+        List<User> allUsers = userRepository.findAll();
+        for (User user : allUsers) {
+            createDefaultSettingsIfNotExists(user.getId());
+        }
+    }
+
+    /**
+     * Creates a default UserSettings record for the given userId if one does not already exist.
+     *
+     * @param userId the user ID.
+     */
+    @Transactional
+    protected void createDefaultSettingsIfNotExists(Long userId) {
+        if (!userSettingsRepository.existsById(userId)) {
+            UserSettings settings = new UserSettings(userId,
+                    defaultLanguage,
+                    defaultLoginNotificationEnabled,
+                    defaultInAppNotificationEnabled,
+                    defaultEmailNotificationEnabled);
+            userSettingsRepository.save(settings);
+            System.out.println("Created default settings for user: " + userId);
+        }
+    }
+
+    /**
+     * Deletes a user by email.
+     * <p>This method deletes the user entity and the corresponding user settings record.</p>
+     *
+     * @param email the email address.
+     */
+    @Override
+    @Transactional
+    public void deleteByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+
+        if (user != null) {
+            userRepository.delete(user);
+            Long userId = user.getId();
+            userSettingsRepository.deleteById(userId);
+        }
     }
 }
