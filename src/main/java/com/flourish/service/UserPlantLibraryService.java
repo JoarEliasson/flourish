@@ -166,6 +166,10 @@ public class UserPlantLibraryService {
         return plantDetailsService.getPlantDetailsById(libraryEntryOpt.get().getPlantId());
     }
 
+    public List<UserPlantLibrary> getUserPlantLibraryEntries(Long userId) {
+        return libraryRepository.findByUserId(userId);
+    }
+
     /**
      * Retrieves all public PlantDetails for the plants in a user's library.
      *
