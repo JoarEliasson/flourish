@@ -1,5 +1,6 @@
 package com.flourish.service;
 
+import com.flourish.domain.LibraryEntry;
 import com.flourish.domain.PlantDetails;
 import com.flourish.domain.PlantIndex;
 import com.flourish.domain.UserPlantLibrary;
@@ -166,25 +167,6 @@ public class UserPlantLibraryService {
         return plantDetailsService.getPlantDetailsById(libraryEntryOpt.get().getPlantId());
     }
 
-    public List<UserPlantLibrary> getUserPlantLibraryEntries(Long userId) {
-        return libraryRepository.findByUserId(userId);
-    }
-
-    /**
-     * Retrieves all public PlantDetails for the plants in a user's library.
-     *
-     * @param userId the user ID.
-     * @return a List of PlantDetails for all plants in the user's library.
-     */
-    public List<PlantDetails> getAllPlantDetailsForUser(Long userId) {
-        List<UserPlantLibrary> libraryEntries = libraryRepository.findByUserId(userId);
-        List<PlantDetails> detailsList = new ArrayList<>();
-        for (UserPlantLibrary entry : libraryEntries) {
-            plantDetailsService.getPlantDetailsById(entry.getPlantId()).ifPresent(detailsList::add);
-        }
-        return detailsList;
-    }
-
     /**
      * Computes a watering gauge percentage for the given library entry.
      *
@@ -226,4 +208,37 @@ public class UserPlantLibraryService {
         }
         return Optional.of(gauge);
     }
+
+    /**
+     * Retrieves all public PlantDetails for the plants in a user's library.
+     *
+     * @param userId the user ID.
+     * @return a List of PlantDetails for all plants in the user's library.
+     */
+    public List<PlantDetails> getAllPlantDetailsForUser(Long userId) {
+        List<UserPlantLibrary> libraryEntries = libraryRepository.findByUserId(userId);
+        List<PlantDetails> detailsList = new ArrayList<>();
+        for (UserPlantLibrary entry : libraryEntries) {
+            plantDetailsService.getPlantDetailsById(entry.getPlantId()).ifPresent(detailsList::add);
+        }
+        return detailsList;
+    }
+
+    /**
+     * Retrieves all library entries for a user, including the associated PlantDetails.
+     *
+     * @param userId the user ID.
+     * @return a List of LibraryEntry objects.
+     */
+    public List<LibraryEntry> getAllLibraryEntriesForUser(Long userId) {
+        List<UserPlantLibrary> libraryEntries = libraryRepository.findByUserId(userId);
+        List<LibraryEntry> entries = new ArrayList<>();
+        for (UserPlantLibrary libraryEntry : libraryEntries) {
+            plantDetailsService.getPlantDetailsById(libraryEntry.getPlantId()).ifPresent(details -> {
+                entries.add(new LibraryEntry(details, libraryEntry));
+            });
+        }
+        return entries;
+    }
+
 }

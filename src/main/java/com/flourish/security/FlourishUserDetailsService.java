@@ -20,14 +20,14 @@ import java.util.Collections;
  *   2025-02-15
  */
 @Service
-public class MyCustomUserDetailsService implements UserDetailsService {
+public class FlourishUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     /**
      * Constructs the service with our JPA repository.
      */
-    public MyCustomUserDetailsService(UserRepository userRepository) {
+    public FlourishUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

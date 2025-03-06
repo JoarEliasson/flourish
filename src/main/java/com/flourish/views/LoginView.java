@@ -88,18 +88,6 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
 
-        //Store the user ID
-        loginForm.addLoginListener(e -> {
-            String username = e.getUsername();
-            userService.findByEmail(username).ifPresent(user -> {
-
-                VaadinSession.getCurrent().setAttribute("user", user);  // Set the user object in the session
-
-                VaadinSession.getCurrent().setAttribute("userId", user.getId()); // Store the user ID
-
-                UI.getCurrent().navigate("dashboard");
-            });
-        });
     }
 
     private void validateLogin(String username, String password) {

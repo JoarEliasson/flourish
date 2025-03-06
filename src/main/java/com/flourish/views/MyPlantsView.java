@@ -1,10 +1,12 @@
 package com.flourish.views;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import com.flourish.domain.PlantDetails;
-import com.flourish.domain.User;
+import java.util.Optional;
+
+import com.flourish.domain.LibraryEntry;
+import com.flourish.security.UserSessionData;
 import com.flourish.service.UserPlantLibraryService;
+import com.flourish.views.components.WaterGauge;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -22,6 +24,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -43,18 +46,20 @@ import jakarta.annotation.security.RolesAllowed;
 @RolesAllowed("USER")
 public class MyPlantsView extends Composite<VerticalLayout> {
 
+    private final UserSessionData userSessionData;
     private final UserPlantLibraryService userPlantLibraryService;
-    //private final ListBox<Plant> plantList = new ListBox<>();
+
     private final FlexLayout plantLayout = new FlexLayout();
     private Div selectedPlantDetails = new Div();
     private Plant currentlySelectedPlant = null;
-    private final User user;
-    private Long userId;
 
     /**
      * A record representing a plant with an ID, name, and description.
      *
-     * @param id                The unique identifier of the plant.
+     * <p>This record is used to store plant data for display in the UI.</p>
+     * <p>It is a simple data container with no behavior.</p>
+     * @param libraryId         The library ID of the plant.
+     * @param plantId           The plant ID of the plant.
      * @param name              The common name of the plant.
      * @param description       A short description of the plant.
      * @param watering
@@ -65,7 +70,7 @@ public class MyPlantsView extends Composite<VerticalLayout> {
      * @param poisonousToPets
      * @param medicinal
      */
-    public record Plant(long id, String name, String description, String imageUrl, String watering, String sunlight,
+    public record Plant(long libraryId, long plantId, String name, String description, String imageUrl, String watering, String sunlight,
                         String type, Boolean edibleFruit, Boolean poisonousToHumans, Boolean poisonousToPets,
                         Boolean medicinal) {}
 
@@ -76,17 +81,17 @@ public class MyPlantsView extends Composite<VerticalLayout> {
      *
      * @param userPlantLibraryService The service for managing user plant data.
      */
-    public MyPlantsView(UserPlantLibraryService userPlantLibraryService) {
-        this.userPlantLibraryService = userPlantLibraryService;
+    @Autowired
+    public MyPlantsView(UserPlantLibraryService userPlantLibraryService, UserSessionData userSessionData) {
 
-        user = (User) VaadinSession.getCurrent().getAttribute("user");
-        if (user == null) {
+        this.userPlantLibraryService = userPlantLibraryService;
+        this.userSessionData = userSessionData;
+
+        if (VaadinSession.getCurrent().getAttribute("user") == null) {
             Notification.show("You must be logged in to view your plants.", 3000, Notification.Position.TOP_CENTER);
             UI.getCurrent().navigate("login");
             return;
         }
-
-        userId = user.getId();
 
         getContent().getStyle().set("background-color", "#e8f5e9").set("padding", "20px");
 
@@ -123,6 +128,7 @@ public class MyPlantsView extends Composite<VerticalLayout> {
         controlsLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
         getContent().add(title, selectedPlantDetails, controlsLayout, plantLayout);
+
     }
 
     /**
@@ -130,97 +136,65 @@ public class MyPlantsView extends Composite<VerticalLayout> {
      */
     private void loadUserPlants() {
         plantLayout.removeAll();
+        List<LibraryEntry> userLibraryEntries = userSessionData.getPlantLibraryEntries();
 
+        List<Plant> userLibraryPlants = userLibraryEntries.stream()
+                .map(entry -> new Plant(entry.getLibraryId(), entry.getPlantDetails().getId(), entry.getPlantDetails().getCommonName(),
+                        entry.getPlantDetails().getDescription(), entry.getPlantDetails().getDefaultImageOriginalUrl(),
+                        entry.getPlantDetails().getWatering(), entry.getPlantDetails().getSunlight(),
+                        entry.getPlantDetails().getType(), entry.getPlantDetails().getEdibleFruit(),
+                        entry.getPlantDetails().getPoisonousToHumans(), entry.getPlantDetails().getPoisonousToPets(),
+                        entry.getPlantDetails().getMedicinal()))
+                .toList();
 
-        List<PlantDetails> userPlants = userPlantLibraryService.getAllPlantDetailsForUser(userId);
-        List<Plant> plantData = userPlants.stream()
-                .map(details -> new Plant(details.getId(), details.getCommonName(), details.getDescription(), details.getDefaultImageMediumUrl()
-                , details.getWatering(), details.getSunlight(), details.getType(),details.getEdibleFruit(), details.getPoisonousToHumans(),
-                        details.getPoisonousToPets(),details.getMedicinal()))
-                .collect(Collectors.toList());
-
-        for(Plant plant: plantData){
-
-            Div plantDiv = new Div();
-            plantDiv.getStyle().set("margin", "10px").set("width","320px").set("height","320px");
-            plantDiv.getStyle().set("display", "inline-block").set("border-radius", "8px").set("box-shadow", "0 2px 5px rgba(0,0,0,0.1)");
-            plantDiv.getStyle().set("background-color","white").set("overflow", "hidden");
-
-            Div imageContainer = new Div();
-            imageContainer.getStyle().set("width", "100%").set("height", "200px").set("overflow", "hidden")
-                    .set("border-top-left-radius", "8px")
-                    .set("border-top-right-radius", "8px");
-
-            Image plantImage = new Image(plant.imageUrl(), plant.name());
-            plantImage.getStyle().set("width","100%").set("height","100%").set("object-fit", "cover").set("cursor", "pointer");
-
-            Div infoUnderPicture = new Div();
-            infoUnderPicture.getStyle().set("background-color", "white").set("padding", "10px").set("border-top", "1px solid #ccc");
-            infoUnderPicture.getStyle().set("width","100%").set("height","120px").set("box-sizing", "border-box");
-
-            Div nameContainer = new Div();
-            nameContainer.getStyle().set("display", "flex").set("height", "60px").set("width", "100%").set("align-items", "center")
-                    .set("justify-content", "center").set("box-seizing", "border-box").set("border-bottom", "1px solid #333")
-                    .set("flex-direction", "column");
-
-            H4 plantName = new H4(plant.name());
-            plantName.getStyle().set("margin", "0");
-            plantName.getStyle().set("font-size", "1rem");
-
-            H5 typeOfPlant = new H5(plant.type());
-            typeOfPlant.getStyle().set("margin", "0").set("font-size", "0.8rem").set("font-style", "italic")
-                    .set("color","limegreen");;
-
-            HorizontalLayout iconContainer = iconCreator(plant);
-            iconContainer.getStyle().set("height", "60px").set("flex", "1").set("display", "flex").set("justify-content", "center").set("align-items", "center");
-
-            plantImage.addClickListener(e -> showPlantDetails(plant));
-            plantName.addClickListener(e -> showPlantDetails(plant));
-
-            nameContainer.add(plantName, typeOfPlant);
-            imageContainer.add(plantImage);
-            infoUnderPicture.add(nameContainer,iconContainer);
-            plantDiv.add(imageContainer, infoUnderPicture);
-            plantLayout.add(plantDiv);
-        }
-
-
-        /*plantList.setItems(plantData);
-        plantList.setRenderer(new ComponentRenderer<>(plant -> {
-            AvatarItem avatarItem = new AvatarItem();
-            avatarItem.setHeading(plant.name);
-            avatarItem.setDescription(plant.description);
-            avatarItem.setAvatar(new Avatar(plant.name));
-            avatarItem.getStyle().set("font-size", "20px").set("padding", "10px");
-            return avatarItem;
-        }));
-
-         */
-
+        loadPlants(userLibraryPlants);
 
     }
 
     /**
-     * Displays the details of the selected plant, the selectedPlantDetails is a hidden div that will be shown when a plant is selected.
-     * @param plant
+     * Displays details for the selected plant along with a water gauge.
+     *
+     * <p>This method retrieves the UserPlantLibrary entry corresponding to the selected plant,
+     * then calls the service to obtain the watering gauge percentage. A WaterGauge component is created,
+     * its value is set, and it is added to the view along with plant image and name.</p>
+     *
+     * @param plant the selected plant record.
      */
     private void showPlantDetails(Plant plant) {
-        if(currentlySelectedPlant != null && currentlySelectedPlant.id() == plant.id()) {
+
+        Optional<LibraryEntry> userPlantOpt = userSessionData.getPlantLibraryEntries().stream()
+                .filter(entry -> entry.getPlantDetails().getId() == plant.plantId())
+                .findFirst();
+
+        if (userPlantOpt.isEmpty()) {
+            Notification.show("No library entry found for this plant.", 3000, Notification.Position.TOP_CENTER);
+            return;
+        }
+
+
+        if (currentlySelectedPlant != null && currentlySelectedPlant.libraryId == plant.libraryId) {
             selectedPlantDetails.getStyle().set("display", "none");
             currentlySelectedPlant = null;
-        }else {
-            selectedPlantDetails.removeAll();
-            selectedPlantDetails.getStyle().set("display", "block");
-
-            Image plantImage = new Image(plant.imageUrl(), plant.name());
-            plantImage.setWidth("300px");
-
-            H3 plantName = new H3(plant.name());
-            Paragraph description = new Paragraph(plant.description());
-
-            selectedPlantDetails.add(plantImage, plantName, description);
-            currentlySelectedPlant = plant;
+            return;
         }
+
+        selectedPlantDetails.removeAll();
+        selectedPlantDetails.getStyle().set("display", "block");
+
+        Image plantImage = new Image(plant.imageUrl(), plant.name());
+        plantImage.setWidth("300px");
+
+        H3 plantName = new H3(plant.name());
+        Paragraph description = new Paragraph(plant.description());
+
+        Optional<Double> gaugePercentageOpt = userPlantLibraryService.getWateringGaugePercentage(userPlantOpt.get().getLibraryId());
+        double gaugeValue = gaugePercentageOpt.orElse(0.0);
+
+        WaterGauge waterGauge = new WaterGauge();
+        waterGauge.setWaterLevel(gaugeValue);
+
+        selectedPlantDetails.add(plantImage, plantName, description, waterGauge);
+        currentlySelectedPlant = plant;
     }
 
     /**
@@ -282,59 +256,79 @@ public class MyPlantsView extends Composite<VerticalLayout> {
         return icons;
     }
 
-    /**
-     * Filters the plant list based on the search query.
-     *
-     * @warning OBSS!!!! Implementation is NOT tested.
-     * !!!!!!!!!!!!!!!!!!!
-     *
-     * @param query The search query entered by the user.
-     */
     private void updatePlantList(String query) {
-        List<PlantDetails> filteredPlants = userPlantLibraryService.getAllPlantDetailsForUser(userId).stream()
-                .filter(plant -> plant.getCommonName().toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
+        List<Plant> userLibraryPlants = userSessionData.getPlantLibraryEntries().stream()
+                .map(entry -> new Plant(entry.getLibraryId(), entry.getPlantDetails().getId(), entry.getPlantDetails().getCommonName(),
+                        entry.getPlantDetails().getDescription(), entry.getPlantDetails().getDefaultImageOriginalUrl(),
+                        entry.getPlantDetails().getWatering(), entry.getPlantDetails().getSunlight(),
+                        entry.getPlantDetails().getType(), entry.getPlantDetails().getEdibleFruit(),
+                        entry.getPlantDetails().getPoisonousToHumans(), entry.getPlantDetails().getPoisonousToPets(),
+                        entry.getPlantDetails().getMedicinal()))
+                .filter(plant -> plant.name().toLowerCase().contains(query.toLowerCase()))
+                .toList();
 
         plantLayout.removeAll();
-        for(PlantDetails plant: filteredPlants){
-            Image plantImage = new Image(plant.getDefaultImageOriginalUrl(), "Plant Image");
-            plantImage.setWidth("100%");
-            Div plantDiv = new Div();
+        loadPlants(userLibraryPlants);
 
-            plantDiv.add(plantImage, new H3(plant.getCommonName()), new Paragraph(plant.getDescription()));
-            plantLayout.add(plantDiv);
-        }
-
-        /*List<Plant> plantData = filteredPlants.stream()
-                .map(details -> new Plant(details.getId(),details.getCommonName(), details.getDescription()))
-                .collect(Collectors.toList());
-
-        plantList.setItems(plantData);
-
-         */
     }
 
-    /**
-     * Deletes the selected plant from the user's library.
-     *
-     * @warning OBSS!!!! There is an issue with this implementation: The plants are not getting deleted,
-     * the issue is with the plantId, The Id needed is the entry Id for the plant (ID in the user_plant_library table).
-     * Check the getAllPlantDetailsForUser method in the userPlantLibraryService class.
-     * !!!!!!!!!!!!!!!!!!!
-     */
     private void deleteSelectedPlant() {
-
-        if (currentlySelectedPlant == null) {
+        if (currentlySelectedPlant != null) {
+            userPlantLibraryService.removePlantFromLibrary(currentlySelectedPlant.libraryId);
+            Notification.show("Plant deleted successfully.", 3000, Notification.Position.TOP_CENTER);
+            loadUserPlants();
+        } else {
             Notification.show("Please select a plant to delete.", 3000, Notification.Position.TOP_CENTER);
-            return;
+
         }
+    }
 
-        userPlantLibraryService.removePlantFromLibrary(currentlySelectedPlant.id());
+    private void loadPlants(List<Plant> plants) {
+        for (Plant plant : plants) {
+            Div plantDiv = new Div();
+            plantDiv.getStyle().set("margin", "10px").set("width", "320px").set("height", "320px")
+                    .set("display", "inline-block").set("border-radius", "8px")
+                    .set("box-shadow", "0 2px 5px rgba(0,0,0,0.1)")
+                    .set("background-color", "white").set("overflow", "hidden");
 
-        Notification.show("Plant deleted successfully.", 3000, Notification.Position.TOP_CENTER);
+            Div imageContainer = new Div();
+            imageContainer.getStyle().set("width", "100%").set("height", "200px").set("overflow", "hidden")
+                    .set("border-top-left-radius", "8px")
+                    .set("border-top-right-radius", "8px");
 
-        loadUserPlants();
+            Image plantImage = new Image(plant.imageUrl(), plant.name());
+            plantImage.getStyle().set("width", "100%").set("height", "100%")
+                    .set("object-fit", "cover").set("cursor", "pointer");
 
+            Div infoUnderPicture = new Div();
+            infoUnderPicture.getStyle().set("background-color", "white").set("padding", "10px")
+                    .set("border-top", "1px solid #ccc")
+                    .set("width", "100%").set("height", "120px").set("box-sizing", "border-box");
 
+            Div nameContainer = new Div();
+            nameContainer.getStyle().set("display", "flex").set("height", "60px")
+                    .set("width", "100%").set("align-items", "center")
+                    .set("justify-content", "center").set("flex-direction", "column")
+                    .set("border-bottom", "1px solid #333");
+
+            H4 plantName = new H4(plant.name());
+            plantName.getStyle().set("margin", "0").set("font-size", "1rem");
+
+            H4 typeOfPlant = new H4(plant.type());
+            typeOfPlant.getStyle().set("margin", "0").set("font-size", "0.8rem")
+                    .set("font-style", "italic").set("color", "limegreen");
+
+            HorizontalLayout iconContainer = iconCreator(plant);
+            iconContainer.getStyle().set("height", "60px").set("flex", "1").set("display", "flex").set("justify-content", "center").set("align-items", "center");
+
+            plantImage.addClickListener(e -> showPlantDetails(plant));
+            plantName.addClickListener(e -> showPlantDetails(plant));
+
+            nameContainer.add(plantName, typeOfPlant);
+            imageContainer.add(plantImage);
+            infoUnderPicture.add(nameContainer);
+            plantDiv.add(imageContainer, infoUnderPicture);
+            plantLayout.add(plantDiv);
+        }
     }
 }

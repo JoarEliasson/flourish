@@ -1,7 +1,7 @@
 package com.flourish.config;
 
-import com.flourish.security.MyAuthenticationManager;
-import com.flourish.security.MyCustomUserDetailsService;
+import com.flourish.security.FlourishAuthenticationManager;
+import com.flourish.security.FlourishUserDetailsService;
 import com.flourish.views.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
@@ -33,14 +33,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityConfig extends VaadinWebSecurity {
 
-    private final MyCustomUserDetailsService myUserDetailsService;
+    private final FlourishUserDetailsService myUserDetailsService;
 
     /**
      * Constructs a new SecurityConfig with our custom DB-based UserDetailsService.
      *
      * @param myUserDetailsService a service that loads users from your MariaDB-based repository
      */
-    public SecurityConfig(MyCustomUserDetailsService myUserDetailsService) {
+    public SecurityConfig(FlourishUserDetailsService myUserDetailsService) {
         this.myUserDetailsService = myUserDetailsService;
     }
 
@@ -97,7 +97,7 @@ public class SecurityConfig extends VaadinWebSecurity {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        return new MyAuthenticationManager(myUserDetailsService, bCryptPasswordEncoder());
+        return new FlourishAuthenticationManager(myUserDetailsService, bCryptPasswordEncoder());
     }
 
     @Bean
