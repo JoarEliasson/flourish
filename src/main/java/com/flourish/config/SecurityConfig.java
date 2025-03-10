@@ -18,9 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * Configures Spring Security + Vaadin security using VaadinWebSecurity,
  * closely matching the official Vaadin docs approach.
  *
- * <p>We specify @Route("login") for the login view,
- * then call setLoginView(http, LoginView.class).
- * Unauthenticated users trying to access
+ * <p>The @Route("login") annotation in LoginView
+ * is matched by setLoginView(http, LoginView.class) here.
+ * This means unauthenticated users trying to access
  * other routes will be redirected to /login.</p>
  *
  * @author
@@ -71,8 +71,8 @@ public class SecurityConfig extends VaadinWebSecurity {
     /**
      * Configures HTTP security using VaadinWebSecurity.
      *
-     * <p>We do not manually call .formLogin(). Instead, we rely on Vaadin
-     * to automatically set up /login as the login-processing URL
+     * <p>The .formLogin() method is not called manually.
+     * Instead, Vaadin automatically sets up /login as the login-processing URL
      * and /login as the route for login if you specify
      * {@code setLoginView(http, LoginView.class)}.</p>
      *
