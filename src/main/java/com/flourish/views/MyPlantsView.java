@@ -4,6 +4,7 @@ import com.flourish.domain.LibraryEntry;
 import com.flourish.security.UserSessionData;
 import com.flourish.service.UserPlantLibraryService;
 import com.flourish.views.components.WaterGauge;
+import com.flourish.views.components.VerticalWaterGauge;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -175,7 +176,6 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
      * Reloads the user's library entries from the service and updates the UI.
      */
     private void refreshPlantList() {
-        // Retrieve library entries from the DB via service.
         List<LibraryEntry> entries = userPlantLibraryService.getAllLibraryEntriesForUser(userSessionData.getUserId());
         // Update session data:
         userSessionData.setPlantLibraryEntries(entries);
@@ -396,26 +396,24 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
      * a water gauge, and a "Mark as Watered" button.
      */
     private void showPlantDetails(Plant plant) {
-        // Find the associated library entry
-        Optional<LibraryEntry> libEntry = userSessionData.getPlantLibraryEntries().stream()
-                .filter(e -> e.getPlantId().equals(plant.plantId()))
-                .findFirst();
+        System.out.println("Showing details for plant: " + plant.name());
 
-        if (libEntry.isEmpty()) {
+        LibraryEntry libEntry = userSessionData.getPlantLibraryEntryById(plant.libraryId());
+
+        if (libEntry == null) {
             Notification.show("No library entry found for this plant.", 3000, Notification.Position.TOP_CENTER);
             return;
         }
 
-        // Display or hide toggling if the same plant is clicked again
+
         if (selectedPlantDetails.isVisible() && selectedPlantDetails.getElement().getProperty("data-plant-id", "").equals("" + plant.plantId())) {
             selectedPlantDetails.setVisible(false);
             return;
         }
 
         selectedPlantDetails.removeAll();
-        selectedPlantDetails.setVisible(true);
 
-        // Save some metadata so we can identify if the same plant is clicked
+        // Save some metadata to identify if the same plant is clicked
         selectedPlantDetails.getElement().setProperty("data-plant-id", "" + plant.plantId());
 
         // Plant image
@@ -428,19 +426,30 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
 
         // Water gauge
         WaterGauge gauge = new WaterGauge();
-        Optional<Double> gaugeValueOpt = userPlantLibraryService.getWateringGaugePercentage(libEntry.get().getLibraryId());
+        Optional<Double> gaugeValueOpt = userPlantLibraryService.getWateringGaugePercentage(libEntry.getLibraryId());
         gauge.setWaterLevel(gaugeValueOpt.orElse(0.0));
 
+
         // "Mark as Watered" button
-        Button waterButton = new Button("Mark as Watered", e -> {
-            userPlantLibraryService.waterPlant(libEntry.get().getLibraryId())
-                    .ifPresent(updated -> {
-                        double updatedValue = userPlantLibraryService.getWateringGaugePercentage(updated.getId()).orElse(0.0);
-                        gauge.setWaterLevel(updatedValue);
-                        Notification.show("Plant marked as watered.", 3000, Notification.Position.TOP_CENTER);
-                    });
-        });
+        Button waterButton = new Button("Mark as Watered", e ->
+                userPlantLibraryService.waterPlant(libEntry.getLibraryId())
+                .ifPresent(updated -> {
+                    double updatedValue = userPlantLibraryService.getWateringGaugePercentage(updated.getId()).orElse(0.0);
+                    gauge.setWaterLevel(updatedValue);
+                    Notification.show("Plant marked as watered.", 3000, Notification.Position.TOP_CENTER);
+                }));
         waterButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+
+
+        VerticalWaterGauge verticalGauge = new VerticalWaterGauge();
+
+        verticalGauge.setLastWatered(libEntry.getLastWatered());
+        verticalGauge.setNextWatering(libEntry.getNextWatering());
+
+
+        verticalGauge.setWaterLevel(gaugeValueOpt.orElse(0.0));
+
+        selectedPlantDetails.add(gauge);
 
         // "Close" button
         Button closeButton = new Button("Close", e -> selectedPlantDetails.setVisible(false));
@@ -449,6 +458,11 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         HorizontalLayout actionBar = new HorizontalLayout(waterButton, closeButton);
         actionBar.setSpacing(true);
 
-        selectedPlantDetails.add(bigPlantImage, title, description, gauge, actionBar);
+        selectedPlantDetails.add(bigPlantImage, title, description, actionBar, gauge, verticalGauge);
+        System.out.println("Details shown for plant: " + plant.name());
+        selectedPlantDetails.getStyle().remove("display");
+        selectedPlantDetails.setVisible(true);
+
+
     }
 }

@@ -80,5 +80,25 @@ public class UserSessionData {
     public void setPlantLibraryEntries(List<LibraryEntry> plantLibraryEntries) {
         this.plantLibraryEntries = plantLibraryEntries;
     }
+
+    /**
+     * Returns a specific plant library entry by its ID.
+     *
+     * <p>This method searches through the user's plant library entries
+     * and returns the entry that matches the given ID.</p>
+     *
+     * @param id the ID of the plant library entry to retrieve.
+     * @return the matching LibraryEntry, or null if not found.
+     */
+    public LibraryEntry getPlantLibraryEntryById(Long id) {
+        if (plantLibraryEntries != null) {
+            for (LibraryEntry entry : plantLibraryEntries) {
+                if (entry.getLibraryId().equals(id)) {
+                    return entry;
+                }
+            }
+        }
+        return null;
+    }
 }
 
