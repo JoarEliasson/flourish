@@ -69,12 +69,26 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User createUser(User user) {
+        if (user.getEmail() == null || !isValidEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Invalid email format.");
+        }
+
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         User savedUser = userRepository.save(user);
 
         createDefaultSettingsIfNotExists(savedUser.getId());
         return savedUser;
+    }
+    /**
+     * Checks if the provided email matches a basic email format.
+     *
+     * @param email The email to validate.
+     * @return true if the email is valid, false otherwise.
+     */
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email.matches(emailRegex);
     }
 
     /**
