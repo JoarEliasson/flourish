@@ -206,6 +206,7 @@ public class UserPlantLibraryService {
         if (gauge < -100) {
             gauge = -100;
         }
+        gauge = Math.round(gauge);
         return Optional.of(gauge);
     }
 

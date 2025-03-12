@@ -10,12 +10,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -427,8 +422,9 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         // Water gauge
         WaterGauge gauge = new WaterGauge();
         Optional<Double> gaugeValueOpt = userPlantLibraryService.getWateringGaugePercentage(libEntry.getLibraryId());
-        gauge.setWaterLevel(gaugeValueOpt.orElse(0.0));
 
+        gauge.setWaterLevel(gaugeValueOpt.orElse(0.0));
+        gauge.setWateringDates(libEntry.getLastWatered(), libEntry.getNextWatering());
 
         // "Mark as Watered" button
         Button waterButton = new Button("Mark as Watered", e ->
@@ -451,14 +447,17 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
 
         selectedPlantDetails.add(gauge);
 
-        // "Close" button
         Button closeButton = new Button("Close", e -> selectedPlantDetails.setVisible(false));
         closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         HorizontalLayout actionBar = new HorizontalLayout(waterButton, closeButton);
         actionBar.setSpacing(true);
 
-        selectedPlantDetails.add(bigPlantImage, title, description, actionBar, gauge, verticalGauge);
+
+
+
+
+        selectedPlantDetails.add(bigPlantImage, title, description, actionBar, gauge);
         System.out.println("Details shown for plant: " + plant.name());
         selectedPlantDetails.getStyle().remove("display");
         selectedPlantDetails.setVisible(true);

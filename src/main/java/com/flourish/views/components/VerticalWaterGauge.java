@@ -12,14 +12,15 @@ import com.vaadin.flow.component.charts.model.style.SolidColor;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.shared.Tooltip;
-import com.vaadin.flow.dom.ElementConstants;
+
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * A vertical bar gauge component for displaying a plant's water level.
+ * <Strong>Please note that this class is not currently used!</Strong>
+ * <em>It is kept for illustrative purposes as an alternative to the current WaterGauge</em>
+ * <p>A vertical bar gauge component for displaying a plant's water level.</p>
  *
  * <p>Uses Vaadin Charts with a single-column chart to represent
  * the watering status. Range is [-100, 120] (similar to the
@@ -34,9 +35,9 @@ import java.time.format.DateTimeFormatter;
  * for the user to see relevant timestamps at a glance.</p>
  *
  * @author
- *
+ *   Joar Eliasson
  * @version
- *
+ *   1.1.0
  * @since
  *   2025-03-12
  */
@@ -47,41 +48,33 @@ public class VerticalWaterGauge extends Div {
 
     private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    // Spans to show lastWatered & nextWatering in the UI
     private final Span lastWateredSpan = new Span();
     private final Span nextWateringSpan = new Span();
 
-    // The Chart & Series
     private final Chart chart = new Chart(ChartType.COLUMN);
     private final ListSeries series = new ListSeries("Water Level");
 
-    // We'll store current "waterLevel" (–100..120)
     private double currentValue = 0.0;
 
     /**
      * Constructs a new VerticalWaterGauge.
      */
     public VerticalWaterGauge() {
-        // Basic layout for the component
-        setWidth("300px");
-        setHeight(null); // auto-height
+        setWidth("100");
+        setHeight(null);
         getStyle().set("border", "1px solid #ddd")
                 .set("border-radius", "8px")
                 .set("padding", "8px");
 
-        // Initialize the spans for date/time
         lastWateredSpan.getStyle().set("display", "block");
         nextWateringSpan.getStyle().set("display", "block");
 
-        // Setup the chart
         Configuration config = chart.getConfiguration();
         config.setTitle("Water Level");
 
-        // We want a single data point, so let's define x-axis with a single category:
-        config.getxAxis().setVisible(false); // or setCategories("Water");
+        config.getxAxis().setVisible(false);
         config.getxAxis().setTickLength(0);
 
-        // Setup the Y-axis range and remove unnecessary lines
         YAxis yAxis = config.getyAxis();
         yAxis.setTitle("");
         yAxis.setMin(-100);
@@ -90,8 +83,8 @@ public class VerticalWaterGauge extends Div {
         yAxis.setGridLineWidth(0);
 
         PlotOptionsColumn columnOptions = new PlotOptionsColumn();
-        columnOptions.setAnimation(true); // animate changes
-        columnOptions.setBorderRadius(5); // slightly rounded corners
+        columnOptions.setAnimation(true);
+        columnOptions.setBorderRadius(5);
 
         columnOptions.setColor(SolidColor.LIGHTBLUE);
 
@@ -112,7 +105,7 @@ public class VerticalWaterGauge extends Div {
         config.addSeries(series);
 
         chart.setWidth(100, Unit.PERCENTAGE);
-        chart.setHeight("300px");
+        chart.setHeight("400px");
 
         add(lastWateredSpan, nextWateringSpan, chart);
     }
@@ -133,7 +126,6 @@ public class VerticalWaterGauge extends Div {
             newValue = -100;
         }
         this.currentValue = newValue;
-
         series.setData(newValue);
         chart.drawChart();
     }
@@ -164,10 +156,4 @@ public class VerticalWaterGauge extends Div {
         }
     }
 
-    /**
-     * @return the current water level value (–100..120).
-     */
-    public double getCurrentValue() {
-        return currentValue;
-    }
 }
