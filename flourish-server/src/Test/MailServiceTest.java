@@ -26,6 +26,16 @@ import org.powermock.api.mockito.PowerMockito;
 //------------------------------------------------------
 
 
+/**
+ * 
+ * Entire class authored by Martin Frick. Was the first foray in to how to test mail service.
+ * Biggest take-away from this code was the neccessity of creating mock instances of the
+ * "Transport" class. Also added a dependancy to simplify the process of extracting
+ * Strings from emails.
+ *
+ *
+ * @author Martin Frick
+ */
 public class MailServiceTest {
 
     @Test
