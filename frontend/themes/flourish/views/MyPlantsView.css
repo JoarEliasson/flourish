@@ -1,0 +1,92 @@
+:host(.my-plants-view) {
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--flourish-bg-color);
+    color: var(--flourish-text-color);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.my-plants-title {
+    margin: 0;
+    color: var(--flourish-secondary-color);
+    font-size: 1.75rem;
+}
+
+.my-plants-search {
+    width: 100%;
+    max-width: 300px;
+}
+
+.my-plants-layout {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.my-plants-details {
+    background-color: var(--flourish-surface-color);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    margin-bottom: 1rem;
+    width: 80%;
+    max-width: 800px;
+}
+
+.my-plants-empty-notice {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.my-plants-card {
+    position: relative;
+    width: 320px;
+    height: 340px;
+    background-color: var(--flourish-surface-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.my-plants-card-image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.my-plants-card-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.my-plants-card-info {
+    padding: 10px;
+}
+
+.my-plants-card-info h4 {
+    margin: 0;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.my-plants-card-vaadin-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: red;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.close-button {
+    background-color: var(--lumo-primary-color);
+    color: var(--flourish-contrast-text);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+}
