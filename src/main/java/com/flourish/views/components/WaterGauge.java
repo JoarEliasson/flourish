@@ -59,36 +59,22 @@ public class WaterGauge extends Div {
      */
     public WaterGauge() {
         addClassName("water-gauge");
-        getStyle().set("background-color", "transparent");
-
-
         chart = new Chart(ChartType.SOLIDGAUGE);
-        chart.getConfiguration().getChart().setBackgroundColor(new SolidColor(0, 0, 0, 0.0));
-        chart.getConfiguration().getLegend().setBackgroundColor(new SolidColor(0, 0, 0, 0.0));
         configuration = chart.getConfiguration();
 
-        Title title = new Title("Water Level");
+        Title chartTitle = new Title("Water Level");
         Style titleStyle = new Style();
         titleStyle.setColor(SolidColor.WHITE);
-        title.setStyle(titleStyle);
-        configuration.setTitle(title);
-        configuration.getLegend().setBackgroundColor(new SolidColor(0, 0, 0, 0.0));
+        chartTitle.setStyle(titleStyle);
+        configuration.setTitle(chartTitle);
 
         Pane pane = configuration.getPane();
         pane.setSize("70%");
         pane.setCenter("50%", "50%");
 
-        Background arcBackground = new Background();
-        arcBackground.setBackgroundColor(new SolidColor(0, 0, 0, 0.0));
-        arcBackground.setInnerRadius("60%");
-        arcBackground.setOuterRadius("100%");
-        arcBackground.setShape(BackgroundShape.ARC);
-        pane.setBackground(arcBackground);
-
         yAxis = new YAxis();
         yAxis.setTickAmount(5);
         yAxis.setGridLineWidth(0);
-
         Style axisLabelStyle = new Style();
         axisLabelStyle.setColor(SolidColor.WHITE);
         yAxis.getLabels().setStyle(axisLabelStyle);
@@ -100,12 +86,11 @@ public class WaterGauge extends Div {
         DataLabels dataLabels = new DataLabels();
         dataLabels.setFormat("{y}%");
         dataLabels.setY(-15);
-
         Style dataLabelStyle = new Style();
         dataLabelStyle.setColor(SolidColor.WHITE);
         dataLabels.setStyle(dataLabelStyle);
-
         plotOptions.setDataLabels(dataLabels);
+
         configuration.setPlotOptions(plotOptions);
 
         series = new ListSeries("Water Level", 0);
