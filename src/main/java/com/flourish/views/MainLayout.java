@@ -31,9 +31,10 @@ public class MainLayout extends AppLayout {
                 .set("margin", "0");
 
         Avatar profileAvatar = new Avatar("USER");
+        profileAvatar.setImage("images/DefualtImage.png");
         ContextMenu menu = new ContextMenu(profileAvatar);
         menu.setOpenOnClick(true);
-        menu.addItem("Account Settings", e -> {});
+        menu.addItem("Account Settings", e -> getUI().ifPresent(ui -> ui.navigate("profile")));
         menu.addItem("Toggle Email Notifications", e -> {});
         menu.addItem("Log Out", e -> logout());
 
