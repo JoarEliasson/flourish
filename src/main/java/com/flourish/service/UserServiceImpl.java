@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+
 /**
  * Implements the UserService interface, handling user-related operations
  * and ensuring that each user has a corresponding settings record.
@@ -51,6 +52,10 @@ public class UserServiceImpl implements UserService {
     @Value("${user.settings.default.emailNotificationEnabled}")
     private boolean defaultEmailNotificationEnabled;
 
+    @Value("${user.default.imageUrl}")
+    private String defaultUserImageUrl;
+
+
     public UserServiceImpl(UserRepository userRepository,
                            UserSettingsRepository userSettingsRepository,
                            PasswordEncoder passwordEncoder) {
@@ -69,12 +74,29 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User createUser(User user) {
+        if (user.getEmail() == null || !isValidEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Invalid email format.");
+        }
+
+        if (user.getProfileImageUrl() == null || user.getProfileImageUrl().isEmpty()) {
+            user.setProfileImageUrl(defaultUserImageUrl);
+        }
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         User savedUser = userRepository.save(user);
 
         createDefaultSettingsIfNotExists(savedUser.getId());
         return savedUser;
+    }
+    /**
+     * Checks if the provided email matches a basic email format.
+     *
+     * @param email The email to validate.
+     * @return true if the email is valid, false otherwise.
+     */
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email.matches(emailRegex);
     }
 
     /**

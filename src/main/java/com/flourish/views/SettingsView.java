@@ -2,6 +2,7 @@ package com.flourish.views;
 
 import com.flourish.domain.User;
 import com.flourish.domain.UserSettings;
+import com.flourish.service.UserService;
 import com.flourish.service.UserSettingsService;
 import java.util.Optional;
 import com.vaadin.flow.component.UI;
@@ -44,11 +45,15 @@ public class SettingsView extends VerticalLayout {
     private final User user;
     private final Long userId;
     private UserSettings userSettings;
+    private UserService userService;
+
     private ComboBox<String> languageSelector;
     private Checkbox emailNotifications;
     private Checkbox notifications;
     private Checkbox loginNotifications;
     private Button saveChanges;
+    private Button deleteAccountButton;
+
 
     /**
      * Constructs a new SettingsView and initializes components.
@@ -56,9 +61,11 @@ public class SettingsView extends VerticalLayout {
      * @param userSettingsService the service managing user settings
      */
     @Autowired
-    public SettingsView(UserSettingsService userSettingsService) {
+    public SettingsView(UserSettingsService userSettingsService, UserService userService) {
         this.userSettingsService = userSettingsService;
+        this.userService=userService;
         addClassName("settings-view");
+
 
         user = (User) VaadinSession.getCurrent().getAttribute("user");
         if (user == null) {
@@ -97,7 +104,11 @@ public class SettingsView extends VerticalLayout {
         saveChanges.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveChanges.addClassName("settings-save-button");
 
-        add(title, languageSelector, emailNotifications, notifications, loginNotifications, saveChanges);
+        deleteAccountButton = new Button("Delete Account", event -> deleteAccount());
+        deleteAccountButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        deleteAccountButton.getStyle().set("margin-top", "20px");
+
+        add(title, languageSelector, emailNotifications, notifications, loginNotifications, saveChanges,deleteAccountButton);
     }
 
     /**
@@ -127,6 +138,22 @@ public class SettingsView extends VerticalLayout {
             userSettings.setLoginNotificationEnabled(loginNotifications.getValue());
             userSettingsService.saveUserSettings(userSettings);
             Notification.show("Settings saved successfully.", 3000, Notification.Position.MIDDLE);
+        }
+    }
+
+    /**
+     * Deletes the user's account and clears the session.
+     * @author Zahraa Alqassab
+     * @since 2025-03-09
+     */
+    private void deleteAccount() {
+        try {
+            userService.deleteByEmail(user.getEmail());
+            Notification.show("Your account has been deleted.", 3000, Notification.Position.TOP_CENTER);
+            VaadinSession.getCurrent().setAttribute("user", null);
+            UI.getCurrent().navigate("login");
+        } catch (Exception e) {
+            Notification.show("Error deleting account: " + e.getMessage(), 3000, Notification.Position.TOP_CENTER);
         }
     }
 }
