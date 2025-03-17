@@ -90,3 +90,17 @@
     border-radius: 6px;
     padding: 0.5rem 1rem;
 }
+
+.my\-plants\-icon {
+    width: 32px;
+    height: 32px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 5px;
+}
+
+.my-plants-card-image-container {
+    background-color: var(--flourish-primary-color);
+    align-content: space-evenly;
+    align-items: center;
+}

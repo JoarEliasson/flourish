@@ -1,9 +1,14 @@
 package com.flourish.views;
 
+import com.flourish.domain.User;
+import com.flourish.security.UserSessionData;
+import com.flourish.service.UserServiceImpl;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -31,6 +36,9 @@ import java.util.Map;
 @RolesAllowed("USER")
 public class MainLayout extends AppLayout implements BeforeEnterObserver {
 
+    UserSessionData userSessionData;
+    private final UserServiceImpl userService;
+
     private final Map<Tab, String> tabToRoute = new LinkedHashMap<>();
     private final Tabs navTabs = new Tabs();
     private final Avatar profileAvatar = new Avatar("USER");
@@ -38,7 +46,10 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
     /**
      * Constructs a MainLayout with a logo image, tabbed navigation, and user profile avatar.
      */
-    public MainLayout() {
+    public MainLayout(UserSessionData userSessionData, UserServiceImpl userService) {
+        this.userSessionData = userSessionData;
+        this.userService = userService;
+        initUserSessionData();
         createHeader();
         setPrimarySection(Section.NAVBAR);
         getElement().getStyle().set("background-color", "var(--flourish-bg-color)");
@@ -74,7 +85,8 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         });
 
         Avatar profileAvatar = new Avatar("USER");
-        profileAvatar.setImage("images/DefualtImage.png");
+
+        profileAvatar.setImage(userService.getUserImageUrl(userSessionData.getUserId()));
 
         ContextMenu menu = new ContextMenu(profileAvatar);
         menu.setOpenOnClick(true);
@@ -138,5 +150,21 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         VaadinSession.getCurrent().getSession().invalidate();
         VaadinSession.getCurrent().close();
         getUI().ifPresent(ui -> ui.getPage().setLocation("login"));
+    }
+
+    /**
+     * Initializes user session data and redirects to the login view if the user is not authenticated.
+     */
+    private void initUserSessionData() {
+        User user = (User) VaadinSession.getCurrent().getAttribute("user");
+        if (user == null) {
+            Notification.show("You must be logged in to view your plants.", 3000, Notification.Position.TOP_CENTER);
+            UI.getCurrent().navigate("login");
+            return;
+        }
+        if (userSessionData.getUserId() == null) {
+            userSessionData.setUserId(user.getId());
+            userSessionData.setUsername(user.getEmail());
+        }
     }
 }

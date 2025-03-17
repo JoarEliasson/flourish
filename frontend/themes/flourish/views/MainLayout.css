@@ -1,9 +1,3 @@
-/*
- * File: MainLayout.css
- *
- * Applies styling for the MainLayout, including the tab bar and avatar area.
- */
-
 :host {
     display: block;
     width: 100%;
@@ -14,11 +8,11 @@
 }
 
 .vaadin-tabs {
-    /* Example styling for the tab container. Adjust as desired. */
     background: transparent;
     border: none;
     box-shadow: none;
     margin: 0 1rem;
+    align-self: center;
 }
 
 .vaadin-tab {

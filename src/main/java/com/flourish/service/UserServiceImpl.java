@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Value("${user.settings.default.emailNotificationEnabled}")
     private boolean defaultEmailNotificationEnabled;
 
-    @Value("${user.default.imageUrl}")
+    @Value("${user.default.user.image}")
     private String defaultUserImageUrl;
 
 
@@ -96,6 +96,14 @@ public class UserServiceImpl implements UserService {
     private boolean isValidEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
         return email.matches(emailRegex);
+    }
+
+    public String getUserImageUrl(long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            return user.getProfileImageUrl();
+        }
+        return null;
     }
 
     /**

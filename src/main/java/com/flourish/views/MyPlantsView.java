@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Displays and manages the user's plant collection.
@@ -70,6 +71,28 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
   private final Div emptyLibraryNotice = new Div();
   private final Div selectedPlantDetails = new Div();
   private final TextField searchField = new TextField("Search Plants");
+
+  @Value("${icon.plant.watering.low}")
+  private String iconWateringLowUrl;
+
+  @Value("${icon.plant.watering.medium}")
+  private String iconWateringMediumUrl;
+
+  @Value("${icon.plant.watering.high}")
+  private String iconWateringHighUrl;
+
+  @Value("${icon.plant.sunlight}")
+  private String iconWSunlightUrl;
+
+  @Value("${icon.plant.edible}")
+  private String iconEdibleWUrl;
+
+  @Value("${icon.plant.medicinal}")
+  private String iconWMedicinalUrl;
+
+  @Value("${icon.plant.poisonous}")
+  private String iconWPoisonousUrl;
+
 
   /**
    * Represents a user-owned plant entry with relevant attributes for the UI.
@@ -283,39 +306,45 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
    */
   public HorizontalLayout iconCreator(Plant plant) {
     HorizontalLayout icons = new HorizontalLayout();
+    icons.addClassName("plant-icons-container");
 
-    Icon sunIcon = VaadinIcon.SUN_O.create();
+    Image sunIcon = new Image(iconWSunlightUrl, "Sunlight Icon");
+    sunIcon.addClassName("my-plants-icon");
     Tooltip.forComponent(sunIcon).setText("Sunlight: " + plant.sunlight());
 
     Image waterIcon;
     if ("Frequent".equalsIgnoreCase(plant.watering())) {
-      waterIcon = new Image("images/Rain.png", "Rain Icon");
+      waterIcon = new Image(iconWateringHighUrl, "Watering Icon");
     } else if ("Average".equalsIgnoreCase(plant.watering())) {
-      waterIcon = new Image("images/AverageWater.png", "Water Icon");
+      waterIcon = new Image(iconWateringMediumUrl, "Watering Icon");
     } else {
-      waterIcon = new Image("images/MinimalWater.png", "Water Icon");
+      waterIcon = new Image(iconWateringLowUrl, "Watering Icon");
     }
+    waterIcon.addClassName("my-plants-icon");
     Tooltip.forComponent(waterIcon).setText("Watering: " + plant.watering());
 
     icons.add(sunIcon, waterIcon);
 
     if (Boolean.TRUE.equals(plant.medicinal())) {
-      Image medicinalIcon = new Image("images/Medicinal.png", "Medicinal Icon");
+      Image medicinalIcon = new Image(iconWMedicinalUrl, "Medicinal Icon");
+      medicinalIcon.addClassName("my-plants-icon");
       Tooltip.forComponent(medicinalIcon).setText("Medicinal Plant");
       icons.add(medicinalIcon);
     }
     if (Boolean.TRUE.equals(plant.edibleFruit())) {
-      Icon fruitIcon = VaadinIcon.CUTLERY.create();
-      Tooltip.forComponent(fruitIcon).setText("Edible Fruit");
-      icons.add(fruitIcon);
+      Image edibleIcon = new Image(iconEdibleWUrl, "Edible Icon");
+      edibleIcon.addClassName("my-plants-icon");
+      Tooltip.forComponent(edibleIcon).setText("Edible Fruit");
+      icons.add(edibleIcon);
     }
     if (Boolean.TRUE.equals(plant.poisonousToHumans()) || Boolean.TRUE.equals(plant.poisonousToPets())) {
-      Image poisonIcon = new Image("images/Poison.png", "Poison Icon");
+      Image poisonousIcon = new Image(iconWPoisonousUrl, "Poisonous Icon");
       String tooltipText = (Boolean.TRUE.equals(plant.poisonousToHumans()) && Boolean.TRUE.equals(plant.poisonousToPets()))
               ? "Poisonous to Humans and Pets"
               : Boolean.TRUE.equals(plant.poisonousToHumans()) ? "Poisonous to Humans" : "Poisonous to Pets";
-      Tooltip.forComponent(poisonIcon).setText(tooltipText);
-      icons.add(poisonIcon);
+      poisonousIcon.addClassName("my-plants-icon");
+      Tooltip.forComponent(poisonousIcon).setText(tooltipText);
+      icons.add(poisonousIcon);
     }
     return icons;
   }
