@@ -21,8 +21,8 @@ import java.time.LocalDateTime;
 /**
  * Unit tests for {@link ForgotPasswordView}.
  *
- * This class verifies the presence of key UI components and ensures
- * that the forgot-password logic behaves as expected.
+ * <p>This class verifies the presence of key UI components and ensures
+ * that the forgot-password logic behaves as expected.</p>
  *
  * @author
  *   Zahraa Alqassab
@@ -120,7 +120,6 @@ class ForgotPasswordViewTest {
         User mockUser = mock(User.class);
         when(userRepository.findByEmail(validEmail)).thenReturn(mockUser);
 
-        // Create a PasswordResetToken with an expiration 30 minutes from now
         PasswordResetToken token = new PasswordResetToken(validEmail, "token123", LocalDateTime.now().plusMinutes(30));
         when(passwordResetService.createPasswordResetToken(eq(validEmail), anyInt())).thenReturn(token);
 
@@ -130,145 +129,4 @@ class ForgotPasswordViewTest {
         verify(mailService, times(1)).sendPasswordResetToken(validEmail, "token123");
     }
 
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * Unit tests for the {@link ForgotPasswordView} class.
- *
- * This test class verifies the functionality of handling forgot password requests
- * by simulating different scenarios such as empty email, user not found,
- * and successful password reset token generation and email sending.
- * It uses the Mockito framework for mocking dependencies and verifying interactions
- * with them, as well as JUnit 5 for test execution and assertions.
- *
- * @author zahraa Alqassab
- * @since 2025-02-24
- */
-/*@ExtendWith(MockitoExtension.class)
-class ForgotPasswordViewTest extends UIUnitTest {
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private PasswordResetService passwordResetService;
-
-    @Mock
-    private MailService mailService;
-
-    @InjectMocks
-    private ForgotPasswordView forgotPasswordView;
-
-    /**
-     * Setup method to initialize the {@link ForgotPasswordView} instance with mocked dependencies
-     * before each test method is executed.
-     */
-   /* @BeforeEach
-    public void setUp() {
-        forgotPasswordView = new ForgotPasswordView(userRepository, passwordResetService, mailService);
-    }*/
-
-    /**
-     * Test case to verify that a notification is shown when the email field is empty.
-     * This simulates the case where the user has not entered an email and attempts
-     * to trigger the forgot password action.
-     *
-     * It verifies that the notification "Please enter your email." is shown when the email
-     * field is empty.
-     */
-   /* @Test
-    void testHandleForgotPassword_EmailFieldEmpty_ShowsNotification() {
-        forgotPasswordView.setEmailFieldValue("");
-        try (MockedStatic<Notification> notificationMock = Mockito.mockStatic(Notification.class)) {
-            forgotPasswordView.triggerHandelForgotPassword();
-            notificationMock.verify(() -> Notification.show("Please enter your email."));
-        }
-    }*/
-
-    /**
-     * Test case to verify that a notification is shown when the user is not found
-     * based on the email address entered. This simulates the case where no user
-     * is associated with the given email.
-     *
-     * It verifies that the notification "If this email exists, a reset token will be sent."
-     * is shown when no user is found with the provided email address.
-     */
-   /* @Test
-    void testHandleForgotPassword_UserNotFound_ShowsNotification() {
-        forgotPasswordView.setEmailFieldValue("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(null);
-
-        try (MockedStatic<Notification> notificationMock = Mockito.mockStatic(Notification.class)) {
-            forgotPasswordView.triggerHandelForgotPassword();
-            notificationMock.verify(() -> Notification.show("If this email exists, a reset token will be sent."));
-        }
-    }*/
-
-    /**
-     * Test case to verify that when the user exists, a password reset token is created
-     * and an email is sent to the user with the token. This simulates the successful
-     * flow where a valid user is found and the password reset process is initiated.
-     *
-     * It verifies that when a valid user is found, a password reset token is created
-     * and the corresponding email is sent.
-     *
-     * @throws MessagingException If there is an error while sending the email.
-     */
-    /*@Test
-    void testHandleForgotPassword_UserExists_SendsResetToken() throws MessagingException {
-        forgotPasswordView.setEmailFieldValue("test@example.com");
-        User user = mock(User.class);
-        when(userRepository.findByEmail("test@example.com")).thenReturn(user);
-        PasswordResetToken resetToken = new PasswordResetToken("test@example.com", "token123", LocalDateTime.now().plusMinutes(30));
-        when(passwordResetService.createPasswordResetToken(anyString(), anyInt())).thenReturn(resetToken);
-
-        try (MockedStatic<Notification> notificationMock = Mockito.mockStatic(Notification.class)) {
-            forgotPasswordView.triggerHandelForgotPassword();
-            verify(mailService, times(1)).sendPasswordResetToken(eq("test@example.com"), eq("token123"));
-
-            notificationMock.verify(() -> Notification.show("A reset token was sent. Check your email."));
-        }
-    }
-}*/

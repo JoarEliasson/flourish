@@ -68,7 +68,6 @@ public class PlantSearchService {
      */
     public List<PlantIndex> search(String query) {
         if (query == null || query.isEmpty()) {
-           //return new ArrayList<>();
             return plantIndexList;
         }
         String lowerQuery = query.toLowerCase();

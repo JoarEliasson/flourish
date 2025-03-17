@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-
 /**
  * Implements the UserService interface, handling user-related operations
  * and ensuring that each user has a corresponding settings record.
@@ -159,7 +158,6 @@ public class UserServiceImpl implements UserService {
                     defaultInAppNotificationEnabled,
                     defaultEmailNotificationEnabled);
             userSettingsRepository.save(settings);
-            System.out.println("Created default settings for user: " + userId);
         }
     }
 

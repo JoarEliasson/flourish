@@ -2,7 +2,6 @@ package com.flourish.domain;
 
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Value;
-
 import java.time.LocalDateTime;
 
 /**
