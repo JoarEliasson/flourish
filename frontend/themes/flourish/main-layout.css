@@ -1,0 +1,61 @@
+[slot="drawer"]:is(header, footer) {
+  display: flex;
+  align-items: center;
+  gap: var(--lumo-space-s);
+  padding: var(--lumo-space-s) var(--lumo-space-m);
+  min-height: var(--lumo-size-xl);
+  box-sizing: border-box;
+  /* Example background behind the drawer area */
+  background-color: var(--flourish-surface-color);
+}
+
+/* Hide empty drawer slots gracefully */
+[slot="drawer"]:is(header, footer):is(:empty) {
+  display: none;
+}
+
+/*
+ * If you have a top bar, for instance:
+ */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(90deg, #3D405B 0%, #4F546D 100%);
+  /*background-color: var(--flourish-bg-color);*/
+  padding: 0.75rem 1rem;
+}
+
+.vaadin-tabs {
+  box-shadow: none;
+  background-color: transparent;
+  padding: 0;
+  border: none;
+}
+
+.vaadin-tab:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.vaadin-tab[selected] {
+  color: #fff;
+  background: linear-gradient(to right, var(--tab-active-start), var(--tab-active-end));
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+:host ::part(tab) {
+  text-decoration: none;
+}
+
+/*
+ * For logo usage with #F4F1DE + #81B29A:
+ * Typically, the gradient might be in the actual logo <img> or an inline SVG,
+ * so you’d handle that in the resource file or with an <img> that includes
+ * the gradient in the artwork.
+ */
+.logo {
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+  /* The gradient is presumably part of the logo image itself */
+}

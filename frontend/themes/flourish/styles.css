@@ -1,0 +1,56 @@
+@import url('./main-layout.css');
+@import url('./views/AllPlantsView.css');
+@import url('./views/ForgotPasswordView.css');
+@import url('./views/HomeView.css');
+@import url('./views/LoginView.css');
+@import url('./views/MainLayout.css');
+@import url('./views/MyPlantsView.css');
+@import url('./views/PlantDetailsView.css');
+@import url('./views/RegistrationView.css');
+@import url('./views/ResetPasswordView.css');
+@import url('./views/SettingsView.css');
+@import url('./components/WaterGauge.css');
+
+/*
+ * Global CSS Variables
+ */
+:root {
+    /* Dark background color: primary background of the app */
+    --flourish-bg-color: #3D405B;
+
+    /* Light text color: stands out on dark backgrounds */
+    --flourish-text-color: #F4F1DE;
+
+    /* Accent color #E07A5F for highlights, buttons, alerts, etc. */
+    --flourish-accent-color: #E07A5F;
+
+    /* Primary color #81B29A for call-to-action or brand highlights */
+    --flourish-primary-color: #81B29A;
+
+    /* Secondary color #F2CC8F for subtle highlights or backgrounds */
+    --flourish-secondary-color: #F2CC8F;
+
+    /* A contrasting text color, if needed for light backgrounds */
+    --flourish-contrast-text: #2D2D2D;
+
+    /* Example alternative background or surfaces */
+    --flourish-surface-color: #4A5065;
+
+    --lumo-base-color: var(--flourish-bg-color);
+    --lumo-body-text-color: var(--flourish-text-color);
+
+    --lumo-primary-color: var(--flourish-primary-color);
+    --lumo-error-color: var(--flourish-accent-color);
+    --lumo-success-color: var(--flourish-primary-color);
+
+    --tab-active-start: #81B29A;
+    --tab-active-end: #3D405B;
+}
+
+html, body, :host {
+    margin: 0;
+    padding: 0;
+    background-color: var(--flourish-bg-color);
+    color: var(--flourish-text-color);
+    font-family: 'Open Sans', sans-serif;
+}

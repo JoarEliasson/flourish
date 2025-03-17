@@ -1,0 +1,42 @@
+/*
+ * File: MainLayout.css
+ *
+ * Applies styling for the MainLayout, including the tab bar and avatar area.
+ */
+
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: var(--flourish-bg-color);
+    color: var(--flourish-text-color);
+    box-sizing: border-box;
+}
+
+.vaadin-tabs {
+    /* Example styling for the tab container. Adjust as desired. */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin: 0 1rem;
+}
+
+.vaadin-tab {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--flourish-text-color);
+}
+
+.vaadin-tab[selected] {
+    background: linear-gradient(
+            to right,
+            var(--flourish-primary-color),
+            var(--flourish-surface-color)
+    );
+    color: #ffffff;
+}
+
+.vaadin-avatar {
+    margin-left: 1rem;
+}

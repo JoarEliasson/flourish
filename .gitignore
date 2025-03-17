@@ -148,3 +148,4 @@ vite.config.ts
 vite.generated.ts
 frontend/generated/
 frontend/index.html
+.vaadin-node-tasks.lock

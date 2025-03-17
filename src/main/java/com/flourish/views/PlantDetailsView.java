@@ -25,6 +25,9 @@ import java.util.Optional;
  * <p><em><strong>Note: </strong>
  * This view is designed to serve as a reference on how to access and display plant details.</em></p>
  *
+ * <p>Uses {@link PlantDetailsService} to fetch data from the backend.
+ * Displays results in a read-only form layout.</p>
+ *
  * @see com.flourish.service.PlantDetailsService
  * @see com.flourish.domain.PlantDetails
  *
@@ -35,17 +38,15 @@ import java.util.Optional;
  * @since
  *   2025-02-25
  */
-@Route("plant-details")
 @PageTitle("Plant Details")
+@Route("plant-details")
 @RolesAllowed("USER")
 public class PlantDetailsView extends VerticalLayout {
 
     private final PlantDetailsService plantDetailsService;
-
     private final NumberField plantIdField = new NumberField("Enter Plant ID");
     private final Button fetchButton = new Button("Fetch Details");
     private final FormLayout detailsForm = new FormLayout();
-
     private final TextArea commonNameField = new TextArea("Common Name");
     private final TextArea scientificNameField = new TextArea("Scientific Name");
     private final TextArea descriptionField = new TextArea("Description");
@@ -53,38 +54,45 @@ public class PlantDetailsView extends VerticalLayout {
     /**
      * Constructs a new PlantDetailsView.
      *
-     * @param plantDetailsService the service to retrieve PlantDetails from the database.
+     * @param plantDetailsService service for retrieving {@link PlantDetails}
      */
     @Autowired
     public PlantDetailsView(PlantDetailsService plantDetailsService) {
         this.plantDetailsService = plantDetailsService;
+        addClassName("plant-details-view");
         setSizeFull();
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        setSpacing(true);
         initializeUI();
     }
 
     /**
-     * Initializes the UI components and layouts.
+     * Initializes the UI components and layout.
      */
     private void initializeUI() {
+        plantIdField.addClassName("plant-details-id-field");
         plantIdField.setMin(1);
-        plantIdField.setValue(1.0);
         plantIdField.setStep(1);
+        plantIdField.setValue(1.0);
+
+        fetchButton.addClassName("plant-details-fetch-button");
         fetchButton.addClickListener(event -> fetchPlantDetails());
 
-        add(plantIdField, fetchButton, detailsForm);
+        detailsForm.addClassName("plant-details-form");
         detailsForm.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
-        detailsForm.add(commonNameField, scientificNameField, descriptionField);
 
+        commonNameField.addClassName("plant-details-field");
+        scientificNameField.addClassName("plant-details-field");
+        descriptionField.addClassName("plant-details-field");
         commonNameField.setReadOnly(true);
         scientificNameField.setReadOnly(true);
         descriptionField.setReadOnly(true);
+
+        detailsForm.add(commonNameField, scientificNameField, descriptionField);
+        add(plantIdField, fetchButton, detailsForm);
     }
 
     /**
-     * Fetches the PlantDetails for the entered plant ID using the PlantDetailsService.
-     * If found, the details are displayed; otherwise, a notification is shown.
+     * Fetches the details for the specified plant ID.
+     * Shows a notification if the ID is invalid or if no matching entry is found.
      */
     private void fetchPlantDetails() {
         Long id = plantIdField.getValue() != null ? plantIdField.getValue().longValue() : null;
@@ -92,7 +100,6 @@ public class PlantDetailsView extends VerticalLayout {
             Notification.show("Please enter a valid Plant ID", 3000, Notification.Position.MIDDLE);
             return;
         }
-
         Optional<PlantDetails> detailsOpt = plantDetailsService.getPlantDetailsById(id);
         if (detailsOpt.isPresent()) {
             updateDetailsForm(detailsOpt.get());
@@ -103,9 +110,9 @@ public class PlantDetailsView extends VerticalLayout {
     }
 
     /**
-     * Updates the details form with the provided PlantDetails data.
+     * Updates the form with data from the given {@link PlantDetails} instance.
      *
-     * @param details the PlantDetails retrieved from the backend.
+     * @param details the plant details to display
      */
     private void updateDetailsForm(PlantDetails details) {
         commonNameField.setValue(details.getCommonName() != null ? details.getCommonName() : "");
@@ -114,7 +121,7 @@ public class PlantDetailsView extends VerticalLayout {
     }
 
     /**
-     * Clears the details form fields.
+     * Clears the fields in the details form.
      */
     private void clearDetailsForm() {
         commonNameField.clear();

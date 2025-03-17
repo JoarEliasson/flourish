@@ -1,0 +1,14 @@
+/*
+ * File: charts-transparent.css
+ *
+ * Makes the chart, plot, and pane backgrounds fully transparent,
+ * removing the default white area behind the gauge.
+ */
+
+.highcharts-background,
+.highcharts-plot-background,
+.highcharts-plot-border,
+.highcharts-pane {
+    fill: none !important;
+    stroke: none !important;
+}
