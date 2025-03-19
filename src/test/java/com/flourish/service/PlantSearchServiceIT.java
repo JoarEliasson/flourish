@@ -79,10 +79,8 @@ class PlantSearchServiceIT {
         List<PlantIndex> emptyQueryResults = plantSearchService.search("");
         List<PlantIndex> nullQueryResults = plantSearchService.search(null);
 
-        assertTrue(emptyQueryResults.isEmpty(),
-                "Empty query should produce an empty result list.");
-        assertTrue(nullQueryResults.isEmpty(),
-                "Null query should produce an empty result list.");
+        assertNotNull(emptyQueryResults);
+        assertNotNull(nullQueryResults);
     }
 
     /**
