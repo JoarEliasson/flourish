@@ -5,8 +5,11 @@ import com.flourish.domain.PlantDetails;
 import com.flourish.domain.PlantIndex;
 import com.flourish.domain.UserPlantLibrary;
 import com.flourish.repository.UserPlantLibraryRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
@@ -30,22 +33,35 @@ import java.util.List;
  * </ul>
  * </p>
  *
+ * ----------------------------------------------------------------
+ * @MartinFrick 250317
+ * Added methods to add, remove and read hashtags from a users plantlibrary.
+ * addHashtag    = Transactional
+ * removeHashtag = Transactional
+ * readHashtags  = NOT Transactional.
+ * ----------------------------------------------------------------
+ *
+ *
  * @see UserPlantLibrary
  * @see UserPlantLibraryRepository
  * @see PlantDetailsService
  *
  * @author
- *   Joar Eliasson
+ *   Joar Eliasson, Martin Frick
  * @version
- *   1.1.0
+ *   1.1.1
  * @since
- *   2025-02-27
+ *   2025-03-17
  */
 @Service
 public class UserPlantLibraryService {
 
     private final UserPlantLibraryRepository libraryRepository;
     private final PlantDetailsService plantDetailsService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
 
     @Autowired
     public UserPlantLibraryService(UserPlantLibraryRepository libraryRepository, PlantDetailsService plantDetailsService) {
@@ -241,5 +257,87 @@ public class UserPlantLibraryService {
         }
         return entries;
     }
+
+    /**
+     * Method to Add a hashtag to database.
+     * Functionality to find plant, potential douplicate hashtag is also here.
+     *
+     * @param userId
+     * @param plantId
+     * @param newHashtag
+     * @return success (boolean)
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean addHashtag(Long userId, Long plantId, String newHashtag) {
+
+        System.out.println("##################HASHTAG INCOMING: " + newHashtag);
+
+        Optional<UserPlantLibrary> tempPlant = libraryRepository.findByUserIdAndPlantId(userId, plantId);
+        if (tempPlant.isEmpty()) {
+            return false; // No such plant found
+        }
+
+        UserPlantLibrary plant = tempPlant.get();
+        List<String> tmpHashtags = new ArrayList<>(plant.getHashtags());
+
+        if (tmpHashtags.contains(newHashtag)) {
+            return false; // Already exists
+        }
+
+        tmpHashtags.add(newHashtag);
+        plant.setHashtags(tmpHashtags);
+        libraryRepository.saveAndFlush(plant);
+
+        return plant != null && plant.getHashtags().contains(newHashtag);
+//        return true;
+    }
+
+    /**
+     * Method to Remove a hashtag to database.
+     * Functionality to find plant, potential douplicate hashtag to remove is also here.
+     *
+     * @param userId
+     * @param plantId
+     * @param hashtagToRemove
+     * @return success (boolean)
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean removeHashtag(Long userId, Long plantId, String hashtagToRemove) {
+        Optional<UserPlantLibrary> tempPlant = libraryRepository.findByUserIdAndPlantId(userId, plantId);
+        if (tempPlant.isEmpty()) {
+            return false; // No plant found
+        }
+
+        UserPlantLibrary plant = tempPlant.get();
+        List<String> existingHashtags = new ArrayList<>(plant.getHashtags()); // Create a new list to avoid reference issues
+
+        if (!existingHashtags.contains(hashtagToRemove)) {
+            return false; // Hashtag not found
+        }
+
+        existingHashtags.remove(hashtagToRemove);
+        plant.setHashtags(existingHashtags);
+
+        libraryRepository.saveAndFlush(plant); // Ensures changes are immediately written to DB
+
+        return !existingHashtags.contains(hashtagToRemove);
+    }
+
+    /**
+     * Method to Read hashtags from database for a particular plant.
+     * Functionality to find plant with all hashtags are also located here.
+     *
+     * @param userId
+     * @param plantId
+     * @return success (boolean)
+     */
+    @Transactional(readOnly = true)
+    public List<String> readHashtags(Long userId, Long plantId) {
+        entityManager.clear();
+        List<String> hashtags = libraryRepository.findHashtagsForUserPlant(userId, plantId);
+        System.out.println("Direct DB Query Result for plantId " + plantId + ": " + hashtags);
+        return hashtags;
+    }
+
 
 }

@@ -1,5 +1,16 @@
 package com.flourish.views;
 
+//import com.vaadin.flow.component.map.Map;
+
+import com.vaadin.flow.component.details.Details;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Image;
+
+import com.vaadin.flow.component.page.Push;
+import com.vaadin.flow.theme.lumo.LumoUtility;
+
 import com.flourish.domain.LibraryEntry;
 import com.flourish.security.UserSessionData;
 import com.flourish.service.UserPlantLibraryService;
@@ -30,6 +41,7 @@ import com.vaadin.flow.server.VaadinSession;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,8 +57,13 @@ import java.util.stream.Collectors;
  *   <li>Uses BeforeEnterObserver to refresh user data on every navigation to this view.</li>
  * </ul>
  *
+ * ------------------------------------
+ * @MartinFrick
+ * Added hastags and filter functionality
+ * ------------------------------------
+ *
  * @author
- *   Kenan Al Tal, Joar Eliasson
+ *   Kenan Al Tal, Joar Eliasson, Martin Frick
  * @version
  *   1.1.1
  * @since
@@ -57,25 +74,19 @@ import java.util.stream.Collectors;
 @RolesAllowed("USER")
 public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnterObserver {
 
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
     private final UserSessionData userSessionData;
     private final UserPlantLibraryService userPlantLibraryService;
-
-    // A layout that holds all plant "cards".
     private final FlexLayout plantLayout = new FlexLayout();
-
-    // A Div for showing "no plants" + a button to add new plants.
     private final Div emptyLibraryNotice = new Div();
-
-    // A panel that shows detailed info + water gauge for the selected plant.
     private final Div selectedPlantDetails = new Div();
-
-    // A search field for filtering user's plants by name.
     private final TextField searchField = new TextField("Search Plants");
 
     /**
      * A record representing a plant with necessary details for the UI.
      *
-     * @param libraryId         The ID of the user's library entry (used for removal, watering).
+     * @param libraryId         The ID of the user's library entry (used forremoval, watering).
      * @param plantId           The ID of the actual plant details record.
      * @param name              The plant's common name.
      * @param description       A short textual description (shown in detail view).
@@ -89,17 +100,20 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
      * @param medicinal         True if the plant is medicinal.
      */
     public record Plant(long libraryId,
-                        long plantId,
-                        String name,
-                        String description,
-                        String imageUrl,
-                        String watering,
-                        String sunlight,
-                        String type,
-                        Boolean edibleFruit,
-                        Boolean poisonousToHumans,
-                        Boolean poisonousToPets,
-                        Boolean medicinal) {}
+                       long plantId,
+                       String name,
+                       String description,
+                       String imageUrl,
+                       String watering,
+                       String sunlight,
+                       String type,
+                       Boolean edibleFruit,
+                       Boolean poisonousToHumans,
+                       Boolean poisonousToPets,
+                       Boolean medicinal,
+                       List<String> hashtags
+    )
+    {}
 
     /**
      * Constructs the MyPlantsView and initializes UI components.
@@ -110,47 +124,39 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         this.userPlantLibraryService = userPlantLibraryService;
         this.userSessionData = userSessionData;
 
-        // Ensure user is logged in.
         if (VaadinSession.getCurrent().getAttribute("user") == null) {
             Notification.show("You must be logged in to view your plants.", 3000, Notification.Position.TOP_CENTER);
             UI.getCurrent().navigate("login");
             return;
         }
 
-        // --- View styling ---
-        getContent().getStyle().set("background-color", "#e8f5e9").set("padding", "20px");
+        getContent().addClassName("my-plants-view");
+        plantLayout.addClassName("my-plants-layout");
+        selectedPlantDetails.addClassName("my-plants-details");
+        emptyLibraryNotice.addClassName("my-plants-empty-notice");
+        searchField.addClassName("my-plants-search");
 
         H2 title = new H2("My Plants");
-        title.getStyle().set("color", "#388e3c").set("font-size", "28px");
+        title.addClassName("my-plants-title");
 
-        // --- Search field ---
-        searchField.setWidth("100%");
-        searchField.getStyle().set("font-size", "18px");
         searchField.addValueChangeListener(e -> filterPlantList(e.getValue()));
 
-        // --- Plant layout for displaying card-like elements ---
-        plantLayout.setFlexWrap(FlexWrap.WRAP);
+        plantLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
         plantLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
         plantLayout.setAlignItems(FlexLayout.Alignment.START);
+        plantLayout.setFlexWrap(FlexWrap.WRAP);
+        plantLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        plantLayout.setAlignItems(FlexComponent.Alignment.START);
+        plantLayout.getStyle()
+                .set("display", "flex")
+                .set("gap", "10px")
+                .set("align-items", "stretch");
         plantLayout.setWidthFull();
 
-        // --- Selected plant details panel (hidden by default) ---
-        selectedPlantDetails.getStyle()
-                .set("display", "none")
-                .set("padding", "20px")
-                .set("border-radius", "8px")
-                .set("background-color", "white")
-                .set("box-shadow", "0 2px 5px rgba(0,0,0,0.1)")
-                .set("margin-bottom", "20px")
-                .set("width", "80%");
+        selectedPlantDetails.setVisible(false);
 
-        // --- Empty library notice & button to AllPlantsView ---
-        emptyLibraryNotice.getStyle()
-                .set("text-align", "center")
-                .set("margin-top", "20px");
         emptyLibraryNotice.setVisible(false);
 
-        // --- Layout the top portion (title + search) ---
         HorizontalLayout topBar = new HorizontalLayout(title, searchField);
         topBar.setWidthFull();
         topBar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
@@ -172,19 +178,12 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
      */
     private void refreshPlantList() {
         List<LibraryEntry> entries = userPlantLibraryService.getAllLibraryEntriesForUser(userSessionData.getUserId());
-        // Update session data:
         userSessionData.setPlantLibraryEntries(entries);
-
-        // Map library entries to our UI-focused Plant record.
-        List<Plant> allPlants = mapLibraryEntriesToPlants(entries);
-
-        // Filter them by current search text, if any, to remain consistent.
+        List<Plant> mappedPlants = mapLibraryEntriesToPlants(entries);
         String currentQuery = searchField.getValue() != null ? searchField.getValue() : "";
-        List<Plant> filtered = allPlants.stream()
+        List<Plant> filtered = mappedPlants.stream()
                 .filter(p -> p.name().toLowerCase().contains(currentQuery.toLowerCase()))
                 .collect(Collectors.toList());
-
-        // Rebuild the layout with filtered plants
         updatePlantLayout(filtered);
     }
 
@@ -192,16 +191,19 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
      * Filters the current library data using the specified search query.
      */
     private void filterPlantList(String query) {
-        // Use the plants in userSessionData to generate the filtered list.
-        List<LibraryEntry> sessionEntries = userSessionData.getPlantLibraryEntries();
-        List<Plant> filteredPlants = mapLibraryEntriesToPlants(sessionEntries).stream()
+        List<LibraryEntry> entries = userSessionData.getPlantLibraryEntries();
+        List<Plant> filteredPlants = mapLibraryEntriesToPlants(entries).stream()
                 .filter(p -> p.name().toLowerCase().contains(query.toLowerCase()))
                 .collect(Collectors.toList());
         updatePlantLayout(filteredPlants);
+
     }
 
     /**
-     * Maps LibraryEntry objects to the local Plant record for easy UI handling.
+     * Maps the user's library entries to {@link Plant} records for display.
+     *
+     * @param entries the user's library entries
+     * @return a list of Plant records derived from the entries
      */
     private List<Plant> mapLibraryEntriesToPlants(List<LibraryEntry> entries) {
         return entries.stream()
@@ -217,121 +219,105 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
                         entry.getPlantDetails().getEdibleFruit(),
                         entry.getPlantDetails().getPoisonousToHumans(),
                         entry.getPlantDetails().getPoisonousToPets(),
-                        entry.getPlantDetails().getMedicinal()
+                        entry.getPlantDetails().getMedicinal(),
+                        entry.getUserPlantLibrary().getHashtags()
                 ))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Rebuilds the layout (plant cards + empty notice) based on the provided list of plants.
+     * Updates the plant layout and hides/shows the empty-library notice as appropriate.
+     *
+     * @param plants the list of plants to display
      */
     private void updatePlantLayout(List<Plant> plants) {
         plantLayout.removeAll();
         selectedPlantDetails.setVisible(false);
-
         if (plants.isEmpty()) {
-            // Show an empty library notice, with a button to go add more plants.
             showEmptyLibraryNotice();
         } else {
             emptyLibraryNotice.setVisible(false);
-            for (Plant plant : plants) {
-                Div card = createPlantCard(plant);
-                plantLayout.add(card);
-            }
+            plants.forEach(plant -> plantLayout.add(createPlantCard(plant)));
         }
     }
 
     /**
-     * Displays a "no plants" message plus a button to navigate to AllPlantsView.
+     * Shows a notice indicating that the library is empty, with a button to add new plants.
      */
     private void showEmptyLibraryNotice() {
         emptyLibraryNotice.removeAll();
         emptyLibraryNotice.setText("No plants in your library yet. Start adding plants now!");
-
         Button goToAllPlantsButton = new Button("Find New Plants", event -> UI.getCurrent().navigate("all-plants"));
         goToAllPlantsButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
         emptyLibraryNotice.add(goToAllPlantsButton);
         emptyLibraryNotice.setVisible(true);
     }
 
     /**
-     * Creates the card (Div) for a single plant, including an image,
-     * plant name, characteristic icons, and a trash icon for deletion.
+     * Creates a card displaying plant information, including an image, icons, and a deletion icon.
+     *
+     * @param plant the plant record used to populate the card
+     * @return a card component for the specified plant
      */
     private Div createPlantCard(Plant plant) {
         Div plantDiv = new Div();
-        plantDiv.getStyle().set("position", "relative")
-                .set("margin", "10px")
+        plantDiv.getStyle()
+                .set("max-width", "320px")  // Prevents stretching
                 .set("width", "320px")
-                .set("height", "340px") // slightly taller to accommodate icons
-                .set("display", "inline-block")
+                .set("height", "400px")  // Ensures consistent height
+                .set("overflow", "hidden")  // Prevents expanding
+                .set("display", "inline-block")  // Ensures it's in a grid layout
                 .set("border-radius", "8px")
-                .set("box-shadow", "0 2px 5px rgba(0,0,0,0.1)")
-                .set("background-color", "white")
-                .set("overflow", "hidden");
+                .set("box-shadow", "0 2px 5px rgba(0,0,0,0.1)");
+        plantDiv.addClassName("my-plants-card");
 
-        // -- Image container --
         Div imageContainer = new Div();
-        imageContainer.getStyle()
-                .set("width", "100%")
-                .set("height", "200px")
-                .set("overflow", "hidden");
+        imageContainer.addClassName("my-plants-card-image-container");
 
         Image plantImage = new Image(plant.imageUrl(), plant.name());
         plantImage.getStyle()
-                .set("width", "100%")
-                .set("height", "100%")
-                .set("object-fit", "cover")
+                .set("width", "100%")  // Ensures it fits within its container
+                .set("max-width", "300px")  // Prevents it from becoming gigantic
+                .set("max-height", "200px")  // Limits height
+                .set("object-fit", "cover")  // Ensures proper aspect ratio
                 .set("cursor", "pointer");
-
         plantImage.addClickListener(e -> showPlantDetails(plant));
         imageContainer.add(plantImage);
 
-        // -- Delete icon --
         Icon deleteIcon = VaadinIcon.TRASH.create();
-        deleteIcon.getStyle()
-                .set("position", "absolute")
-                .set("top", "5px")
-                .set("right", "5px")
-                .set("cursor", "pointer")
-                .set("color", "red")
-                .set("font-size", "1.2rem");
+        deleteIcon.addClassName("my-plants-card-vaadin-icon");
         deleteIcon.addClickListener(e -> confirmPlantDeletion(plant));
 
-        // -- Info container (name + icons) --
         Div infoContainer = new Div();
-        infoContainer.getStyle().set("padding", "10px");
+        infoContainer.addClassName("my-plants-card-info");
 
         H4 plantName = new H4(plant.name());
-        plantName.getStyle().set("margin", "0").set("font-size", "1rem").set("cursor", "pointer");
         plantName.addClickListener(e -> showPlantDetails(plant));
 
-        // Add characteristic icons to a row
         HorizontalLayout iconLayout = iconCreator(plant);
-        iconLayout.getStyle().set("margin-top", "6px");
 
-        infoContainer.add(plantName, iconLayout);
+        LibraryEntry lib = userSessionData.getPlantLibraryEntryById(plant.libraryId());
+        Div nextWateringLabel = new Div();
+        nextWateringLabel.setText("Next Watering: " + lib.getNextWatering().format(DATE_FORMAT));
+
+        infoContainer.add(plantName, iconLayout, nextWateringLabel);
         plantDiv.add(imageContainer, infoContainer, deleteIcon);
 
         return plantDiv;
     }
 
     /**
-     * Creates a horizontal layout containing icons that represent various plant characteristics.
+     * Creates a row of icons representing plant attributes such as sunlight, watering, or poison status.
      *
-     * @param plant the plant record.
-     * @return a HorizontalLayout with characteristic icons and tooltips.
+     * @param plant the plant record whose properties will be displayed as icons
+     * @return a HorizontalLayout containing characteristic icons
      */
     public HorizontalLayout iconCreator(Plant plant) {
         HorizontalLayout icons = new HorizontalLayout();
 
-        // Sunlight icon
         Icon sunIcon = VaadinIcon.SUN_O.create();
-        sunIcon.getStyle().set("color", "orange").set("font-size", "1.5rem").set("margin", "0");
         Tooltip.forComponent(sunIcon).setText("Sunlight: " + plant.sunlight());
 
-        // Watering icon (image variant based on frequency)
         Image waterIcon;
         if ("Frequent".equalsIgnoreCase(plant.watering())) {
             waterIcon = new Image("images/Rain.png", "Rain Icon");
@@ -340,26 +326,22 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         } else {
             waterIcon = new Image("images/MinimalWater.png", "Water Icon");
         }
-        waterIcon.getStyle().set("width", "24px").set("height", "24px").set("cursor", "pointer");
         Tooltip.forComponent(waterIcon).setText("Watering: " + plant.watering());
 
         icons.add(sunIcon, waterIcon);
 
         if (Boolean.TRUE.equals(plant.medicinal())) {
             Image medicinalIcon = new Image("images/Medicinal.png", "Medicinal Icon");
-            medicinalIcon.getStyle().set("width", "24px").set("height", "24px");
             Tooltip.forComponent(medicinalIcon).setText("Medicinal Plant");
             icons.add(medicinalIcon);
         }
         if (Boolean.TRUE.equals(plant.edibleFruit())) {
             Icon fruitIcon = VaadinIcon.CUTLERY.create();
-            fruitIcon.getStyle().set("color", "green").set("font-size", "1.5rem");
             Tooltip.forComponent(fruitIcon).setText("Edible Fruit");
             icons.add(fruitIcon);
         }
         if (Boolean.TRUE.equals(plant.poisonousToHumans()) || Boolean.TRUE.equals(plant.poisonousToPets())) {
             Image poisonIcon = new Image("images/Poison.png", "Poison Icon");
-            poisonIcon.getStyle().set("width", "24px").set("height", "24px");
             String tooltipText = (Boolean.TRUE.equals(plant.poisonousToHumans()) && Boolean.TRUE.equals(plant.poisonousToPets()))
                     ? "Poisonous to Humans and Pets"
                     : Boolean.TRUE.equals(plant.poisonousToHumans()) ? "Poisonous to Humans" : "Poisonous to Pets";
@@ -370,7 +352,9 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
     }
 
     /**
-     * Opens a confirm dialog before deleting the specified plant.
+     * Opens a confirmation dialog before removing the specified plant from the user's library.
+     *
+     * @param plant the plant to be removed
      */
     private void confirmPlantDeletion(Plant plant) {
         ConfirmDialog confirmDialog = new ConfirmDialog();
@@ -379,8 +363,8 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         confirmDialog.setCancelable(true);
         confirmDialog.setConfirmText("Delete");
         confirmDialog.addConfirmListener(event -> {
-            userPlantLibraryService.removePlantFromLibrary(plant.libraryId);
-            refreshPlantList(); // Re-pull data from the DB and re-render
+            userPlantLibraryService.removePlantFromLibrary(plant.libraryId());
+            refreshPlantList();
             Notification.show("Plant deleted successfully.", 3000, Notification.Position.TOP_CENTER);
         });
         confirmDialog.open();
@@ -392,6 +376,21 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
      */
     private void showPlantDetails(Plant plant) {
         System.out.println("Showing details for plant: " + plant.name());
+
+
+        System.out.println("looking at User: "+userSessionData.getUserId());
+        System.out.println("looking plantId: "+plant.plantId());
+
+
+        selectedPlantDetails.getStyle()
+                .set("max-width", "600px")  // Limit width
+                .set("width", "80%")  // Prevents overflow
+                .set("margin", "auto")  // Centers the element
+                .set("padding", "20px")
+                .set("border-radius", "8px")
+                .set("background-color", "white")
+                .set("box-shadow", "0 2px 5px rgba(0,0,0,0.1)");
+
 
         LibraryEntry libEntry = userSessionData.getPlantLibraryEntryById(plant.libraryId());
 
@@ -407,61 +406,140 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         }
 
         selectedPlantDetails.removeAll();
-
-        // Save some metadata to identify if the same plant is clicked
         selectedPlantDetails.getElement().setProperty("data-plant-id", "" + plant.plantId());
 
-        // Plant image
         Image bigPlantImage = new Image(plant.imageUrl(), plant.name());
         bigPlantImage.setWidth("300px");
 
-        // Title + description
         H3 title = new H3(plant.name());
-        Paragraph description = new Paragraph(plant.description() != null ? plant.description() : "(No Description)");
+        Paragraph description = new Paragraph(
+                plant.description() != null ? plant.description() : "(No Description)"
+        );
 
-        // Water gauge
         WaterGauge gauge = new WaterGauge();
         Optional<Double> gaugeValueOpt = userPlantLibraryService.getWateringGaugePercentage(libEntry.getLibraryId());
-
         gauge.setWaterLevel(gaugeValueOpt.orElse(0.0));
         gauge.setWateringDates(libEntry.getLastWatered(), libEntry.getNextWatering());
 
-        // "Mark as Watered" button
         Button waterButton = new Button("Mark as Watered", e ->
-                userPlantLibraryService.waterPlant(libEntry.getLibraryId())
-                .ifPresent(updated -> {
-                    double updatedValue = userPlantLibraryService.getWateringGaugePercentage(updated.getId()).orElse(0.0);
+                userPlantLibraryService.waterPlant(libEntry.getLibraryId()).ifPresent(updatedEntry -> {
+                    double updatedValue = userPlantLibraryService
+                            .getWateringGaugePercentage(updatedEntry.getId())
+                            .orElse(0.0);
                     gauge.setWaterLevel(updatedValue);
+                    gauge.setWateringDates(updatedEntry.getLastWatered(), updatedEntry.getNextWatering());
                     Notification.show("Plant marked as watered.", 3000, Notification.Position.TOP_CENTER);
-                }));
+                })
+        );
         waterButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
 
-
-        VerticalWaterGauge verticalGauge = new VerticalWaterGauge();
-
-        verticalGauge.setLastWatered(libEntry.getLastWatered());
-        verticalGauge.setNextWatering(libEntry.getNextWatering());
-
-
-        verticalGauge.setWaterLevel(gaugeValueOpt.orElse(0.0));
-
-        selectedPlantDetails.add(gauge);
-
         Button closeButton = new Button("Close", e -> selectedPlantDetails.setVisible(false));
-        closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        closeButton.addClassName("close-button");
+        closeButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
 
         HorizontalLayout actionBar = new HorizontalLayout(waterButton, closeButton);
-        actionBar.setSpacing(true);
 
+        //---------------
+        // Hashtags display
+        List<String> fetchedHashtags = userPlantLibraryService.readHashtags(userSessionData.getUserId(), plant.libraryId());
 
+        Div hashtagsDiv = new Div();
+        hashtagsDiv.getStyle().set("margin-top", "10px");
+        updateHashtagDisplay(hashtagsDiv, fetchedHashtags);
 
+        // Add hashtag field and button
+        TextField addHashtagField = new TextField();
+        addHashtagField.setPlaceholder("Add hashtag");
 
+        Button addHashtagButton = new Button("Add", e -> {
+            String newHashtag = addHashtagField.getValue().trim();
+            if (!newHashtag.isEmpty()) {
+                boolean success = userPlantLibraryService.addHashtag(userSessionData.getUserId(), plant.plantId(), newHashtag);
 
-        selectedPlantDetails.add(bigPlantImage, title, description, actionBar, gauge);
-        System.out.println("Details shown for plant: " + plant.name());
+                if (success) {
+                    List<String> updatedHashtags = userPlantLibraryService.readHashtags(userSessionData.getUserId(), plant.libraryId());
+
+                    UI.getCurrent().access(() -> {
+                        updateHashtagDisplay(hashtagsDiv, updatedHashtags);
+                        addHashtagField.clear();
+                        System.out.println("Added hashtag, updated list: " + updatedHashtags);
+                    });
+
+                } else {
+                    Notification.show("Hashtag already exists.", 3000, Notification.Position.TOP_CENTER);
+                }
+            }
+        });
+
+        // Remove hashtag field and button
+        TextField removeHashtagField = new TextField();
+        removeHashtagField.setPlaceholder("Remove hashtag");
+
+        Button removeHashtagButton = new Button("Remove", e -> {
+            String hashtagToRemove = removeHashtagField.getValue().trim();
+            if (!hashtagToRemove.isEmpty()) {
+                boolean success = userPlantLibraryService.removeHashtag(userSessionData.getUserId(), plant.plantId(), hashtagToRemove);
+                if (success) {
+                    List<String> updatedHashtags = userPlantLibraryService.readHashtags(userSessionData.getUserId(), plant.libraryId());
+
+                    UI.getCurrent().access(() -> {
+                        updateHashtagDisplay(hashtagsDiv, updatedHashtags);
+                        removeHashtagField.clear();
+                        System.out.println("Removed hashtag, updated list: " + updatedHashtags);
+                    });
+
+                } else {
+                    Notification.show("Hashtag not found.", 3000, Notification.Position.TOP_CENTER);
+                }
+            }
+        });
+        //--------
+        HorizontalLayout hashtagActions = new HorizontalLayout(addHashtagField, addHashtagButton, removeHashtagField, removeHashtagButton);
+        hashtagActions.setSpacing(true);
+
+        selectedPlantDetails.add(bigPlantImage, title, description, hashtagsDiv, hashtagActions, actionBar, gauge);
         selectedPlantDetails.getStyle().remove("display");
         selectedPlantDetails.setVisible(true);
-
-
+//        selectedPlantDetails.getStyle().set("pointer-events", "auto");
     }
+
+    private void showExistingHashtags() {
+//        refreshUserSessionData();
+        List<LibraryEntry> entries = userPlantLibraryService.getAllLibraryEntriesForUser(userSessionData.getUserId());
+        List<Plant> allPlants = mapLibraryEntriesToPlants(entries);
+        for (Plant plant : allPlants) {
+            List<String> fetchedHashtags = userPlantLibraryService.readHashtags(userSessionData.getUserId(), plant.libraryId());
+            Div hashtagsDiv = new Div();
+            updateHashtagDisplay(hashtagsDiv, fetchedHashtags);
+            selectedPlantDetails.add(hashtagsDiv);
+            System.out.println("Existing hashtags for plant " + plant.libraryId() + ": " + fetchedHashtags);
+        }
+    }
+
+    private void updateHashtagDisplay(Div hashtagsDiv, List<String> hashtags) {
+        
+        hashtagsDiv.removeAll(); // Clear
+
+        System.out.println("Hashtags coming in: "+hashtags);
+
+        if (hashtags.isEmpty()) {
+            hashtagsDiv.setText("No hashtags yet.");
+//            showExistingHashtags();
+        } else {
+            hashtagsDiv.setText("Hashtags: " + String.join(", ", hashtags));
+        }
+
+//        UI.getCurrent().getPage().reload();
+/*
+
+        System.out.println("Updating UI with hashtags: " + hashtags);
+        System.out.println("Current content of hashtagsDiv: " + hashtagsDiv.getText());
+*/
+    }
+
+   /* public void refreshUserSessionData() {
+        List<LibraryEntry> updatedEntries = userPlantLibraryService.getAllLibraryEntriesForUser(userSessionData.getUserId());
+        userSessionData.setPlantLibraryEntries(updatedEntries);
+    }*/
+
 }
