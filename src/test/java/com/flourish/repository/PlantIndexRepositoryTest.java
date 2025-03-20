@@ -26,15 +26,7 @@ import com.flourish.domain.PlantIndex;
  * @since
  *   2025-02-24
  */
-@DataJpaTest(
-        properties = {
-                "spring.datasource.url=jdbc:h2:mem:myTestDB;DB_CLOSE_ON_EXIT=false",
-                "spring.datasource.driver-class-name=org.h2.Driver",
-                "spring.datasource.username=sa",
-                "spring.datasource.password=",
-                "spring.jpa.hibernate.ddl-auto=create-drop"
-        }
-)
+@DataJpaTest
 @ActiveProfiles("test")
 class PlantIndexRepositoryTest {
 

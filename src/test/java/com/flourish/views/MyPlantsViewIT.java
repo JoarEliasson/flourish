@@ -79,7 +79,7 @@ public class MyPlantsViewIT extends TestBenchTestCase {
      */
     @BeforeAll
     static void globalSetup() {
-        WebDriverManager.chromiumdriver().setup();
+        WebDriverManager.chromedriver().setup();
     }
 
     /**
@@ -98,6 +98,7 @@ public class MyPlantsViewIT extends TestBenchTestCase {
         setDriver(TestBench.createDriver(new ChromeDriver(options)));
 
         getDriver().get("http://localhost:" + port + "/login");
+
         LoginFormElement loginForm = $(LoginFormElement.class).first();
         loginForm.getUsernameField().setValue(testUserEmail);
         loginForm.getPasswordField().setValue(TEST_USER_PASSWORD);
