@@ -51,6 +51,10 @@ public class UserServiceImpl implements UserService {
     @Value("${user.settings.default.emailNotificationEnabled}")
     private boolean defaultEmailNotificationEnabled;
 
+    @Value("${user.default.user.image}")
+    private String defaultUserImageUrl;
+
+
     public UserServiceImpl(UserRepository userRepository,
                            UserSettingsRepository userSettingsRepository,
                            PasswordEncoder passwordEncoder) {
@@ -69,12 +73,37 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User createUser(User user) {
+        if (user.getEmail() == null || !isValidEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Invalid email format.");
+        }
+
+        if (user.getProfileImageUrl() == null || user.getProfileImageUrl().isEmpty()) {
+            user.setProfileImageUrl(defaultUserImageUrl);
+        }
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         User savedUser = userRepository.save(user);
 
         createDefaultSettingsIfNotExists(savedUser.getId());
         return savedUser;
+    }
+    /**
+     * Checks if the provided email matches a basic email format.
+     *
+     * @param email The email to validate.
+     * @return true if the email is valid, false otherwise.
+     */
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email.matches(emailRegex);
+    }
+
+    public String getUserImageUrl(long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            return user.getProfileImageUrl();
+        }
+        return null;
     }
 
     /**
@@ -137,7 +166,6 @@ public class UserServiceImpl implements UserService {
                     defaultInAppNotificationEnabled,
                     defaultEmailNotificationEnabled);
             userSettingsRepository.save(settings);
-            System.out.println("Created default settings for user: " + userId);
         }
     }
 
@@ -157,5 +185,18 @@ public class UserServiceImpl implements UserService {
             Long userId = user.getId();
             userSettingsRepository.deleteById(userId);
         }
+    }
+
+    /**
+     * Deletes a user by ID.
+     * <p>This method deletes the user entity and the corresponding user settings record.</p>
+     *
+     * @param userId the user ID.
+     */
+    @Override
+    @Transactional
+    public void deleteById(Long userId) {
+        userRepository.deleteById(userId);
+        userSettingsRepository.deleteById(userId);
     }
 }

@@ -1,0 +1,52 @@
+[slot="drawer"]:is(header, footer) {
+  display: flex;
+  align-items: center;
+  gap: var(--lumo-space-s);
+  padding: var(--lumo-space-s) var(--lumo-space-m);
+  min-height: var(--lumo-size-xl);
+  box-sizing: border-box;
+  background-color: var(--flourish-surface-color);
+}
+
+[slot="drawer"]:is(header, footer):is(:empty) {
+  display: none;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(90deg, #3D405B 0%, #4F546D 100%);
+  padding: 0.75rem 1rem;
+}
+
+.vaadin-tabs {
+  box-shadow: none;
+  background-color: transparent;
+  padding: 0;
+  border: none;
+  align-content: center;
+  align-items: center;
+  align-self: stretch;
+}
+
+.vaadin-tab:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.vaadin-tab[selected] {
+  color: #fff;
+  background: linear-gradient(to right, var(--tab-active-start), var(--tab-active-end));
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+:host ::part(tab) {
+  text-decoration: none;
+}
+
+
+.logo {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+}

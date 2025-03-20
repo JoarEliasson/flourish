@@ -65,4 +65,11 @@ public interface UserService {
      * @param testUserEmail the email address of the user to delete.
      */
     void deleteByEmail(String testUserEmail);
+
+    /**
+     * Deletes a user by ID.
+     *
+     * @param userId the ID of the user to delete.
+     */
+    void deleteById(Long userId);
 }

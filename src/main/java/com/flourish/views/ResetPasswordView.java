@@ -16,27 +16,31 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Optional;
+
 /**
- * A public view for resetting the password once the user has a valid token.
+ * Allows users to reset their password using a valid reset token.
+ * Updates the password in the database and logs the user in upon success.
  *
- * <p>The user provides the token and a new password.
- * If valid, we update the password in DB and log the user in
- * (by placing an Authentication in the SecurityContextHolder).</p>
+ * <p>Accessible at "/reset-password." The user is prompted for a token and
+ * new password fields. A successful reset navigates to the home page
+ * with an active authentication.</p>
+ *
+ * <p>This view is available to anonymous users.</p>
  *
  * @author
  *   Joar Eliasson, Christoffer Salomonsson
  * @version
  *   1.1.0
  * @since
- *   2025-02-16
+ *   2025-03-14
  */
 @PageTitle("Reset password")
-@Route("resetpassword")
+@Route("reset-password")
 @AnonymousAllowed
 public class ResetPasswordView extends Composite<VerticalLayout> {
 
     private final PasswordResetService passwordResetService;
-
     private final TextField tokenField = new TextField("Reset Token");
     private final PasswordField newPasswordField1 = new PasswordField("New Password");
     private final PasswordField newPasswordField2 = new PasswordField("Confirm New Password");
@@ -44,48 +48,44 @@ public class ResetPasswordView extends Composite<VerticalLayout> {
     /**
      * Constructs a new ResetPasswordView.
      *
-     * @param passwordResetService The service handling reset logic.
+     * @param passwordResetService the service handling reset logic
      */
     public ResetPasswordView(PasswordResetService passwordResetService) {
         this.passwordResetService = passwordResetService;
-
-        getStyle().set("background-color", "#e8f5e9");
-        VerticalLayout resetPswLayout = getContent();
-        resetPswLayout.setSizeFull();
-        resetPswLayout.setJustifyContentMode(JustifyContentMode.CENTER);
-        resetPswLayout.setAlignItems(Alignment.CENTER);
+        addClassName("reset-password-view");
+        VerticalLayout layout = getContent();
+        layout.addClassName("reset-password-layout");
+        layout.setSizeFull();
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        layout.setAlignItems(Alignment.CENTER);
 
         VerticalLayout formLayout = new VerticalLayout();
+        formLayout.addClassName("reset-password-form");
         formLayout.setWidth("400px");
-        formLayout.setPadding(true);
-        formLayout.setSpacing(true);
-        formLayout.setAlignItems(Alignment.CENTER);
 
-        tokenField.setWidthFull();
-        newPasswordField1.setWidthFull();
-        newPasswordField2.setWidthFull();
+        tokenField.addClassName("reset-password-token");
+        newPasswordField1.addClassName("reset-password-field");
+        newPasswordField2.addClassName("reset-password-field");
 
-        Button resetButton = new Button("Reset Password", e -> handleResetPassword());
+        Button resetButton = new Button("Reset Password", event -> handleResetPassword());
+        resetButton.addClassName("reset-password-button");
 
         formLayout.add(tokenField, newPasswordField1, newPasswordField2, resetButton);
-
-        resetPswLayout.add(formLayout);
+        layout.add(formLayout);
     }
 
     /**
-     * Validates the token, updates the user's password if valid,
-     * and logs the user in programmatically.
+     * Validates the reset token and new passwords, updates the database, and
+     * logs the user in if successful.
      */
     private void handleResetPassword() {
         String token = tokenField.getValue();
         String newPassword1 = newPasswordField1.getValue();
         String newPassword2 = newPasswordField2.getValue();
-
         boolean success = false;
 
         if (token.isEmpty() || newPassword1.isEmpty() || newPassword2.isEmpty()) {
             Notification.show("Please fill in all the required fields.");
-
         } else if (!newPassword1.equals(newPassword2)) {
             Notification.show("Passwords do not match.");
         } else {
@@ -100,9 +100,7 @@ public class ResetPasswordView extends Composite<VerticalLayout> {
                         new UsernamePasswordAuthenticationToken(email, newPassword1);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
-
             Notification.show("Password reset successful! You are now logged in.");
-
             getUI().ifPresent(ui -> ui.navigate(""));
         } else {
             Notification.show("Invalid or expired token.");

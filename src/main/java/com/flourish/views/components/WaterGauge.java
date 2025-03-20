@@ -1,136 +1,97 @@
 package com.flourish.views.components;
 
 import com.vaadin.flow.component.charts.Chart;
-import com.vaadin.flow.component.charts.model.*;
+import com.vaadin.flow.component.charts.model.Background;
+import com.vaadin.flow.component.charts.model.BackgroundShape;
+import com.vaadin.flow.component.charts.model.ChartType;
+import com.vaadin.flow.component.charts.model.Configuration;
+import com.vaadin.flow.component.charts.model.DataLabels;
+import com.vaadin.flow.component.charts.model.ListSeries;
+import com.vaadin.flow.component.charts.model.Pane;
+import com.vaadin.flow.component.charts.model.PlotOptionsSolidgauge;
+import com.vaadin.flow.component.charts.model.Stop;
+import com.vaadin.flow.component.charts.model.Title;
+import com.vaadin.flow.component.charts.model.YAxis;
+import com.vaadin.flow.component.charts.model.style.Style;
 import com.vaadin.flow.component.charts.model.style.SolidColor;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.theme.Theme;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 /**
- * A custom WaterGauge that displays positive values (0..100) in a blue gauge oriented from
- * bottom (-180 deg) to top (0 deg), and negative values (0..100) in a red gauge oriented
- * from top (180 deg) to bottom (0 deg).
+ * Represents a dark-themed solid gauge for displaying a plant's water level.
  *
- * <p>The actual numeric "water level" passed in can be negative or positive:
- * <ul>
- *   <li>If it's ≥ 0, we treat it as 0..100 in a "blue" gauge (freshly watered).</li>
- *   <li>If it's &lt; 0, we treat the absolute value in a "red" gauge (overdue).</li>
- * </ul>
- * <p>
- * Text for lastWatered, nextWatering, and days-left (or overdue days) is also displayer
- * at the bottom of the component for clarity.
- * </p>
+ * <p>Positive values (0..100) appear as a blue gauge oriented from bottom to top.
+ * Negative values (-1..-100) appear as a red gauge from top to bottom.
+ * All backgrounds are set to transparent so the gauge can blend with the
+ * parent layout's dark background.</p>
+ *
+ * <p>Includes labels for last watering, next watering, and
+ * days until or overdue. Relies on an external {@code WaterGauge.css} file
+ * for container-level styling.</p>
+ *
+ * <p>Use {@link #setWaterLevel(double)} to set the numeric gauge,
+ * and {@link #setWateringDates(LocalDateTime, LocalDateTime)} for date labels.</p>
  *
  * @author
  *   Joar Eliasson
  * @version
  *   1.1.0
  * @since
- *   2025-03-12
+ *   2025-03-14
  */
 public class WaterGauge extends Div {
 
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Date/time format for lastWatered & nextWatering display.
-     * Adjust as needed.
-     */
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-    private final Chart chart = new Chart(ChartType.SOLIDGAUGE);
+    private final Chart chart;
     private final Configuration configuration;
     private final YAxis yAxis;
     private final ListSeries series;
-
-    private double rawValue = 0.0;
-
-    private final LabelGroup labelGroup = new LabelGroup();
-
-    private static class LabelGroup extends Div {
-        private final Div lastWateredLabel = new Div();
-        private final Div nextWateringLabel = new Div();
-        private final Div daysUntilLabel  = new Div();
-
-        public LabelGroup() {
-            getStyle()
-                    .set("border-top", "1px solid #ddd")
-                    .set("margin-top", "8px")
-                    .set("padding-top", "8px");
-
-            lastWateredLabel.getStyle().set("font-size", "0.9rem");
-            nextWateringLabel.getStyle().set("font-size", "0.9rem");
-            daysUntilLabel.getStyle().set("font-size", "0.9rem").set("font-weight", "bold");
-
-            add(lastWateredLabel, nextWateringLabel, daysUntilLabel);
-        }
-
-        public void setLastWatered(LocalDateTime dt) {
-            if (dt == null) {
-                lastWateredLabel.setText("Last Watered: —");
-            } else {
-                lastWateredLabel.setText("Last Watered: " + dt.format(DATE_FORMAT));
-            }
-        }
-
-        public void setNextWatering(LocalDateTime dt) {
-            if (dt == null) {
-                nextWateringLabel.setText("Next Watering: —");
-            } else {
-                nextWateringLabel.setText("Next Watering: " + dt.format(DATE_FORMAT));
-            }
-        }
-
-        /**
-         * @param daysLeft Positive means days remain, negative means overdue.
-         */
-        public void setDaysUntil(long daysLeft) {
-            if (daysLeft < 0) {
-                daysUntilLabel.setText("Overdue by " + Math.abs(daysLeft) + " day(s)!");
-                daysUntilLabel.getStyle().set("color", "red");
-            } else {
-                daysUntilLabel.setText("Next watering in " + daysLeft + " day(s)");
-                daysUntilLabel.getStyle().remove("color"); // revert to default
-            }
-        }
-    }
+    private final LabelGroup labelGroup;
+    private double rawValue;
 
     /**
-     * Constructs a WaterGauge with default config. We alter the gauge
-     * orientation, color stops, etc. at runtime based on the value's sign.
+     * Constructs a new WaterGauge with transparent backgrounds and
+     * light-colored text, suitable for a dark-inspired theme.
      */
     public WaterGauge() {
-        setWidth("300px");
-        setHeight(null);
-
+        addClassName("water-gauge");
+        chart = new Chart(ChartType.SOLIDGAUGE);
         configuration = chart.getConfiguration();
-        configuration.setTitle("Water Level");
+
+        Title chartTitle = new Title("Water Level");
+        Style titleStyle = new Style();
+        titleStyle.setColor(SolidColor.WHITE);
+        chartTitle.setStyle(titleStyle);
+        configuration.setTitle(chartTitle);
 
         Pane pane = configuration.getPane();
-
         pane.setSize("70%");
         pane.setCenter("50%", "50%");
-        Background bkg = new Background();
-        bkg.setBackgroundColor(new SolidColor("#eeeeee"));
-        bkg.setInnerRadius("60%");
-        bkg.setOuterRadius("100%");
-        bkg.setShape(BackgroundShape.ARC);
-        pane.setBackground(bkg);
 
         yAxis = new YAxis();
         yAxis.setTickAmount(5);
         yAxis.setGridLineWidth(0);
+        Style axisLabelStyle = new Style();
+        axisLabelStyle.setColor(SolidColor.WHITE);
+        yAxis.getLabels().setStyle(axisLabelStyle);
         configuration.addyAxis(yAxis);
 
-        PlotOptionsSolidgauge plotOpts = new PlotOptionsSolidgauge();
-        plotOpts.setAnimation(true);
+        PlotOptionsSolidgauge plotOptions = new PlotOptionsSolidgauge();
+        plotOptions.setAnimation(true);
+
         DataLabels dataLabels = new DataLabels();
         dataLabels.setFormat("{y}%");
         dataLabels.setY(-15);
-        plotOpts.setDataLabels(dataLabels);
-        configuration.setPlotOptions(plotOpts);
+        Style dataLabelStyle = new Style();
+        dataLabelStyle.setColor(SolidColor.WHITE);
+        dataLabels.setStyle(dataLabelStyle);
+        plotOptions.setDataLabels(dataLabels);
+
+        configuration.setPlotOptions(plotOptions);
 
         series = new ListSeries("Water Level", 0);
         configuration.addSeries(series);
@@ -138,33 +99,32 @@ public class WaterGauge extends Div {
         chart.setWidth("100%");
         chart.setHeight("220px");
 
+        labelGroup = new LabelGroup();
         add(chart, labelGroup);
     }
 
     /**
-     * Sets the raw water level. If >= 0, we consider that "just watered" territory
-     * with a gauge from 0..100 in BLUE gradient, oriented from bottom to top.
-     * If < 0, we consider that "overdue" territory with a gauge from 0..100 in a
-     * RED gradient, oriented from top to bottom. The absolute value is used
-     * as the fill percentage.
+     * Sets the gauge value. Positive values (0..100) appear blue;
+     * negative (-1..-100) appear red. Values exceeding 100 are clamped.
      *
-     * @param level A double, e.g. +43 means 43% fresh. -25 means 25% overdue.
+     * @param level the water level
      */
     public void setWaterLevel(double level) {
-        this.rawValue = level;
+        rawValue = level;
         updateGauge();
     }
 
     /**
-     * Updates lastWatered, nextWatering, and calculates days until
-     * (or overdue from) nextWatering to show the user.
+     * Sets the last and next watering times, calculating days until or overdue.
+     *
+     * @param lastWatered the last watering time
+     * @param nextWatering the next scheduled watering time
      */
     public void setWateringDates(LocalDateTime lastWatered, LocalDateTime nextWatering) {
         labelGroup.setLastWatered(lastWatered);
         labelGroup.setNextWatering(nextWatering);
-
         if (lastWatered != null && nextWatering != null) {
-            long daysLeft = java.time.temporal.ChronoUnit.DAYS.between(LocalDateTime.now(), nextWatering);
+            long daysLeft = ChronoUnit.DAYS.between(LocalDateTime.now(), nextWatering);
             labelGroup.setDaysUntil(daysLeft);
         } else {
             labelGroup.setDaysUntil(0);
@@ -172,43 +132,74 @@ public class WaterGauge extends Div {
     }
 
     /**
-     * Internal method to reconfigure the gauge based on rawValue's sign.
+     * Updates the gauge arc orientation, color stops, and displayed value.
      */
     private void updateGauge() {
         double absVal = Math.abs(rawValue);
-
         if (absVal > 100) {
             absVal = 100;
         }
-
         if (rawValue >= 0) {
             configuration.getPane().setStartAngle(-180);
             configuration.getPane().setEndAngle(0);
-
             yAxis.setMin(0);
             yAxis.setMax(100);
-
             yAxis.setStops(
-                    new Stop(0.0f, new SolidColor("#B3E6FF")),
+                    new Stop(0.0f, new SolidColor("#A3D1FF")),
                     new Stop(1.0f, new SolidColor("#0055FF"))
             );
-
         } else {
-
             configuration.getPane().setStartAngle(180);
             configuration.getPane().setEndAngle(0);
-
             yAxis.setMin(0);
             yAxis.setMax(100);
-
             yAxis.setStops(
                     new Stop(0.0f, new SolidColor("#FFC0C0")),
                     new Stop(1.0f, new SolidColor("#FF0000"))
             );
         }
-
         series.setData(absVal);
-
         chart.drawChart();
+    }
+
+    /**
+     * Holds textual labels for last watering, next watering, and days until or overdue.
+     */
+    private static class LabelGroup extends Div {
+
+        private final Div lastWateredLabel = new Div();
+        private final Div nextWateringLabel = new Div();
+        private final Div daysUntilLabel = new Div();
+
+        LabelGroup() {
+            addClassName("water-gauge-label-group");
+            add(lastWateredLabel, nextWateringLabel, daysUntilLabel);
+        }
+
+        void setLastWatered(LocalDateTime dt) {
+            if (dt == null) {
+                lastWateredLabel.setText("Last Watered: —");
+            } else {
+                lastWateredLabel.setText("Last Watered: " + dt.format(DATE_FORMAT));
+            }
+        }
+
+        void setNextWatering(LocalDateTime dt) {
+            if (dt == null) {
+                nextWateringLabel.setText("Next Watering: —");
+            } else {
+                nextWateringLabel.setText("Next Watering: " + dt.format(DATE_FORMAT));
+            }
+        }
+
+        void setDaysUntil(long daysLeft) {
+            if (daysLeft < 0) {
+                daysUntilLabel.setText("Overdue by " + Math.abs(daysLeft) + " day(s)!");
+                daysUntilLabel.getStyle().set("color", "red");
+            } else {
+                daysUntilLabel.setText("Next watering in " + daysLeft + " day(s)");
+                daysUntilLabel.getStyle().remove("color");
+            }
+        }
     }
 }

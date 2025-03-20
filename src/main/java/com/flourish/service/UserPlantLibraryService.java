@@ -302,14 +302,14 @@ public class UserPlantLibraryService {
     public boolean removeHashtag(Long userId, Long libraryId, String hashtagToRemove) {
         Optional<UserPlantLibrary> tempPlant = libraryRepository.findById(libraryId);
         if (tempPlant.isEmpty()) {
-            return false; // No plant found
+            return false;
         }
 
         UserPlantLibrary plant = tempPlant.get();
         List<String> existingHashtags = new ArrayList<>(plant.getHashtags());
 
         if (!existingHashtags.contains(hashtagToRemove)) {
-            return false; // Hashtag not found
+            return false;
         }
 
         existingHashtags.remove(hashtagToRemove);
@@ -333,6 +333,5 @@ public class UserPlantLibraryService {
         entityManager.clear();
         return libraryRepository.findHashtagsForUserPlant(libraryId);
     }
-
 
 }

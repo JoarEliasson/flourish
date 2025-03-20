@@ -1,4 +1,4 @@
-package com.flourish.security;
+package com.flourish.service;
 
 import com.flourish.domain.LibraryEntry;
 import org.springframework.stereotype.Component;
