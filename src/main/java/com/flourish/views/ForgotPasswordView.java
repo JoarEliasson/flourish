@@ -4,6 +4,7 @@ import com.flourish.domain.User;
 import com.flourish.repository.UserRepository;
 import com.flourish.service.MailService;
 import com.flourish.service.PasswordResetService;
+import com.flourish.service.UserServiceImpl;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
@@ -15,6 +16,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.mail.MessagingException;
+
+import java.util.Optional;
 
 /**
  * Provides a public view for initiating a password-reset flow.
@@ -36,26 +39,23 @@ import jakarta.mail.MessagingException;
 @AnonymousAllowed
 public class ForgotPasswordView extends Composite<VerticalLayout> {
 
-    private final UserRepository userRepository;
     private final PasswordResetService passwordResetService;
     private final MailService mailService;
     private final EmailField emailField = new EmailField("Email");
-
+    private final UserServiceImpl userService;
     /**
      * Constructs a new ForgotPasswordView.
      *
-     * @param userRepository the user repository
      * @param passwordResetService the service creating reset tokens
      * @param mailService the service sending emails
      */
     public ForgotPasswordView(
-            UserRepository userRepository,
             PasswordResetService passwordResetService,
-            MailService mailService
+            MailService mailService, UserServiceImpl userService
     ) {
-        this.userRepository = userRepository;
         this.passwordResetService = passwordResetService;
         this.mailService = mailService;
+        this.userService = userService;
 
         getContent().addClassName("forgot-password-view");
         getContent().setSizeFull();
@@ -87,8 +87,8 @@ public class ForgotPasswordView extends Composite<VerticalLayout> {
             Notification.show("Please enter your email.");
             return;
         }
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
+        Optional<User> user = userService.findByEmail(email);
+        if (user.isEmpty()) {
             Notification.show("If this email exists, a reset token will be sent.");
             return;
         }

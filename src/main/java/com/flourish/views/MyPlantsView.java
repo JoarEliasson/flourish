@@ -1,7 +1,7 @@
 package com.flourish.views;
 
 import com.flourish.domain.LibraryEntry;
-import com.flourish.security.UserSessionData;
+import com.flourish.service.UserSessionData;
 import com.flourish.service.UserPlantLibraryService;
 import com.flourish.views.components.WaterGauge;
 import com.vaadin.flow.component.Composite;

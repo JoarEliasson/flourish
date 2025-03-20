@@ -2,6 +2,7 @@ package com.flourish.views;
 
 import com.flourish.domain.User;
 import com.flourish.service.UserService;
+import com.flourish.service.UserServiceImpl;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
@@ -39,7 +40,7 @@ import java.util.Map;
 @AnonymousAllowed
 public class RegistrationView extends VerticalLayout {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final TextField firstNameField = new TextField("First Name");
     private final TextField lastNameField = new TextField("Last Name");
     private final EmailField emailField = new EmailField("Email");
@@ -50,7 +51,7 @@ public class RegistrationView extends VerticalLayout {
      *
      * @param userService the service to create and save user records
      */
-    public RegistrationView(UserService userService) {
+    public RegistrationView(UserServiceImpl userService) {
         this.userService = userService;
         addClassName("registration-view");
         setSizeFull();

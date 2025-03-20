@@ -44,7 +44,6 @@ public class AllPlantsView extends Composite<VerticalLayout> {
     private final PlantDetailsService plantDetailsService;
     private final UserPlantLibraryService userPlantLibraryService;
     private Grid<PlantIndex> plantGrid;
-    private final User user;
     private final Long userId;
 
     /**
@@ -63,7 +62,7 @@ public class AllPlantsView extends Composite<VerticalLayout> {
         this.plantDetailsService = plantDetailsService;
         this.userPlantLibraryService = userPlantLibraryService;
 
-        user = (User) VaadinSession.getCurrent().getAttribute("user");
+        User user = (User) VaadinSession.getCurrent().getAttribute("user");
         if (user == null) {
             Notification.show("You must be logged in to view your plants.", 3000, Notification.Position.TOP_CENTER);
             UI.getCurrent().navigate("login");

@@ -7,6 +7,7 @@ import com.flourish.domain.User;
 import com.flourish.repository.UserRepository;
 import com.flourish.service.MailService;
 import com.flourish.service.PasswordResetService;
+import com.flourish.service.UserServiceImpl;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,16 +38,17 @@ class ForgotPasswordViewTest {
     private UserRepository userRepository;
     private PasswordResetService passwordResetService;
     private MailService mailService;
+    private UserServiceImpl userService;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
         passwordResetService = mock(PasswordResetService.class);
         mailService = mock(MailService.class);
+        userService = mock(UserServiceImpl.class);
 
-        forgotPasswordView = new ForgotPasswordView(userRepository, passwordResetService, mailService);
-        UI ui = new UI();
-        UI.setCurrent(ui);
+        forgotPasswordView = new ForgotPasswordView(passwordResetService, mailService, userService);
+        UI.setCurrent(new UI());
     }
 
     /**

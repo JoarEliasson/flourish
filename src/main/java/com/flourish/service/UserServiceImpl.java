@@ -186,4 +186,17 @@ public class UserServiceImpl implements UserService {
             userSettingsRepository.deleteById(userId);
         }
     }
+
+    /**
+     * Deletes a user by ID.
+     * <p>This method deletes the user entity and the corresponding user settings record.</p>
+     *
+     * @param userId the user ID.
+     */
+    @Override
+    @Transactional
+    public void deleteById(Long userId) {
+        userRepository.deleteById(userId);
+        userSettingsRepository.deleteById(userId);
+    }
 }

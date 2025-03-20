@@ -1,7 +1,7 @@
 package com.flourish.views;
 
 import com.flourish.domain.User;
-import com.flourish.security.UserSessionData;
+import com.flourish.service.UserSessionData;
 import com.flourish.service.UserPlantLibraryService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.H1;

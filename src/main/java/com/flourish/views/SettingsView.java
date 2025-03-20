@@ -3,6 +3,7 @@ package com.flourish.views;
 import com.flourish.domain.User;
 import com.flourish.domain.UserSettings;
 import com.flourish.service.UserService;
+import com.flourish.service.UserServiceImpl;
 import com.flourish.service.UserSettingsService;
 import java.util.Optional;
 import com.vaadin.flow.component.UI;
@@ -42,11 +43,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SettingsView extends VerticalLayout {
 
     private final UserSettingsService userSettingsService;
-    private final User user;
     private final Long userId;
-    private UserSettings userSettings;
-    private UserService userService;
-
+    private UserServiceImpl userService;
     private ComboBox<String> languageSelector;
     private Checkbox emailNotifications;
     private Checkbox notifications;
@@ -61,13 +59,13 @@ public class SettingsView extends VerticalLayout {
      * @param userSettingsService the service managing user settings
      */
     @Autowired
-    public SettingsView(UserSettingsService userSettingsService, UserService userService) {
+    public SettingsView(UserSettingsService userSettingsService, UserServiceImpl userService) {
         this.userSettingsService = userSettingsService;
         this.userService=userService;
         addClassName("settings-view");
 
 
-        user = (User) VaadinSession.getCurrent().getAttribute("user");
+        User user = (User) VaadinSession.getCurrent().getAttribute("user");
         if (user == null) {
             Notification.show("You must be logged in to view your plants.", 3000, Notification.Position.TOP_CENTER);
             UI.getCurrent().navigate("login");
@@ -116,12 +114,13 @@ public class SettingsView extends VerticalLayout {
      */
     private void loadUserSettings() {
         Optional<UserSettings> settingsOpt = userSettingsService.getUserSettings(userId);
+
         if (settingsOpt.isPresent()) {
-            userSettings = settingsOpt.get();
-            languageSelector.setValue(userSettings.getLanguage());
-            emailNotifications.setValue(userSettings.isEmailNotificationEnabled());
-            notifications.setValue(userSettings.isInAppNotificationEnabled());
-            loginNotifications.setValue(userSettings.isLoginNotificationEnabled());
+            UserSettings settings = settingsOpt.get();
+            languageSelector.setValue(settings.getLanguage());
+            emailNotifications.setValue(settings.isEmailNotificationEnabled());
+            notifications.setValue(settings.isInAppNotificationEnabled());
+            loginNotifications.setValue(settings.isLoginNotificationEnabled());
         } else {
             Notification.show("No settings found for this user.", 3000, Notification.Position.TOP_CENTER);
         }
@@ -131,6 +130,7 @@ public class SettingsView extends VerticalLayout {
      * Saves the changes to user settings and displays a notification.
      */
     private void saveUserSettings() {
+        UserSettings userSettings = userSettingsService.getUserSettings(userId).orElse(null);
         if (userSettings != null) {
             userSettings.setLanguage(languageSelector.getValue());
             userSettings.setEmailNotificationEnabled(emailNotifications.getValue());
@@ -148,7 +148,7 @@ public class SettingsView extends VerticalLayout {
      */
     private void deleteAccount() {
         try {
-            userService.deleteByEmail(user.getEmail());
+            userService.deleteById(userId);
             Notification.show("Your account has been deleted.", 3000, Notification.Position.TOP_CENTER);
             VaadinSession.getCurrent().setAttribute("user", null);
             UI.getCurrent().navigate("login");
