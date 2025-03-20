@@ -1,6 +1,7 @@
 package com.flourish.views;
 
 import com.flourish.domain.User;
+import com.flourish.service.PlantNotificationService;
 import com.flourish.service.UserSessionData;
 import com.flourish.service.UserServiceImpl;
 import com.vaadin.flow.component.UI;
@@ -8,6 +9,7 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -38,7 +40,7 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
 
     UserSessionData userSessionData;
     private final UserServiceImpl userService;
-
+    private  PlantNotificationService notificationService;
     private final Map<Tab, String> tabToRoute = new LinkedHashMap<>();
     private final Tabs navTabs = new Tabs();
     private final Avatar profileAvatar = new Avatar("USER");
@@ -46,9 +48,10 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
     /**
      * Constructs a MainLayout with a logo image, tabbed navigation, and user profile avatar.
      */
-    public MainLayout(UserSessionData userSessionData, UserServiceImpl userService) {
+    public MainLayout(UserSessionData userSessionData, UserServiceImpl userService, PlantNotificationService plantNotificationService) {
         this.userSessionData = userSessionData;
         this.userService = userService;
+        this.notificationService = plantNotificationService;
         initUserSessionData();
         createHeader();
         setPrimarySection(Section.NAVBAR);
@@ -67,7 +70,28 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         Tab myPlantsTab = new Tab("My Plants");
         Tab allPlantsTab = new Tab("All Plants");
         Tab settingsTab = new Tab("Settings");
+
+        HorizontalLayout notificationsLayout = new HorizontalLayout();
         Tab notificationsTab = new Tab("Notifications");
+        Span notificationsLabel = new Span("Notifications");
+        notificationsLayout.add(notificationsLabel);
+        notificationsLayout.setSpacing(false);
+        int notificationCount = 0;
+        if (userSessionData.getUserId() != null) {
+            notificationCount = notificationService.generateNotificationsForUser(userSessionData.getUserId()).size();
+        }
+        if (notificationCount > 0) {
+            Span badge = new Span(String.valueOf(notificationCount));
+            badge.getStyle()
+                    .set("color", "white")
+                    .set("background-color", "red")
+                    .set("border-radius", "50%")
+                    .set("padding", "0 6px")
+                    .set("font-weight", "bold")
+                    .set("margin-left", "5px");
+            notificationsLayout.add(badge);
+        }
+         notificationsTab = new Tab(notificationsLayout);
 
         tabToRoute.put(homeTab, "");
         tabToRoute.put(myPlantsTab, "my-plants");
