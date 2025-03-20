@@ -263,16 +263,13 @@ public class UserPlantLibraryService {
      * Functionality to find plant, potential douplicate hashtag is also here.
      *
      * @param userId
-     * @param plantId
+     * @param libraryId
      * @param newHashtag
      * @return success (boolean)
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean addHashtag(Long userId, Long plantId, String newHashtag) {
-
-//        System.out.println("##################HASHTAG INCOMING: " + newHashtag);
-
-        Optional<UserPlantLibrary> tempPlant = libraryRepository.findByUserIdAndPlantId(userId, plantId);
+    public boolean addHashtag(Long userId, Long libraryId, String newHashtag) {
+        Optional<UserPlantLibrary> tempPlant = libraryRepository.findById(libraryId);
         if (tempPlant.isEmpty()) {
             return false; // No such plant
         }
@@ -286,9 +283,10 @@ public class UserPlantLibraryService {
 
         tmpHashtags.add(newHashtag);
         plant.setHashtags(tmpHashtags);
-        libraryRepository.saveAndFlush(plant);
 
-        return libraryRepository.findHashtagsForUserPlant(plant.getId()).contains(newHashtag);//        return true;
+         libraryRepository.saveAndFlush(plant);
+
+        return plant.getHashtags().contains(newHashtag);
     }
 
     /**
@@ -296,19 +294,19 @@ public class UserPlantLibraryService {
      * Functionality to find plant, potential douplicate hashtag to remove is also here.
      *
      * @param userId
-     * @param plantId
+     * @param libraryId
      * @param hashtagToRemove
      * @return success (boolean)
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean removeHashtag(Long userId, Long plantId, String hashtagToRemove) {
-        Optional<UserPlantLibrary> tempPlant = libraryRepository.findByUserIdAndPlantId(userId, plantId);
+    public boolean removeHashtag(Long userId, Long libraryId, String hashtagToRemove) {
+        Optional<UserPlantLibrary> tempPlant = libraryRepository.findById(libraryId);
         if (tempPlant.isEmpty()) {
             return false; // No plant found
         }
 
         UserPlantLibrary plant = tempPlant.get();
-        List<String> existingHashtags = new ArrayList<>(plant.getHashtags()); // Create a new list to avoid reference issues
+        List<String> existingHashtags = new ArrayList<>(plant.getHashtags());
 
         if (!existingHashtags.contains(hashtagToRemove)) {
             return false; // Hashtag not found
@@ -319,7 +317,7 @@ public class UserPlantLibraryService {
 
         libraryRepository.saveAndFlush(plant);
 
-        return !libraryRepository.findHashtagsForUserPlant(plant.getId()).contains(hashtagToRemove);
+         return !plant.getHashtags().contains(hashtagToRemove);
     }
 
     /**

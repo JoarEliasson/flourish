@@ -2,20 +2,15 @@ package com.flourish.views;
 
 //import com.vaadin.flow.component.map.Map;
 
-import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 
-import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.theme.lumo.LumoUtility;
-
 import com.flourish.domain.LibraryEntry;
 import com.flourish.security.UserSessionData;
 import com.flourish.service.UserPlantLibraryService;
 import com.flourish.views.components.WaterGauge;
-import com.flourish.views.components.VerticalWaterGauge;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -42,8 +37,7 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -82,6 +76,10 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
     private final Div emptyLibraryNotice = new Div();
     private final Div selectedPlantDetails = new Div();
     private final TextField searchField = new TextField("Search Plants");
+    private final TextField plantDetailsHashtagField = new TextField("Hashtag field");
+    private final Set<String> selectedHashtags = new HashSet<>();
+    private Button resetFilterButton = new Button();
+    private final Div mainViewHashtagFilterField = new Div();
 
     /**
      * A record representing a plant with necessary details for the UI.
@@ -98,6 +96,7 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
      * @param poisonousToHumans True if the plant is poisonous to humans.
      * @param poisonousToPets   True if the plant is poisonous to pets.
      * @param medicinal         True if the plant is medicinal.
+     * @param hashtags          List of hashtags associated with the library entry.
      */
     public record Plant(long libraryId,
                        long plantId,
@@ -140,6 +139,7 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         title.addClassName("my-plants-title");
 
         searchField.addValueChangeListener(e -> filterPlantList(e.getValue()));
+        plantDetailsHashtagField.setVisible(false);
 
         plantLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
         plantLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
@@ -159,9 +159,57 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
 
         HorizontalLayout topBar = new HorizontalLayout(title, searchField);
         topBar.setWidthFull();
+        topBar.setFlexGrow(1, searchField);
         topBar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 
-        getContent().add(topBar, selectedPlantDetails, plantLayout, emptyLibraryNotice);
+        //--------------------------------------------------------------------
+        mainViewHashtagFilterField.getStyle()
+                .set("display", "flex")
+                .set("flex-direction", "column")
+                .set("gap", "5px")
+                .set("align-items", "start")
+                .set("width", "200px")
+                .set("height", "400px") // Fixed height to prevent jumping
+                .set("overflow-y", "auto")
+                .set("overflow-x", "auto")
+                .set("background-color", "#e8e8e8")
+                .set("padding", "10px")
+                .set("border-radius", "5px")
+                .set("border", "1px solid #ccc");
+
+
+        resetFilterButton.addClickListener(btClick -> resetFilter());
+        resetFilterButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        resetFilterButton.getStyle()
+                .set("min-height", "40px")
+                .set("width", "100%")
+                .set("background-color", "red")
+                .set("color", "white")
+                .set("opacity", "0")
+                .set("visibility", "hidden");
+
+        VerticalLayout rightBar = new VerticalLayout(resetFilterButton, mainViewHashtagFilterField);
+        rightBar.setWidth("250px");
+        rightBar.getStyle().set("flex-shrink", "0");
+        rightBar.getStyle().set("align-items", "start");
+        rightBar.getStyle().set("min-height", "200px");
+
+        plantLayout.setWidth("100%");
+/*
+        rightBar.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        getContent().setFlexGrow(1, plantLayout);
+        getContent().add(new HorizontalLayout(plantLayout, rightBar));*/
+
+
+        HorizontalLayout mainLayout = new HorizontalLayout(plantLayout, rightBar);
+        mainLayout.setWidthFull();
+        mainLayout.setFlexGrow(1, plantLayout);
+        mainLayout.setSpacing(true);
+
+
+        //--------------------------------------------------------------------
+
+        getContent().add(topBar, selectedPlantDetails, mainLayout, emptyLibraryNotice);
     }
 
     /**
@@ -180,11 +228,41 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         List<LibraryEntry> entries = userPlantLibraryService.getAllLibraryEntriesForUser(userSessionData.getUserId());
         userSessionData.setPlantLibraryEntries(entries);
         List<Plant> mappedPlants = mapLibraryEntriesToPlants(entries);
+
+        populateRightBarHashtags();
+
         String currentQuery = searchField.getValue() != null ? searchField.getValue() : "";
         List<Plant> filtered = mappedPlants.stream()
                 .filter(p -> p.name().toLowerCase().contains(currentQuery.toLowerCase()))
                 .collect(Collectors.toList());
+
         updatePlantLayout(filtered);
+
+//        populateAvailableFilters();
+
+    }
+
+    private void filterByHashtag(String hashtag) {
+
+        System.out.println("Existing hashtags coming in: " + selectedHashtags);
+
+        if (selectedHashtags.contains(hashtag)) {
+            selectedHashtags.remove(hashtag);
+        } else {
+            selectedHashtags.add(hashtag);
+        }
+
+        List<LibraryEntry> entries = userSessionData.getPlantLibraryEntries();
+        List<Plant> filteredPlants = mapLibraryEntriesToPlants(entries).stream()
+                .filter(p -> selectedHashtags.isEmpty() || p.hashtags().stream().anyMatch(selectedHashtags::contains))
+                .collect(Collectors.toList());
+
+        updatePlantLayout(filteredPlants);
+
+        resetFilterButton.setVisible(!selectedHashtags.isEmpty());
+
+        System.out.println("Existing hashtags going out: " + selectedHashtags);
+
     }
 
     /**
@@ -253,8 +331,8 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         emptyLibraryNotice.setVisible(true);
     }
 
-    /**
-     * Creates a card displaying plant information, including an image, icons, and a deletion icon.
+/**
+* Creates a card displaying plant information, including an image, icons, and a deletion icon.
      *
      * @param plant the plant record used to populate the card
      * @return a card component for the specified plant
@@ -294,6 +372,9 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         H4 plantName = new H4(plant.name());
         plantName.addClickListener(e -> showPlantDetails(plant));
 
+        Div hashtagContainer = createHashtagComponent(plant);
+        hashtagContainer.getStyle().set("margin-bottom", "10px");
+
         HorizontalLayout iconLayout = iconCreator(plant);
 
         LibraryEntry lib = userSessionData.getPlantLibraryEntryById(plant.libraryId());
@@ -301,7 +382,8 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         nextWateringLabel.setText("Next Watering: " + lib.getNextWatering().format(DATE_FORMAT));
 
         infoContainer.add(plantName, iconLayout, nextWateringLabel);
-        plantDiv.add(imageContainer, infoContainer, deleteIcon);
+        plantDiv.add(imageContainer, infoContainer, deleteIcon, hashtagContainer);
+
 
         return plantDiv;
     }
@@ -377,7 +459,6 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
     private void showPlantDetails(Plant plant) {
         System.out.println("Showing details for plant: " + plant.name());
 
-
         System.out.println("looking at User: "+userSessionData.getUserId());
         System.out.println("looking plantId: "+plant.plantId());
 
@@ -400,7 +481,7 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         }
 
 
-        if (selectedPlantDetails.isVisible() && selectedPlantDetails.getElement().getProperty("data-plant-id", "").equals("" + plant.plantId())) {
+        if (selectedPlantDetails.isVisible() && selectedPlantDetails.getElement().getProperty("data-plant-id", "").equals("" + plant.plantId())){
             selectedPlantDetails.setVisible(false);
             return;
         }
@@ -421,7 +502,7 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         gauge.setWaterLevel(gaugeValueOpt.orElse(0.0));
         gauge.setWateringDates(libEntry.getLastWatered(), libEntry.getNextWatering());
 
-        Button waterButton = new Button("Mark as Watered", e ->
+        Button waterButton = new Button("Mark as Watered",e ->
                 userPlantLibraryService.waterPlant(libEntry.getLibraryId()).ifPresent(updatedEntry -> {
                     double updatedValue = userPlantLibraryService
                             .getWateringGaugePercentage(updatedEntry.getId())
@@ -433,7 +514,7 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         );
         waterButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
 
-        Button closeButton = new Button("Close", e -> selectedPlantDetails.setVisible(false));
+        Button closeButton = new Button("Close", e -> {refreshPlantList();});
         closeButton.addClassName("close-button");
         closeButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
 
@@ -445,24 +526,22 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
 
         Div hashtagsDiv = new Div();
         hashtagsDiv.getStyle().set("margin-top", "10px");
-        updateHashtagDisplay(hashtagsDiv, fetchedHashtags);
+        plantDetailsUpdateHashtagDisplay(hashtagsDiv, fetchedHashtags);
 
         // Add hashtag field and button
         TextField addHashtagField = new TextField();
         addHashtagField.setPlaceholder("Add hashtag");
-
         Button addHashtagButton = new Button("Add", e -> {
             String newHashtag = addHashtagField.getValue().trim();
             if (!newHashtag.isEmpty()) {
-                boolean success = userPlantLibraryService.addHashtag(userSessionData.getUserId(), plant.plantId(), newHashtag);
-
+                boolean success = userPlantLibraryService.addHashtag(userSessionData.getUserId(), plant.libraryId(), newHashtag);
                 if (success) {
                     List<String> updatedHashtags = userPlantLibraryService.readHashtags(userSessionData.getUserId(), plant.libraryId());
 
                     UI.getCurrent().access(() -> {
-                        updateHashtagDisplay(hashtagsDiv, updatedHashtags);
+                        plantDetailsUpdateHashtagDisplay(hashtagsDiv, updatedHashtags);
                         addHashtagField.clear();
-                        System.out.println("Added hashtag, updated list: " + updatedHashtags);
+                        populateRightBarHashtags();
                     });
 
                 } else {
@@ -474,18 +553,17 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
         // Remove hashtag field and button
         TextField removeHashtagField = new TextField();
         removeHashtagField.setPlaceholder("Remove hashtag");
-
         Button removeHashtagButton = new Button("Remove", e -> {
             String hashtagToRemove = removeHashtagField.getValue().trim();
             if (!hashtagToRemove.isEmpty()) {
-                boolean success = userPlantLibraryService.removeHashtag(userSessionData.getUserId(), plant.plantId(), hashtagToRemove);
+                boolean success = userPlantLibraryService.removeHashtag(userSessionData.getUserId(), plant.libraryId(), hashtagToRemove);
                 if (success) {
                     List<String> updatedHashtags = userPlantLibraryService.readHashtags(userSessionData.getUserId(), plant.libraryId());
 
                     UI.getCurrent().access(() -> {
-                        updateHashtagDisplay(hashtagsDiv, updatedHashtags);
+                        plantDetailsUpdateHashtagDisplay(hashtagsDiv, updatedHashtags);
                         removeHashtagField.clear();
-                        System.out.println("Removed hashtag, updated list: " + updatedHashtags);
+                        populateRightBarHashtags();
                     });
 
                 } else {
@@ -503,20 +581,7 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
 //        selectedPlantDetails.getStyle().set("pointer-events", "auto");
     }
 
-    private void showExistingHashtags() {
-//        refreshUserSessionData();
-        List<LibraryEntry> entries = userPlantLibraryService.getAllLibraryEntriesForUser(userSessionData.getUserId());
-        List<Plant> allPlants = mapLibraryEntriesToPlants(entries);
-        for (Plant plant : allPlants) {
-            List<String> fetchedHashtags = userPlantLibraryService.readHashtags(userSessionData.getUserId(), plant.libraryId());
-            Div hashtagsDiv = new Div();
-            updateHashtagDisplay(hashtagsDiv, fetchedHashtags);
-            selectedPlantDetails.add(hashtagsDiv);
-            System.out.println("Existing hashtags for plant " + plant.libraryId() + ": " + fetchedHashtags);
-        }
-    }
-
-    private void updateHashtagDisplay(Div hashtagsDiv, List<String> hashtags) {
+    private void plantDetailsUpdateHashtagDisplay(Div hashtagsDiv, List<String> hashtags) {
         
         hashtagsDiv.removeAll(); // Clear
 
@@ -524,18 +589,100 @@ public class MyPlantsView extends Composite<VerticalLayout> implements BeforeEnt
 
         if (hashtags.isEmpty()) {
             hashtagsDiv.setText("No hashtags yet.");
-//            showExistingHashtags();
         } else {
-            hashtagsDiv.setText("Hashtags: " + String.join(", ", hashtags));
+            hashtags.forEach(hashtag -> {
+                Button hashtagButton = new Button("#" + hashtag, e -> toggleHashtagSelection(hashtag));
+                hashtagButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+                if (selectedHashtags.contains(hashtag)) {
+                    hashtagButton.addClassName("selected");
+                }
+                hashtagsDiv.add(hashtagButton);
+            });
+        }
+    }
+
+    private void toggleHashtagSelection(String hashtag) {
+        if (!selectedHashtags.isEmpty()) {
+            resetFilterButton.getStyle().set("visibility", "visible");
+        } else {
+            resetFilterButton.getStyle().set("visibility", "hidden");
         }
 
-//        UI.getCurrent().getPage().reload();
-/*
+        filterByHashtag(hashtag);
 
-        System.out.println("Updating UI with hashtags: " + hashtags);
-        System.out.println("Current content of hashtagsDiv: " + hashtagsDiv.getText());
-*/
+
+        //Too keep the space the button occupies empty when it goes invisible.
+        if (!selectedHashtags.isEmpty()) {
+            resetFilterButton.getStyle().set("opacity", "1").set("pointer-events", "auto");
+        } else {
+            resetFilterButton.getStyle().set("opacity", "0").set("pointer-events", "none");
+        }
     }
+
+    private void resetFilter(){
+
+        selectedHashtags.clear();
+
+        resetFilterButton.getStyle().set("visibility", "hidden");
+
+        refreshPlantList();
+        populateRightBarHashtags();
+    }
+
+    private Div createHashtagComponent(Plant plant) {
+        Div hashtagContainer = new Div();
+        hashtagContainer.getStyle().set("margin-top", "5px");
+
+        if (plant.hashtags().isEmpty()) {
+            hashtagContainer.setText("No hashtags");
+            return hashtagContainer;
+        }
+
+        for (String hashtag : plant.hashtags()) {
+            Span tag = new Span("#" + hashtag);
+            tag.getStyle()
+                    .set("color", "blue")
+                    .set("cursor", "pointer")
+                    .set("margin-right", "5px")
+                    .set("text-decoration", "underline");
+            tag.addClickListener(e -> filterByHashtag(hashtag));
+            hashtagContainer.add(tag);
+        }
+
+        return hashtagContainer;
+    }
+
+    private void populateRightBarHashtags() {
+        mainViewHashtagFilterField.removeAll();
+
+        //
+        Set<String> allHashtags = userSessionData.getPlantLibraryEntries().stream()
+                .flatMap(entry -> entry.getUserPlantLibrary().getHashtags().stream())
+                .collect(Collectors.toSet());
+
+        if (allHashtags.isEmpty()) {
+            Div spacer = new Div();
+            spacer.setText("No available filters.");
+            spacer.getStyle().set("min-height", "20px");
+            mainViewHashtagFilterField.add(spacer);
+//            mainViewHashtagFilterField.setText("No available filters.");
+            return;
+        }
+
+        allHashtags.forEach(hashtag -> {
+            Span tag = new Span("#" + hashtag);
+            tag.getStyle()
+                    .set("color", "blue")
+                    .set("cursor", "pointer")
+                    .set("margin-right", "5px")
+                    .set("text-decoration", "underline");
+
+            tag.addClickListener(e -> filterByHashtag(hashtag));
+            mainViewHashtagFilterField.add(tag);
+        });
+    }
+
+
 
    /* public void refreshUserSessionData() {
         List<LibraryEntry> updatedEntries = userPlantLibraryService.getAllLibraryEntriesForUser(userSessionData.getUserId());
