@@ -45,7 +45,7 @@
 .my-plants-card {
     position: relative;
     width: 320px;
-    height: 340px;
+    height: 360px;
     background-color: var(--flourish-surface-color);
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -54,8 +54,12 @@
 
 .my-plants-card-image-container {
     width: 100%;
-    height: 200px;
+    height: 220px;
     overflow: hidden;
+    background-color: var(--flourish-primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .my-plants-card-image-container img {
@@ -77,8 +81,8 @@
 
 .my-plants-card-vaadin-icon {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 10px;
+    right: 10px;
     color: red;
     font-size: 1.2rem;
     cursor: pointer;
@@ -89,6 +93,67 @@
     color: var(--flourish-contrast-text);
     border-radius: 6px;
     padding: 0.5rem 1rem;
+}
+
+.my-plants-icon {
+    width: 32px;
+    height: 32px;
+    padding-right: 5px;
+}
+
+.my-plants-right-bar {
+    flex-shrink: 0;
+    align-items: start;
+    min-height: 200px;
+}
+
+.my-plants-hashtag-header {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.my-plants-hashtag-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: var(--flourish-surface-color);
+    color: var(--flourish-text-color);
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--flourish-primary-color);
+    margin-bottom: 1rem;
+    margin-right: 10px;
+}
+
+.my-plants-no-tags {
+    opacity: 0.5;
+    font-size: 0.95rem;
+}
+
+.my-plants-reset-filter-button {
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    opacity 0.2s;
+}
+
+.my-plants-reset-filter-button-inactive {
+    background-color: #d4d4d4;
+    color: #666666;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.my-plants-reset-filter-button-active {
+    background-color: var(--flourish-secondary-color);
+    color: var(--flourish-contrast-text);
+    cursor: pointer;
+    opacity: 1;
 }
 
 .my\-plants\-icon {

@@ -8,6 +8,13 @@
 }
 
 .vaadin-tabs {
+    box-shadow: none;
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    align-content: center;
+    align-items: center;
+    align-self: stretch;
     background: transparent;
     border: none;
     box-shadow: none;

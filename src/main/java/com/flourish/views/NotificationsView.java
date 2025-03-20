@@ -28,7 +28,8 @@ import java.util.List;
 @PageTitle("Notifications")
 @Route(value = "notifications", layout = MainLayout.class)
 @RolesAllowed("USER")
-public class NotificationsView extends VerticalLayout{
+public class NotificationsView extends VerticalLayout {
+
     private final PlantNotificationService notificationService;
 
     /**
@@ -78,4 +79,5 @@ public class NotificationsView extends VerticalLayout{
             }
         }
     }
+
 }
