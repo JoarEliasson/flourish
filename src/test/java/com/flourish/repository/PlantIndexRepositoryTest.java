@@ -26,7 +26,15 @@ import com.flourish.domain.PlantIndex;
  * @since
  *   2025-02-24
  */
-@DataJpaTest
+@DataJpaTest(
+        properties = {
+                "spring.datasource.url=jdbc:h2:mem:myTestDB;DB_CLOSE_ON_EXIT=false",
+                "spring.datasource.driver-class-name=org.h2.Driver",
+                "spring.datasource.username=sa",
+                "spring.datasource.password=",
+                "spring.jpa.hibernate.ddl-auto=create-drop"
+        }
+)
 @ActiveProfiles("test")
 class PlantIndexRepositoryTest {
 
@@ -84,4 +92,5 @@ class PlantIndexRepositoryTest {
     void testNonExistentRecord() {
         assertTrue(plantIndexRepository.findById(999L).isEmpty());
     }
+
 }
