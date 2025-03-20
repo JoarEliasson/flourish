@@ -5,24 +5,17 @@
   padding: var(--lumo-space-s) var(--lumo-space-m);
   min-height: var(--lumo-size-xl);
   box-sizing: border-box;
-  /* Example background behind the drawer area */
   background-color: var(--flourish-surface-color);
-}
 
-/* Hide empty drawer slots gracefully */
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
 
-/*
- * If you have a top bar, for instance:
- */
 .top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: linear-gradient(90deg, #3D405B 0%, #4F546D 100%);
-  /*background-color: var(--flourish-bg-color);*/
   padding: 0.75rem 1rem;
 }
 
@@ -31,6 +24,9 @@
   background-color: transparent;
   padding: 0;
   border: none;
+  align-content: center;
+  align-items: center;
+  align-self: stretch;
 }
 
 .vaadin-tab:hover {
@@ -47,15 +43,10 @@
   text-decoration: none;
 }
 
-/*
- * For logo usage with #F4F1DE + #81B29A:
- * Typically, the gradient might be in the actual logo <img> or an inline SVG,
- * so you’d handle that in the resource file or with an <img> that includes
- * the gradient in the artwork.
- */
+
 .logo {
-  width: 120px;
+  width: 140px;
   height: auto;
   object-fit: contain;
-  /* The gradient is presumably part of the logo image itself */
+
 }
