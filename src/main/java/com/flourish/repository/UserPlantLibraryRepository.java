@@ -32,7 +32,10 @@ public interface UserPlantLibraryRepository extends JpaRepository<UserPlantLibra
     @Query("SELECT upl FROM UserPlantLibrary upl LEFT JOIN FETCH upl.hashtags WHERE upl.userId = :userId AND upl.plantId = :plantId")
     Optional<UserPlantLibrary> findByUserIdAndPlantId(@Param("userId") Long userId, @Param("plantId") Long plantId);
 
-    @Query(value = "SELECT hashtag FROM user_plant_hashtags WHERE user_plant_id = :plantId", nativeQuery = true)
-    List<String> findHashtagsForUserPlant(@Param("userId") Long userId, @Param("plantId") Long plantId);
+/*    @Query(value = "SELECT hashtag FROM user_plant_hashtags WHERE user_plant_id = :plantId", nativeQuery = true)
+    List<String> findHashtagsForUserPlant(@Param("userId") Long userId, @Param("plantId") Long plantId);*/
+
+    @Query(value = "SELECT hashtag FROM user_plant_hashtags WHERE user_plant_id = :libraryId", nativeQuery = true)
+    List<String> findHashtagsForUserPlant(@Param("libraryId") Long libraryId);
 
 }

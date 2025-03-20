@@ -270,11 +270,11 @@ public class UserPlantLibraryService {
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean addHashtag(Long userId, Long plantId, String newHashtag) {
 
-        System.out.println("##################HASHTAG INCOMING: " + newHashtag);
+//        System.out.println("##################HASHTAG INCOMING: " + newHashtag);
 
         Optional<UserPlantLibrary> tempPlant = libraryRepository.findByUserIdAndPlantId(userId, plantId);
         if (tempPlant.isEmpty()) {
-            return false; // No such plant found
+            return false; // No such plant
         }
 
         UserPlantLibrary plant = tempPlant.get();
@@ -288,8 +288,7 @@ public class UserPlantLibraryService {
         plant.setHashtags(tmpHashtags);
         libraryRepository.saveAndFlush(plant);
 
-        return plant != null && plant.getHashtags().contains(newHashtag);
-//        return true;
+        return libraryRepository.findHashtagsForUserPlant(plant.getId()).contains(newHashtag);//        return true;
     }
 
     /**
@@ -318,9 +317,9 @@ public class UserPlantLibraryService {
         existingHashtags.remove(hashtagToRemove);
         plant.setHashtags(existingHashtags);
 
-        libraryRepository.saveAndFlush(plant); // Ensures changes are immediately written to DB
+        libraryRepository.saveAndFlush(plant);
 
-        return !existingHashtags.contains(hashtagToRemove);
+        return !libraryRepository.findHashtagsForUserPlant(plant.getId()).contains(hashtagToRemove);
     }
 
     /**
@@ -328,15 +327,13 @@ public class UserPlantLibraryService {
      * Functionality to find plant with all hashtags are also located here.
      *
      * @param userId
-     * @param plantId
+     * @param libraryId
      * @return success (boolean)
      */
     @Transactional(readOnly = true)
-    public List<String> readHashtags(Long userId, Long plantId) {
+    public List<String> readHashtags(Long userId, Long libraryId) {
         entityManager.clear();
-        List<String> hashtags = libraryRepository.findHashtagsForUserPlant(userId, plantId);
-        System.out.println("Direct DB Query Result for plantId " + plantId + ": " + hashtags);
-        return hashtags;
+        return libraryRepository.findHashtagsForUserPlant(libraryId);
     }
 
 
