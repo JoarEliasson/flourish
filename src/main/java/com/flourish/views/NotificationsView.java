@@ -1,7 +1,5 @@
 package com.flourish.views;
 
-import com.vaadin.flow.router.Route;
-import jakarta.annotation.security.RolesAllowed;
 import com.flourish.domain.User;
 import com.flourish.service.PlantNotificationService;
 import com.vaadin.flow.component.html.Div;
