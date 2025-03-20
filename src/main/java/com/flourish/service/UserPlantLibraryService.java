@@ -1,11 +1,15 @@
 package com.flourish.service;
 
+import com.flourish.domain.LibraryEntry;
 import com.flourish.domain.PlantDetails;
 import com.flourish.domain.PlantIndex;
 import com.flourish.domain.UserPlantLibrary;
 import com.flourish.repository.UserPlantLibraryRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
@@ -29,22 +33,35 @@ import java.util.List;
  * </ul>
  * </p>
  *
+ * ----------------------------------------------------------------
+ * @MartinFrick 250317
+ * Added methods to add, remove and read hashtags from a users plantlibrary.
+ * addHashtag    = Transactional
+ * removeHashtag = Transactional
+ * readHashtags  = NOT Transactional.
+ * ----------------------------------------------------------------
+ *
+ *
  * @see UserPlantLibrary
  * @see UserPlantLibraryRepository
  * @see PlantDetailsService
  *
  * @author
- *   Joar Eliasson
+ *   Joar Eliasson, Martin Frick
  * @version
- *   1.1.0
+ *   1.1.1
  * @since
- *   2025-02-27
+ *   2025-03-17
  */
 @Service
 public class UserPlantLibraryService {
 
     private final UserPlantLibraryRepository libraryRepository;
     private final PlantDetailsService plantDetailsService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
 
     @Autowired
     public UserPlantLibraryService(UserPlantLibraryRepository libraryRepository, PlantDetailsService plantDetailsService) {
@@ -167,21 +184,6 @@ public class UserPlantLibraryService {
     }
 
     /**
-     * Retrieves all public PlantDetails for the plants in a user's library.
-     *
-     * @param userId the user ID.
-     * @return a List of PlantDetails for all plants in the user's library.
-     */
-    public List<PlantDetails> getAllPlantDetailsForUser(Long userId) {
-        List<UserPlantLibrary> libraryEntries = libraryRepository.findByUserId(userId);
-        List<PlantDetails> detailsList = new ArrayList<>();
-        for (UserPlantLibrary entry : libraryEntries) {
-            plantDetailsService.getPlantDetailsById(entry.getPlantId()).ifPresent(detailsList::add);
-        }
-        return detailsList;
-    }
-
-    /**
      * Computes a watering gauge percentage for the given library entry.
      *
      * <p>The gauge is calculated based on the elapsed time since the plant was last watered relative
@@ -220,6 +222,116 @@ public class UserPlantLibraryService {
         if (gauge < -100) {
             gauge = -100;
         }
+        gauge = Math.round(gauge);
         return Optional.of(gauge);
     }
+
+    /**
+     * Retrieves all public PlantDetails for the plants in a user's library.
+     *
+     * @param userId the user ID.
+     * @return a List of PlantDetails for all plants in the user's library.
+     */
+    public List<PlantDetails> getAllPlantDetailsForUser(Long userId) {
+        List<UserPlantLibrary> libraryEntries = libraryRepository.findByUserId(userId);
+        List<PlantDetails> detailsList = new ArrayList<>();
+        for (UserPlantLibrary entry : libraryEntries) {
+            plantDetailsService.getPlantDetailsById(entry.getPlantId()).ifPresent(detailsList::add);
+        }
+        return detailsList;
+    }
+
+    /**
+     * Retrieves all library entries for a user, including the associated PlantDetails.
+     *
+     * @param userId the user ID.
+     * @return a List of LibraryEntry objects.
+     */
+    public List<LibraryEntry> getAllLibraryEntriesForUser(Long userId) {
+        List<UserPlantLibrary> libraryEntries = libraryRepository.findByUserId(userId);
+        List<LibraryEntry> entries = new ArrayList<>();
+        for (UserPlantLibrary libraryEntry : libraryEntries) {
+            plantDetailsService.getPlantDetailsById(libraryEntry.getPlantId()).ifPresent(details -> {
+                entries.add(new LibraryEntry(details, libraryEntry));
+            });
+        }
+        return entries;
+    }
+
+    /**
+     * Method to Add a hashtag to database.
+     * Functionality to find plant, potential douplicate hashtag is also here.
+     *
+     * @param userId
+     * @param libraryId
+     * @param newHashtag
+     * @return success (boolean)
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean addHashtag(Long userId, Long libraryId, String newHashtag) {
+        Optional<UserPlantLibrary> tempPlant = libraryRepository.findById(libraryId);
+        if (tempPlant.isEmpty()) {
+            return false; // No such plant
+        }
+
+        UserPlantLibrary plant = tempPlant.get();
+        List<String> tmpHashtags = new ArrayList<>(plant.getHashtags());
+
+        if (tmpHashtags.contains(newHashtag)) {
+            return false; // Already exists
+        }
+
+        tmpHashtags.add(newHashtag);
+        plant.setHashtags(tmpHashtags);
+
+         libraryRepository.saveAndFlush(plant);
+
+        return plant.getHashtags().contains(newHashtag);
+    }
+
+    /**
+     * Method to Remove a hashtag to database.
+     * Functionality to find plant, potential douplicate hashtag to remove is also here.
+     *
+     * @param userId
+     * @param libraryId
+     * @param hashtagToRemove
+     * @return success (boolean)
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean removeHashtag(Long userId, Long libraryId, String hashtagToRemove) {
+        Optional<UserPlantLibrary> tempPlant = libraryRepository.findById(libraryId);
+        if (tempPlant.isEmpty()) {
+            return false;
+        }
+
+        UserPlantLibrary plant = tempPlant.get();
+        List<String> existingHashtags = new ArrayList<>(plant.getHashtags());
+
+        if (!existingHashtags.contains(hashtagToRemove)) {
+            return false;
+        }
+
+        existingHashtags.remove(hashtagToRemove);
+        plant.setHashtags(existingHashtags);
+
+        libraryRepository.saveAndFlush(plant);
+
+         return !plant.getHashtags().contains(hashtagToRemove);
+    }
+
+    /**
+     * Method to Read hashtags from database for a particular plant.
+     * Functionality to find plant with all hashtags are also located here.
+     *
+     * @param userId
+     * @param libraryId
+     * @return success (boolean)
+     */
+    @Transactional(readOnly = true)
+    public List<String> readHashtags(Long userId, Long libraryId) {
+        entityManager.clear();
+        return libraryRepository.findHashtagsForUserPlant(libraryId);
+    }
+
 }

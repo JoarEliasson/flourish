@@ -1,0 +1,43 @@
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: var(--flourish-bg-color);
+    color: var(--flourish-text-color);
+    box-sizing: border-box;
+}
+
+.vaadin-tabs {
+    box-shadow: none;
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    align-content: center;
+    align-items: center;
+    align-self: stretch;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin: 0 1rem;
+    align-self: center;
+}
+
+.vaadin-tab {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--flourish-text-color);
+}
+
+.vaadin-tab[selected] {
+    background: linear-gradient(
+            to right,
+            var(--flourish-primary-color),
+            var(--flourish-surface-color)
+    );
+    color: #ffffff;
+}
+
+.vaadin-avatar {
+    margin-left: 1rem;
+}

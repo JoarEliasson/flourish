@@ -84,4 +84,5 @@ class PlantIndexRepositoryTest {
     void testNonExistentRecord() {
         assertTrue(plantIndexRepository.findById(999L).isEmpty());
     }
+
 }

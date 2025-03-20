@@ -15,47 +15,48 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-
 import java.util.List;
 import java.util.Map;
 
 /**
- * A Vaadin view that serves as the login page.
+ * Presents a login interface that authenticates users.
+ * Redirects unauthenticated users who attempt to access restricted views.
  *
- * <p>Route-based security is handled by VaadinWebSecurity:
- * If a user is not authenticated and tries to access a secured route,
- * they're redirected here.</p>
+ * <p>Supports a forgot-password flow and a registration link for new users.</p>
  *
- * <p>This route is "login", matching setLoginView in SecurityConfig.</p>
+ * <p>Query parameters are used to determine if an error occurred.</p>
+ *
+ * <p>This view is accessible anonymously at the "login" route, hence {@link AnonymousAllowed}.</p>
  *
  * @author
- *   Joar Eliasson
+ *   Joar Eliasson, Kenan Al Tal, Emil Åqvist, Christoffer Salsomonsson
  * @version
- *   1.1.0
+ *   1.2.0
  * @since
- *   2025-02-15
+ *   2025-03-14
  */
 @Route("login")
 @AnonymousAllowed
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
+
     private final LoginForm loginForm;
     private final UserServiceImpl userService;
 
     /**
      * Constructs a new LoginView with a Vaadin LoginForm.
+     *
+     * @param userService the user service implementation handling authentication logic
      */
     public LoginView(UserServiceImpl userService) {
         this.userService = userService;
+        addClassName("login-view");
+
         loginForm = new LoginForm();
         loginForm.setAction("login");
-        getStyle().set("background-color", "#e8f5e9");
-        VerticalLayout loginLayout = new VerticalLayout();
-        loginLayout.setWidth("400px");
-        loginLayout.setPadding(true);
-        loginLayout.setSpacing(true);
-        loginLayout.setAlignItems(Alignment.CENTER);
+        loginForm.addClassName("login-form");
 
-        System.out.println("In constructor");
+        VerticalLayout loginLayout = new VerticalLayout();
+        loginLayout.addClassName("login-layout");
 
         LoginI18n i18n = LoginI18n.createDefault();
         if (i18n.getHeader() == null) {
@@ -63,82 +64,67 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         }
         i18n.getHeader().setTitle("Please Log In");
         i18n.getHeader().setDescription("Enter your credentials");
-
         i18n.getForm().setForgotPassword("Forgot password? Click here!");
-
         loginForm.setI18n(i18n);
 
-        loginForm.addLoginListener(e -> validateLogin(e.getUsername(),e.getPassword()));
+        loginForm.addLoginListener(e -> validateLogin(e.getUsername(), e.getPassword()));
+        loginForm.addForgotPasswordListener(e -> getUI().ifPresent(ui -> ui.navigate("forgot-password")));
 
-        loginForm.addForgotPasswordListener(e -> getUI().ifPresent(ui -> ui.navigate("forgotpassword")));
-
-        Button registerButton = new Button("Register", e ->
-                getUI().ifPresent(ui -> ui.navigate("register"))
-        );
+        Button registerButton = new Button("Register", e -> getUI().ifPresent(ui -> ui.navigate("register")));
+        registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        registerButton.addClassName("login-register-button");
 
         H3 header = new H3("New to Flourish?");
+        header.addClassName("login-register-header");
 
-        registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-
-        registerButton.getStyle().set("cursor", "pointer");
         loginLayout.add(loginForm, header, registerButton);
         add(loginLayout);
 
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
-
-        //Store the user ID
-        loginForm.addLoginListener(e -> {
-            String username = e.getUsername();
-            userService.findByEmail(username).ifPresent(user -> {
-
-                VaadinSession.getCurrent().setAttribute("user", user);  // Set the user object in the session
-
-                VaadinSession.getCurrent().setAttribute("userId", user.getId()); // Store the user ID
-
-                UI.getCurrent().navigate("dashboard");
-            });
-        });
     }
 
+    /**
+     * Validates the provided credentials for correct formatting.
+     * Shows an error notification if they are invalid.
+     *
+     * @param username the provided username (email)
+     * @param password the provided password
+     */
     private void validateLogin(String username, String password) {
-        if(username == null || username.trim().isEmpty()){
+        if (username == null || username.trim().isEmpty()) {
             showErrorNotification("Email is required!");
         } else if (!username.contains("@")) {
-            showErrorNotification("Invalid email format. Please enter valid email!");
+            showErrorNotification("Invalid email format. Please enter a valid email!");
         } else if (password == null || password.trim().isEmpty()) {
             showErrorNotification("Password is required!");
         }
     }
 
-
-
+    /**
+     * Observes route navigation events. Displays an error if the route
+     * includes an "error" parameter, indicating a failed login attempt.
+     *
+     * @param event the BeforeEnterEvent containing route information
+     */
     @Override
-    public void beforeEnter(BeforeEnterEvent event){
-
-        // Access query parameters directly before rendering the view
+    public void beforeEnter(BeforeEnterEvent event) {
         Map<String, List<String>> queryParams = event.getLocation().getQueryParameters().getParameters();
-        System.out.println("Before Enter: Query params: " + queryParams);
-
-        // Handle the "error" query parameter
-        String query = queryParams.getOrDefault("error", List.of())
-                .stream()
-                .findFirst()
-                .orElse(null);
-        System.out.println("Before Enter: Query: " + query);
-
-
+        String query = queryParams.getOrDefault("error", List.of()).stream().findFirst().orElse(null);
         if (query != null) {
-            System.out.println("Wrong pass");
             loginForm.setError(true);
             showErrorNotification("Incorrect username or password");
         }
     }
-    private void showErrorNotification(String errorMessage) {
-        Notification notification = Notification.show(errorMessage,3000,Notification.Position.TOP_CENTER);
-        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        notification.open();
-    }
 
+    /**
+     * Displays an error notification with the specified message.
+     *
+     * @param errorMessage the error message to show
+     */
+    private void showErrorNotification(String errorMessage) {
+        Notification notification = Notification.show(errorMessage, 3000, Notification.Position.TOP_CENTER);
+        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+    }
 }

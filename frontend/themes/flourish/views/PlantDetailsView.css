@@ -1,0 +1,35 @@
+:host(.plant-details-view) {
+    width: 100%;
+    height: 100%;
+    background-color: var(--flourish-bg-color);
+    color: var(--flourish-text-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    padding: 2rem;
+}
+
+.plant-details-id-field {
+    margin-bottom: 1rem;
+    max-width: 200px;
+}
+
+.plant-details-fetch-button {
+    margin-bottom: 1.5rem;
+}
+
+.plant-details-form {
+    width: 100%;
+    max-width: 600px;
+    background-color: var(--flourish-surface-color);
+    padding: 1rem;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.plant-details-field {
+    width: 100%;
+    margin-bottom: 1rem;
+}

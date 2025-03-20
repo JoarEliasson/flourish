@@ -1,6 +1,7 @@
 package com.flourish.domain;
 
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Value;
 import java.time.LocalDateTime;
 
 /**
@@ -58,6 +59,9 @@ public class User {
      */
     private LocalDateTime resetTokenExpiry;
 
+    @Value("${user.default.imageUrl}")
+    private String profileImageUrl;
+
     protected User() {}
 
     public User(String firstName, String lastName, String email, String password, String role) {
@@ -66,6 +70,15 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public User(String firstName, String lastName, String email, String password, String role, String profileImageUrl) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.profileImageUrl = profileImageUrl;
     }
 
     public Long getId() {
@@ -131,4 +144,8 @@ public class User {
     public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
         this.resetTokenExpiry = resetTokenExpiry;
     }
+
+    public String getProfileImageUrl() {return profileImageUrl;}
+
+    public void setProfileImageUrl(String profileImageUrl) {this.profileImageUrl = profileImageUrl;}
 }

@@ -41,7 +41,6 @@ public class MailService {
      * @param token The token string to include in the message.
      * @throws MessagingException If sending fails due to mail server issues.
      *
-     * TODO: should return a boolean indicating success or failure
      */
     public void sendPasswordResetToken(String toEmail, String token) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();

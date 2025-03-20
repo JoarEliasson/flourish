@@ -2,6 +2,8 @@ package com.flourish.views;
 
 import com.flourish.domain.User;
 import com.flourish.domain.UserSettings;
+import com.flourish.service.UserService;
+import com.flourish.service.UserServiceImpl;
 import com.flourish.service.UserSettingsService;
 import java.util.Optional;
 import com.vaadin.flow.component.UI;
@@ -19,17 +21,21 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A view for Settings to view and edit the user's settings.
+ * Displays and edits user settings such as language and notifications.
  *
- * <p>This class allows authenticated users to view and update their settings,
- * such as language preference and notification preferences.</p>
+ * <p>Loads the user's existing settings, allows changes, and persists updates
+ * via {@link UserSettingsService}.</p>
+ *
+ * <p>Requires an authenticated user, otherwise redirects to login.</p>
+ *
+ * <p>Available at the route "settings" with {@code MainLayout}.</p>
  *
  * @author
- *   Kenan Al Tal
+ *   Kenan Al Tal, Joar Eliasson
  * @version
- *   1.0.0
+ *   1.1.0
  * @since
- *   2025-02-21
+ *   2025-03-14
  */
 @PageTitle("Settings")
 @Route(value = "settings", layout = MainLayout.class)
@@ -37,87 +43,117 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SettingsView extends VerticalLayout {
 
     private final UserSettingsService userSettingsService;
-    private final User user;
-    private Long userId;
-    private UserSettings userSettings;
-
+    private final Long userId;
+    private UserServiceImpl userService;
     private ComboBox<String> languageSelector;
     private Checkbox emailNotifications;
     private Checkbox notifications;
     private Checkbox loginNotifications;
     private Button saveChanges;
+    private Button deleteAccountButton;
 
 
     /**
-     * Constructs the SettingsView and initializes the UI components.
+     * Constructs a new SettingsView and initializes components.
      *
-     * <p>The User id is saved using VaadinSession</p>
-     *
-     * @param userSettingsService The service for handling user settings.
+     * @param userSettingsService the service managing user settings
      */
     @Autowired
-    public SettingsView(UserSettingsService userSettingsService) {
+    public SettingsView(UserSettingsService userSettingsService, UserServiceImpl userService) {
         this.userSettingsService = userSettingsService;
+        this.userService=userService;
+        addClassName("settings-view");
 
-        user = (User) VaadinSession.getCurrent().getAttribute("user");
+
+        User user = (User) VaadinSession.getCurrent().getAttribute("user");
         if (user == null) {
             Notification.show("You must be logged in to view your plants.", 3000, Notification.Position.TOP_CENTER);
             UI.getCurrent().navigate("login");
+            userId = null;
             return;
         }
-
         userId = user.getId();
 
-        setupUI();
+        createUI();
         loadUserSettings();
     }
 
     /**
-     * Sets up the UI components for the settings page.
+     * Creates and configures the UI components.
      */
-    private void setupUI() {
-        getStyle().set("background-color", "#e8f5e9").set("padding", "20px");
-
+    private void createUI() {
         H2 title = new H2("Settings");
-        title.getStyle().set("color", "#388e3c").set("font-size", "28px");
+        title.addClassName("settings-title");
 
         languageSelector = new ComboBox<>("Language");
         languageSelector.setItems("English");
-        languageSelector.setWidth("250px");
+        languageSelector.addClassName("settings-language");
 
         emailNotifications = new Checkbox("Enable Email Notifications");
+        emailNotifications.addClassName("settings-checkbox");
+
         notifications = new Checkbox("Enable In-App Notifications");
+        notifications.addClassName("settings-checkbox");
+
         loginNotifications = new Checkbox("Enable Login Notifications");
+        loginNotifications.addClassName("settings-checkbox");
 
         saveChanges = new Button("Save Changes", event -> saveUserSettings());
         saveChanges.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveChanges.getStyle().set("background-color", "#66bb6a").set("color", "white");
+        saveChanges.addClassName("settings-save-button");
 
-        add(title, languageSelector, emailNotifications, notifications, loginNotifications, saveChanges);
+        deleteAccountButton = new Button("Delete Account", event -> deleteAccount());
+        deleteAccountButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        deleteAccountButton.getStyle().set("margin-top", "20px");
+
+        add(title, languageSelector, emailNotifications, notifications, loginNotifications, saveChanges,deleteAccountButton);
     }
 
     /**
-     * Loads the current user's settings (saved in the database) and updates the UI components accordingly.
+     * Loads the user's current settings from the database and updates the UI.
      */
     private void loadUserSettings() {
         Optional<UserSettings> settingsOpt = userSettingsService.getUserSettings(userId);
-            userSettings = settingsOpt.get();
-            languageSelector.setValue(userSettings.getLanguage());
-            emailNotifications.setValue(userSettings.isEmailNotificationEnabled());
-            notifications.setValue(userSettings.isInAppNotificationEnabled());
-            loginNotifications.setValue(userSettings.isLoginNotificationEnabled());
+
+        if (settingsOpt.isPresent()) {
+            UserSettings settings = settingsOpt.get();
+            languageSelector.setValue(settings.getLanguage());
+            emailNotifications.setValue(settings.isEmailNotificationEnabled());
+            notifications.setValue(settings.isInAppNotificationEnabled());
+            loginNotifications.setValue(settings.isLoginNotificationEnabled());
+        } else {
+            Notification.show("No settings found for this user.", 3000, Notification.Position.TOP_CENTER);
+        }
     }
 
     /**
-     * Saves the user's updated settings to the database
+     * Saves the changes to user settings and displays a notification.
      */
     private void saveUserSettings() {
-        userSettings.setLanguage(languageSelector.getValue());
-        userSettings.setEmailNotificationEnabled(emailNotifications.getValue());
-        userSettings.setInAppNotificationEnabled(notifications.getValue());
-        userSettings.setLoginNotificationEnabled(loginNotifications.getValue());
-        userSettingsService.saveUserSettings(userSettings);
+        UserSettings userSettings = userSettingsService.getUserSettings(userId).orElse(null);
+        if (userSettings != null) {
+            userSettings.setLanguage(languageSelector.getValue());
+            userSettings.setEmailNotificationEnabled(emailNotifications.getValue());
+            userSettings.setInAppNotificationEnabled(notifications.getValue());
+            userSettings.setLoginNotificationEnabled(loginNotifications.getValue());
+            userSettingsService.saveUserSettings(userSettings);
+            Notification.show("Settings saved successfully.", 3000, Notification.Position.MIDDLE);
+        }
+    }
 
-        Notification.show("Settings saved successfully", 3000, Notification.Position.MIDDLE);
+    /**
+     * Deletes the user's account and clears the session.
+     * @author Zahraa Alqassab
+     * @since 2025-03-09
+     */
+    private void deleteAccount() {
+        try {
+            userService.deleteById(userId);
+            Notification.show("Your account has been deleted.", 3000, Notification.Position.TOP_CENTER);
+            VaadinSession.getCurrent().setAttribute("user", null);
+            UI.getCurrent().navigate("login");
+        } catch (Exception e) {
+            Notification.show("Error deleting account: " + e.getMessage(), 3000, Notification.Position.TOP_CENTER);
+        }
     }
 }

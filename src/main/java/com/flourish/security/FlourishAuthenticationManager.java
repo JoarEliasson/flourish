@@ -23,12 +23,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @since
  *   2025-02-15
  */
-public class MyAuthenticationManager implements AuthenticationManager {
+public class FlourishAuthenticationManager implements AuthenticationManager {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-    public MyAuthenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public FlourishAuthenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
     }

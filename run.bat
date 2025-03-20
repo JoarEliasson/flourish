@@ -1,4 +1,5 @@
 @echo off
-echo Starting Flourish Server...
+echo Running Flourish application...
 mvn spring-boot:run
+
 pause

@@ -1,0 +1,36 @@
+:host(.all-plants-view) {
+    display: block;
+    padding: 1.25rem;
+    background-color: var(--flourish-bg-color);
+    color: var(--flourish-text-color);
+    min-height: 100vh;
+}
+
+.all-plants-title {
+    margin-bottom: 1rem;
+    color: var(--flourish-secondary-color);
+}
+
+.all-plants-search {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.all-plants-grid {
+    width: 100%;
+    margin-top: 1rem;
+    border-radius: 6px;
+    background-color: var(--flourish-surface-color);
+}
+
+.all-plants-details-layout {
+    padding: 0.5rem;
+    background-color: var(--flourish-bg-color);
+    border-radius: 4px;
+}
+
+.all-plants-add-button {
+    background-color: var(--lumo-primary-color);
+    color: var(--flourish-contrast-text);
+    margin-top: 1rem;
+}

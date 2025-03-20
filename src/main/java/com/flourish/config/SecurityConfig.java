@@ -1,7 +1,7 @@
 package com.flourish.config;
 
-import com.flourish.security.MyAuthenticationManager;
-import com.flourish.security.MyCustomUserDetailsService;
+import com.flourish.security.FlourishAuthenticationManager;
+import com.flourish.security.FlourishUserDetailsService;
 import com.flourish.views.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
@@ -18,9 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * Configures Spring Security + Vaadin security using VaadinWebSecurity,
  * closely matching the official Vaadin docs approach.
  *
- * <p>We specify @Route("login") for the login view,
- * then call setLoginView(http, LoginView.class).
- * Unauthenticated users trying to access
+ * <p>The @Route("login") annotation in LoginView
+ * is matched by setLoginView(http, LoginView.class) here.
+ * This means unauthenticated users trying to access
  * other routes will be redirected to /login.</p>
  *
  * @author
@@ -33,14 +33,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityConfig extends VaadinWebSecurity {
 
-    private final MyCustomUserDetailsService myUserDetailsService;
+    private final FlourishUserDetailsService myUserDetailsService;
 
     /**
      * Constructs a new SecurityConfig with our custom DB-based UserDetailsService.
      *
      * @param myUserDetailsService a service that loads users from your MariaDB-based repository
      */
-    public SecurityConfig(MyCustomUserDetailsService myUserDetailsService) {
+    public SecurityConfig(FlourishUserDetailsService myUserDetailsService) {
         this.myUserDetailsService = myUserDetailsService;
     }
 
@@ -71,8 +71,8 @@ public class SecurityConfig extends VaadinWebSecurity {
     /**
      * Configures HTTP security using VaadinWebSecurity.
      *
-     * <p>We do not manually call .formLogin(). Instead, we rely on Vaadin
-     * to automatically set up /login as the login-processing URL
+     * <p>The .formLogin() method is not called manually.
+     * Instead, Vaadin automatically sets up /login as the login-processing URL
      * and /login as the route for login if you specify
      * {@code setLoginView(http, LoginView.class)}.</p>
      *
@@ -97,7 +97,7 @@ public class SecurityConfig extends VaadinWebSecurity {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        return new MyAuthenticationManager(myUserDetailsService, bCryptPasswordEncoder());
+        return new FlourishAuthenticationManager(myUserDetailsService, bCryptPasswordEncoder());
     }
 
     @Bean
