@@ -6,7 +6,6 @@
   min-height: var(--lumo-size-xl);
   box-sizing: border-box;
   background-color: var(--flourish-surface-color);
-}
 
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
@@ -49,4 +48,5 @@
   width: 140px;
   height: auto;
   object-fit: contain;
+
 }
